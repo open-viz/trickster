@@ -46,5 +46,5 @@ func main() {
 }
 
 func exitFatal() {
-	os.Exit(1)
+	panic(1)
 }

@@ -84,26 +84,45 @@ func (o *Options) Validate() (bool, error) {
 		return false, nil
 	}
 
-	_, err := os.ReadFile(o.FullChainCertPath)
-	if err != nil {
-		return false, err
+	if o.FullChainCertPath != "" {
+		_, err := os.ReadFile(o.FullChainCertPath)
+		if err != nil {
+			return false, err
+		}
 	}
-	_, err = os.ReadFile(o.PrivateKeyPath)
-	if err != nil {
-		return false, err
+
+	if o.PrivateKeyPath != "" {
+		_, err := os.ReadFile(o.PrivateKeyPath)
+		if err != nil {
+			return false, err
+		}
 	}
 
 	// Verify CA Paths
 	if o.CertificateAuthorityPaths != nil && len(o.CertificateAuthorityPaths) > 0 {
 		for _, path := range o.CertificateAuthorityPaths {
-			_, err = os.ReadFile(path)
+			_, err := os.ReadFile(path)
 			if err != nil {
 				return false, err
 			}
 		}
 	}
 
-	o.ServeTLS = true
+	if o.ClientCertPath != "" {
+		_, err := os.ReadFile(o.ClientCertPath)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	if o.ClientKeyPath != "" {
+		_, err := os.ReadFile(o.ClientKeyPath)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	o.ServeTLS = o.FullChainCertPath != "" && o.PrivateKeyPath != ""
 
 	return true, nil
 }

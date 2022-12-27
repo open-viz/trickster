@@ -31,9 +31,9 @@ func OptionsChanged(conf, oldConf *config.Config) bool {
 	}
 
 	for k, v := range oldConf.Backends {
-		if v.TLS != nil && v.TLS.ServeTLS {
+		if v.TLS != nil {
 			if o, ok := conf.Backends[k]; !ok ||
-				o.TLS == nil || !o.TLS.ServeTLS ||
+				o.TLS == nil ||
 				!o.TLS.Equal(v.TLS) {
 				return true
 			}
@@ -41,9 +41,9 @@ func OptionsChanged(conf, oldConf *config.Config) bool {
 	}
 
 	for k, v := range conf.Backends {
-		if v.TLS != nil && v.TLS.ServeTLS {
+		if v.TLS != nil {
 			if o, ok := oldConf.Backends[k]; !ok ||
-				o.TLS == nil || !o.TLS.ServeTLS ||
+				o.TLS == nil ||
 				!o.TLS.Equal(v.TLS) {
 				return true
 			}

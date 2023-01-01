@@ -37,7 +37,7 @@ import (
 	"github.com/trickstercache/trickster/v2/pkg/util/yamlx"
 
 	"github.com/gorilla/mux"
-	"gopkg.in/yaml.v2"
+	"sigs.k8s.io/yaml"
 )
 
 var restrictedOriginNames = map[string]interface{}{"": true, "frontend": true}

@@ -195,3 +195,25 @@ serve-debug:
 .PHONY: serve-info
 serve-info:
 	@cd cmd/trickster && go run . -config /etc/trickster/trickster.yaml --log-level info
+
+## Location to install dependencies to
+# BUILD_SUBDIR ?= $(shell pwd)/bin
+$(BUILD_SUBDIR):
+	mkdir -p $(BUILD_SUBDIR)
+
+## Tool Binaries
+CONTROLLER_GEN ?= $(BUILD_SUBDIR)/controller-gen
+
+## Tool Versions
+CONTROLLER_TOOLS_VERSION ?= v0.10.0
+
+.PHONY: generate2
+generate2: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./pkg/backends/options/..."
+
+
+.PHONY: controller-gen
+controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary. If wrong version is installed, it will be overwritten.
+$(CONTROLLER_GEN): $(BUILD_SUBDIR)
+	test -s $(BUILD_SUBDIR)/controller-gen && $(BUILD_SUBDIR)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
+	GOBIN=$(shell pwd)/$(BUILD_SUBDIR) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)

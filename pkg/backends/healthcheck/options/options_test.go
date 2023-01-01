@@ -23,7 +23,7 @@ import (
 
 	"github.com/trickstercache/trickster/v2/pkg/util/yamlx"
 
-	"gopkg.in/yaml.v2"
+	"sigs.k8s.io/yaml"
 )
 
 func TestNew(t *testing.T) {

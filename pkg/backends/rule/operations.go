@@ -21,18 +21,19 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/trickstercache/trickster/v2/pkg/encoding/base64"
 	"github.com/trickstercache/trickster/v2/pkg/checksum/md5"
 	"github.com/trickstercache/trickster/v2/pkg/checksum/sha1"
+	"github.com/trickstercache/trickster/v2/pkg/encoding/base64"
 )
 
-type operation string
-type operationFunc func(input string, arg string, negate bool) string
+type (
+	operation     string
+	operationFunc func(input string, arg string, negate bool) string
+)
 
 var compiledRegexes = make(map[string]*regexp.Regexp)
 
 var operationFuncs = map[operation]operationFunc{
-
 	"string-rmatch":   opStringRMatch,
 	"string-eq":       opStringEquality,
 	"string-contains": opStringContains,
@@ -57,7 +58,6 @@ var operationFuncs = map[operation]operationFunc{
 }
 
 func btos(t bool, negate bool) string {
-
 	if negate {
 		t = !t
 	}

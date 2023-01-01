@@ -33,7 +33,6 @@ func TestNew(t *testing.T) {
 }
 
 func TestCloneAndEqual(t *testing.T) {
-
 	o := New()
 	o2 := o.Clone()
 
@@ -44,13 +43,11 @@ func TestCloneAndEqual(t *testing.T) {
 	if o.Equal(nil) {
 		t.Error("expected false")
 	}
-
 }
 
 func TestSetDefaults(t *testing.T) {
-
 	// SetDefaults(metadata yamlx.KeyLookup,
-	//activeCaches map[string]interface{})
+	// activeCaches map[string]interface{})
 	// ([]string, error) {
 
 	o := New()
@@ -118,7 +115,6 @@ func TestSetDefaults(t *testing.T) {
 	if err != errMaxSizeBackoffObjectsTooBig {
 		t.Error(err)
 	}
-
 }
 
 const testYAML = `

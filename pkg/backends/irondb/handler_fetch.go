@@ -25,11 +25,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/trickstercache/trickster/v2/pkg/checksum/md5"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/engines"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/errors"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/urls"
 	"github.com/trickstercache/trickster/v2/pkg/timeseries"
-	"github.com/trickstercache/trickster/v2/pkg/checksum/md5"
 )
 
 // FetchHandler handles requests for numeric timeseries data with specified
@@ -43,8 +43,8 @@ func (c *Client) FetchHandler(w http.ResponseWriter, r *http.Request) {
 // provided Extent.
 func (c *Client) fetchHandlerSetExtent(r *http.Request,
 	trq *timeseries.TimeRangeQuery,
-	extent *timeseries.Extent) {
-
+	extent *timeseries.Extent,
+) {
 	if r == nil || extent == nil || (extent.Start.IsZero() && extent.End.IsZero()) {
 		return
 	}
@@ -87,7 +87,8 @@ func (c *Client) fetchHandlerSetExtent(r *http.Request,
 // fetchHandlerParseTimeRangeQuery parses the key parts of a TimeRangeQuery
 // from the inbound HTTP Request.
 func (c *Client) fetchHandlerParseTimeRangeQuery(
-	r *http.Request) (*timeseries.TimeRangeQuery, error) {
+	r *http.Request,
+) (*timeseries.TimeRangeQuery, error) {
 	trq := &timeseries.TimeRangeQuery{}
 
 	b, err := io.ReadAll(r.Body)
@@ -124,7 +125,8 @@ func (c *Client) fetchHandlerParseTimeRangeQuery(
 // fetchHandlerDeriveCacheKey calculates a query-specific keyname based on the
 // user request.
 func (c *Client) fetchHandlerDeriveCacheKey(path string, params url.Values,
-	headers http.Header, body io.ReadCloser, extra string) (string, io.ReadCloser) {
+	headers http.Header, body io.ReadCloser, extra string,
+) (string, io.ReadCloser) {
 	var sb strings.Builder
 	sb.WriteString(path)
 	newBody := &bytes.Buffer{}

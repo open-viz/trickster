@@ -205,7 +205,6 @@ func StreamLogger(w io.Writer, logLevel string) *Logger {
 
 // ConsoleLogger returns a Logger object that prints log events to the Console
 func ConsoleLogger(logLevel string) *Logger {
-
 	l := noopLogger()
 	wr := os.Stdout
 	l.baseLogger = gkl.NewLogfmtLogger(gkl.NewSyncWriter(wr))
@@ -243,7 +242,6 @@ func (tl *Logger) SetLogLevel(logLevel string) {
 // returned Logger will write to files distinguished from other Loggers by the
 // instance string.
 func New(conf *config.Config) *Logger {
-
 	l := noopLogger()
 	var wr io.Writer
 

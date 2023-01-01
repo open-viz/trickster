@@ -47,7 +47,6 @@ type Cache struct {
 
 // New returns a new bbolt cache as a Trickster Cache Interface type
 func New(fileName, bucketName string) (cache.Cache, error) {
-
 	c := &Cache{}
 
 	c.SetLocker(locks.NewNamedLocker())
@@ -86,7 +85,7 @@ func (c *Cache) Connect() error {
 	c.lockPrefix = c.Name + ".bbolt."
 
 	var err error
-	c.dbh, err = bbolt.Open(c.Config.BBolt.Filename, 0644, &bbolt.Options{Timeout: 1 * time.Second})
+	c.dbh, err = bbolt.Open(c.Config.BBolt.Filename, 0o644, &bbolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return err
 	}
@@ -118,13 +117,14 @@ func (c *Cache) storeNoIndex(cacheKey string, data []byte) {
 	err := c.store(cacheKey, data, 31536000*time.Second, false)
 	if err != nil {
 		tl.Error(c.Logger, "cache failed to write non-indexed object",
-			tl.Pairs{"cacheName": c.Name, "cacheProvider": "bbolt",
-				"cacheKey": cacheKey, "objectSize": len(data)})
+			tl.Pairs{
+				"cacheName": c.Name, "cacheProvider": "bbolt",
+				"cacheKey": cacheKey, "objectSize": len(data),
+			})
 	}
 }
 
 func (c *Cache) store(cacheKey string, data []byte, ttl time.Duration, updateIndex bool) error {
-
 	var exp time.Time
 	if ttl > 0 {
 		exp = time.Now().Add(ttl)
@@ -161,8 +161,8 @@ func (c *Cache) Retrieve(cacheKey string, allowExpired bool) ([]byte, status.Loo
 }
 
 func (c *Cache) retrieve(cacheKey string, allowExpired bool,
-	atime bool) ([]byte, status.LookupStatus, error) {
-
+	atime bool,
+) ([]byte, status.LookupStatus, error) {
 	nl, _ := c.locker.RAcquire(c.lockPrefix + cacheKey)
 	var data []byte
 	err := c.dbh.View(func(tx *bbolt.Tx) error {

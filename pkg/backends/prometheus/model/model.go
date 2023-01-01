@@ -60,13 +60,11 @@ func (e *Envelope) StartMarshal(w io.Writer, httpStatus int) {
 
 	if len(e.Warnings) > 0 {
 		w.Write([]byte(fmt.Sprintf(`,"warnings":["%s"]`, strings.Join(e.Warnings, `","`))))
-
 	}
 }
 
 // Merge combines the passed envelope data with the subject data
 func (e *Envelope) Merge(e2 *Envelope) {
-
 	if e2.Error != "" {
 		e.Warnings = append(e.Warnings, e2.Error)
 	}
@@ -81,5 +79,4 @@ func (e *Envelope) Merge(e2 *Envelope) {
 		e.Warnings = append(e.Warnings, e.Error)
 		e.Error = ""
 	}
-
 }

@@ -135,7 +135,7 @@ func (ds *DataSet) CroppedClone(e timeseries.Extent) timeseries.Timeseries {
 				sc := &Series{
 					Header: s2.Header.Clone(),
 				}
-				var start, end, l = 0, -1, len(s2.Points)
+				start, end, l := 0, -1, len(s2.Points)
 				var iwg sync.WaitGroup
 				iwg.Add(2)
 				go func() {
@@ -214,7 +214,6 @@ func (ds *DataSet) Merge(sortSeries bool, collection ...timeseries.Timeseries) {
 
 // DefaultMerger is the default Merger function
 func (ds *DataSet) DefaultMerger(sortSeries bool, collection ...timeseries.Timeseries) {
-
 	ds.UpdateLock.Lock()
 	defer ds.UpdateLock.Unlock()
 
@@ -412,7 +411,7 @@ func (ds *DataSet) DefaultRangeCropper(e timeseries.Extent) {
 			}
 			wg.Add(1)
 			go func(s2 *Series) {
-				var start, end, l = 0, -1, len(s2.Points)
+				start, end, l := 0, -1, len(s2.Points)
 				var iwg sync.WaitGroup
 				iwg.Add(2)
 				go func() {

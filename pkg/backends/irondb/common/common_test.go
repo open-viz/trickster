@@ -54,5 +54,4 @@ func TestParseTimestamp(t *testing.T) {
 	if err == nil {
 		t.Fatalf("expected error: %s", "parse timestamp")
 	}
-
 }

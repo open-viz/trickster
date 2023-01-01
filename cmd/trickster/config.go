@@ -44,12 +44,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var cfgLock = &sync.Mutex{}
-var hc healthcheck.HealthChecker
+var (
+	cfgLock = &sync.Mutex{}
+	hc      healthcheck.HealthChecker
+)
 
 func runConfig(oldConf *config.Config, wg *sync.WaitGroup, logger *tl.Logger,
-	oldCaches map[string]cache.Cache, args []string, errorFunc func()) error {
-
+	oldCaches map[string]cache.Cache, args []string, errorFunc func(),
+) error {
 	metrics.BuildInfo.WithLabelValues(goruntime.Version(),
 		applicationGitCommitID, applicationVersion).Set(1)
 
@@ -93,12 +95,11 @@ func runConfig(oldConf *config.Config, wg *sync.WaitGroup, logger *tl.Logger,
 	}
 
 	return applyConfig(conf, oldConf, wg, logger, oldCaches, args, errorFunc)
-
 }
 
 func applyConfig(conf, oldConf *config.Config, wg *sync.WaitGroup, logger *tl.Logger,
-	oldCaches map[string]cache.Cache, args []string, errorFunc func()) error {
-
+	oldCaches map[string]cache.Cache, args []string, errorFunc func(),
+) error {
 	if conf == nil {
 		return nil
 	}
@@ -118,7 +119,7 @@ func applyConfig(conf, oldConf *config.Config, wg *sync.WaitGroup, logger *tl.Lo
 		tl.Warn(logger, w, tl.Pairs{})
 	}
 
-	//Register Tracing Configurations
+	// Register Tracing Configurations
 	tracers, err := tr.RegisterAll(conf, logger, false)
 	if err != nil {
 		handleStartupIssue("tracing registration failed", tl.Pairs{"detail": err.Error()},
@@ -132,7 +133,7 @@ func applyConfig(conf, oldConf *config.Config, wg *sync.WaitGroup, logger *tl.Lo
 
 	router.HandleFunc(conf.Main.PingHandlerPath, handlers.PingHandleFunc(conf)).Methods(http.MethodGet)
 
-	var caches = applyCachingConfig(conf, oldConf, logger, oldCaches)
+	caches := applyCachingConfig(conf, oldConf, logger, oldCaches)
 	rh := handlers.ReloadHandleFunc(runConfig, conf, wg, logger, caches, args)
 
 	o, err := routing.RegisterProxyRoutes(conf, router, mr, caches, tracers, logger, false)
@@ -161,12 +162,12 @@ func applyConfig(conf, oldConf *config.Config, wg *sync.WaitGroup, logger *tl.Lo
 		oldConf.Resources.QuitChan <- true // this signals the old hup monitor goroutine to exit
 	}
 	startHupMonitor(conf, wg, logger, caches, args)
+	startKubeController(conf, wg, logger, caches, args)
 
 	return nil
 }
 
 func applyLoggingConfig(c, o *config.Config, oldLog *tl.Logger) *tl.Logger {
-
 	if c == nil || c.Logging == nil {
 		return oldLog
 	}
@@ -202,8 +203,8 @@ func applyLoggingConfig(c, o *config.Config, oldLog *tl.Logger) *tl.Logger {
 }
 
 func applyCachingConfig(c, oc *config.Config, logger *tl.Logger,
-	oldCaches map[string]cache.Cache) map[string]cache.Cache {
-
+	oldCaches map[string]cache.Cache,
+) map[string]cache.Cache {
 	if c == nil {
 		return nil
 	}
@@ -306,12 +307,11 @@ func handleStartupIssue(event string, detail tl.Pairs, logger *tl.Logger, errorF
 }
 
 func validateConfig(conf *config.Config) error {
-
 	for _, w := range conf.LoaderWarnings {
 		fmt.Println(w)
 	}
 
-	var caches = make(map[string]cache.Cache)
+	caches := make(map[string]cache.Cache)
 	for k := range conf.Caches {
 		caches[k] = nil
 	}

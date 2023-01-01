@@ -25,7 +25,6 @@ import (
 )
 
 func TestNew(t *testing.T) {
-
 	hc := New()
 	if hc == nil {
 		t.Error("expected non-nil")
@@ -121,7 +120,6 @@ func TestStatus(t *testing.T) {
 }
 
 func TestStatuses(t *testing.T) {
-
 	hc := New().(*healthChecker)
 	o := ho.New()
 	o.IntervalMS = 500
@@ -137,7 +135,6 @@ func TestStatuses(t *testing.T) {
 }
 
 func TestHealthCheckerProbe(t *testing.T) {
-
 	hc := New().(*healthChecker)
 	o := ho.New()
 

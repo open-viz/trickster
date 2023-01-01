@@ -192,7 +192,8 @@ func (o *Options) Merge(o2 *Options) {
 	o.Custom = strutil.Unique(o.Custom)
 }
 
-var pathMembers = []string{"path", "match_type", "handler", "methods", "cache_key_params",
+var pathMembers = []string{
+	"path", "match_type", "handler", "methods", "cache_key_params",
 	"cache_key_headers", "default_ttl_ms", "request_headers", "response_headers",
 	"response_headers", "response_code", "response_body", "no_metrics", "collapsed_forwarding",
 	"req_rewriter_name",
@@ -236,8 +237,7 @@ func SetDefaults(
 			if _, ok := forwarding.CollapsedForwardingTypeNames[p.CollapsedForwardingName]; !ok {
 				return fmt.Errorf("invalid collapsed_forwarding name: %s", p.CollapsedForwardingName)
 			}
-			p.CollapsedForwardingType =
-				forwarding.GetCollapsedForwardingType(p.CollapsedForwardingName)
+			p.CollapsedForwardingType = forwarding.GetCollapsedForwardingType(p.CollapsedForwardingName)
 		} else {
 			p.CollapsedForwardingType = forwarding.CFTypeBasic
 		}

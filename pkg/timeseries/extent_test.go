@@ -19,7 +19,6 @@ package timeseries
 import "testing"
 
 func TestStartsAtOrAfter(t *testing.T) {
-
 	e := Extent{Start: t101, End: t200}
 	if !e.StartsAtOrAfter(t100) {
 		t.Error(("expected true"))
@@ -28,11 +27,9 @@ func TestStartsAtOrAfter(t *testing.T) {
 	if e.StartsAtOrAfter(t200) {
 		t.Error(("expected false"))
 	}
-
 }
 
 func TestEndsAtOrBefore(t *testing.T) {
-
 	e := Extent{Start: t101, End: t200}
 	if e.EndsAtOrBefore(t100) {
 		t.Error(("expected false"))
@@ -41,7 +38,6 @@ func TestEndsAtOrBefore(t *testing.T) {
 	if !e.EndsAtOrBefore(t201) {
 		t.Error(("expected true"))
 	}
-
 }
 
 // // StartsAtOrAfter returns true if t is equal to or after the Extent's start time

@@ -27,7 +27,6 @@ import (
 )
 
 func TestQueryHandler(t *testing.T) {
-
 	const expected = `{"status":"ok","data":{"resultType":"vector","result":[]}}`
 
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)

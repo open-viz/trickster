@@ -35,7 +35,6 @@ const (
 
 // SetExtent will change the upstream request query to use the provided Extent
 func (c *Client) SetExtent(r *http.Request, trq *timeseries.TimeRangeQuery, extent *timeseries.Extent) {
-
 	if extent == nil || r == nil || trq == nil {
 		return
 	}
@@ -50,11 +49,9 @@ func (c *Client) SetExtent(r *http.Request, trq *timeseries.TimeRangeQuery, exte
 		qi.Set(upQuery, sqlQuery)
 		r.URL.RawQuery = qi.Encode()
 	}
-
 }
 
 func interpolateTimeQuery(template string, tsFieldName string, timeFormat int, extent *timeseries.Extent, step time.Duration) string {
-
 	var start, end int64
 
 	switch timeFormat {

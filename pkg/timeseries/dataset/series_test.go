@@ -52,7 +52,6 @@ func TestString(t *testing.T) {
 	if sl.String() != expected {
 		t.Errorf("expected %s got %s", expected, sl.String())
 	}
-
 }
 
 func testSeriesHeader() SeriesHeader {
@@ -83,15 +82,13 @@ func TestSeriesHeaderClone(t *testing.T) {
 	sh := testSeriesHeader()
 	sh2 := sh.Clone()
 	if sh2.Size != sh.Size ||
-		len(sh2.FieldsList) != 1 || //len(sh2.FieldsLookup) != 1 ||
+		len(sh2.FieldsList) != 1 || // len(sh2.FieldsLookup) != 1 ||
 		sh2.FieldsList[0].Name != "Field1" {
 		t.Error("series header clone mismatch")
 	}
-
 }
 
 func TestSeriesClone(t *testing.T) {
-
 	s := testSeries()
 	s2 := s.Clone()
 
@@ -102,5 +99,4 @@ func TestSeriesClone(t *testing.T) {
 	if s2.Points[0].Epoch != s.Points[0].Epoch {
 		t.Error("series clone mismatch")
 	}
-
 }

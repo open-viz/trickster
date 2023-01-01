@@ -61,8 +61,10 @@ func (c *Cache) Configuration() *options.Options {
 
 // Connect instantiates the Cache mutex map and starts the Expired Entry Reaper goroutine
 func (c *Cache) Connect() error {
-	tl.Info(c.Logger, "filesystem cache setup", tl.Pairs{"name": c.Name,
-		"cachePath": c.Config.Filesystem.CachePath})
+	tl.Info(c.Logger, "filesystem cache setup", tl.Pairs{
+		"name":      c.Name,
+		"cachePath": c.Config.Filesystem.CachePath,
+	})
 	if err := makeDirectory(c.Config.Filesystem.CachePath); err != nil {
 		return err
 	}
@@ -84,13 +86,14 @@ func (c *Cache) storeNoIndex(cacheKey string, data []byte) {
 	err := c.store(cacheKey, data, 31536000*time.Second, false)
 	if err != nil {
 		tl.Error(c.Logger,
-			"cache failed to write non-indexed object", tl.Pairs{"cacheName": c.Name,
-				"cacheProvider": "filesystem", "cacheKey": cacheKey, "objectSize": len(data)})
+			"cache failed to write non-indexed object", tl.Pairs{
+				"cacheName":     c.Name,
+				"cacheProvider": "filesystem", "cacheKey": cacheKey, "objectSize": len(data),
+			})
 	}
 }
 
 func (c *Cache) store(cacheKey string, data []byte, ttl time.Duration, updateIndex bool) error {
-
 	if ttl < 1 {
 		return fmt.Errorf("invalid ttl: %d", int64(ttl.Seconds()))
 	}
@@ -106,7 +109,7 @@ func (c *Cache) store(cacheKey string, data []byte, ttl time.Duration, updateInd
 	nl, _ := c.locker.Acquire(c.lockPrefix + cacheKey)
 
 	o := &index.Object{Key: cacheKey, Value: data, Expiration: time.Now().Add(ttl)}
-	err := os.WriteFile(dataFile, o.ToBytes(), os.FileMode(0777))
+	err := os.WriteFile(dataFile, o.ToBytes(), os.FileMode(0o777))
 	if err != nil {
 		nl.Release()
 		return err
@@ -126,7 +129,6 @@ func (c *Cache) Retrieve(cacheKey string, allowExpired bool) ([]byte, status.Loo
 }
 
 func (c *Cache) retrieve(cacheKey string, allowExpired bool, atime bool) ([]byte, status.LookupStatus, error) {
-
 	dataFile := c.getFileName(cacheKey)
 
 	nl, _ := c.locker.RAcquire(c.lockPrefix + cacheKey)
@@ -217,7 +219,7 @@ func (c *Cache) getFileName(cacheKey string) string {
 
 // makeDirectory creates a directory on the filesystem and returns the error in the event of a failure.
 func makeDirectory(path string) error {
-	err := os.MkdirAll(path, 0755)
+	err := os.MkdirAll(path, 0o755)
 	if err == nil {
 		s := ""
 		if !strings.HasSuffix(path, "/") {
@@ -225,7 +227,7 @@ func makeDirectory(path string) error {
 		}
 		// verify writability by attempting to touch a test file in the cache path
 		tf := path + s + ".test." + strconv.FormatInt(time.Now().Unix(), 10)
-		err = os.WriteFile(tf, []byte(""), 0600)
+		err = os.WriteFile(tf, []byte(""), 0o600)
 		if err == nil {
 			os.Remove(tf)
 		}

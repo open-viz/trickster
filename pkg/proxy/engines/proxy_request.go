@@ -147,7 +147,6 @@ func (pr *proxyRequest) Clone() *proxyRequest {
 // Fetch makes an HTTP request to the provided Origin URL, bypassing the Cache, and returns the
 // response and elapsed time to the caller.
 func (pr *proxyRequest) Fetch() ([]byte, *http.Response, time.Duration) {
-
 	rsc := request.GetResources(pr.upstreamRequest)
 	o := rsc.BackendOptions
 	pc := rsc.PathConfig
@@ -182,7 +181,6 @@ func (pr *proxyRequest) Fetch() ([]byte, *http.Response, time.Duration) {
 }
 
 func (pr *proxyRequest) prepareRevalidationRequest() {
-
 	rsc := request.GetResources(pr.upstreamRequest)
 	pr.revalidation = RevalStatusInProgress
 	pr.revalidationRequest = request.SetResources(pr.upstreamRequest.Clone(context.Background()),
@@ -190,8 +188,7 @@ func (pr *proxyRequest) prepareRevalidationRequest() {
 
 	_, span := tspan.NewChildSpan(pr.revalidationRequest.Context(), rsc.Tracer, "FetchRevlidation")
 	if span != nil {
-		pr.revalidationRequest =
-			pr.revalidationRequest.WithContext(trace.ContextWithSpan(pr.revalidationRequest.Context(), span))
+		pr.revalidationRequest = pr.revalidationRequest.WithContext(trace.ContextWithSpan(pr.revalidationRequest.Context(), span))
 		defer span.End()
 	}
 
@@ -235,7 +232,6 @@ func (pr *proxyRequest) prepareRevalidationRequest() {
 		pr.revalidationRequest.Header.Set(headers.NameIfModifiedSince,
 			pr.cachingPolicy.LastModified.UTC().Format(time.RFC1123))
 	}
-
 }
 
 func (pr *proxyRequest) setRangeHeader(h http.Header) {
@@ -246,7 +242,6 @@ func (pr *proxyRequest) setRangeHeader(h http.Header) {
 }
 
 func (pr *proxyRequest) prepareUpstreamRequests() {
-
 	pr.setRangeHeader(pr.upstreamRequest.Header)
 
 	pr.stripConditionalHeaders()
@@ -274,7 +269,6 @@ func (pr *proxyRequest) prepareUpstreamRequests() {
 }
 
 func (pr *proxyRequest) makeUpstreamRequests() error {
-
 	wg := sync.WaitGroup{}
 
 	rsc := request.GetResources(pr.Request)
@@ -369,7 +363,6 @@ func (pr *proxyRequest) writeResponseHeader() {
 }
 
 func (pr *proxyRequest) setBodyWriter() {
-
 	if !pr.isPCF {
 		pr.mapLock.Lock()
 		PrepareResponseWriter(pr.responseWriter, pr.upstreamResponse.StatusCode, pr.upstreamResponse.Header)
@@ -402,7 +395,6 @@ func (pr *proxyRequest) writeResponseBody() {
 }
 
 func (pr *proxyRequest) determineCacheability() {
-
 	rsc := request.GetResources(pr.Request)
 	resp := pr.upstreamResponse
 
@@ -432,8 +424,10 @@ func (pr *proxyRequest) determineCacheability() {
 
 	if rsc.AlternateCacheTTL > 0 {
 		pr.writeToCache = true
-		pr.cachingPolicy = &CachingPolicy{LocalDate: time.Now(),
-			FreshnessLifetime: int(rsc.AlternateCacheTTL.Seconds())}
+		pr.cachingPolicy = &CachingPolicy{
+			LocalDate:         time.Now(),
+			FreshnessLifetime: int(rsc.AlternateCacheTTL.Seconds()),
+		}
 		return
 	}
 
@@ -447,7 +441,6 @@ func (pr *proxyRequest) determineCacheability() {
 }
 
 func (pr *proxyRequest) store() error {
-
 	if !pr.writeToCache || pr.cacheDocument == nil {
 		return nil
 	}
@@ -484,7 +477,6 @@ func (pr *proxyRequest) store() error {
 }
 
 func (pr *proxyRequest) updateContentLength() {
-
 	resp := pr.upstreamResponse
 	if resp == nil || pr.responseBody == nil || pr.upstreamResponse.StatusCode > 299 {
 		return
@@ -498,7 +490,6 @@ func (pr *proxyRequest) updateContentLength() {
 }
 
 func (pr *proxyRequest) prepareResponse() {
-
 	pr.cachingPolicy.ResolveClientConditionals(pr.cacheStatus)
 
 	d := pr.cacheDocument
@@ -566,13 +557,11 @@ func (pr *proxyRequest) prepareResponse() {
 	}
 
 	pr.updateContentLength()
-
 }
 
 // reconstitute will arrange and process multiple responses so that
 // we have just one response for the initial request
 func (pr *proxyRequest) reconstituteResponses() {
-
 	hasRevalidationRequest := pr.revalidationRequest != nil
 
 	var wasRevalidated bool
@@ -737,5 +726,4 @@ func (pr *proxyRequest) reconstituteResponses() {
 		pr.mapLock.Unlock()
 
 	}
-
 }

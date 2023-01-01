@@ -66,7 +66,8 @@ func (hc *healthChecker) Shutdown() {
 }
 
 func (hc *healthChecker) Register(name, description string, o *ho.Options,
-	client *http.Client, logger interface{}) (*Status, error) {
+	client *http.Client, logger interface{},
+) (*Status, error) {
 	if o == nil {
 		return nil, ho.ErrNoOptionsProvided
 	}

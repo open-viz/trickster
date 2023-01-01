@@ -5,7 +5,6 @@ import (
 )
 
 func TestEqual(t *testing.T) {
-
 	sl := SeriesList{testSeries()}
 	if sl.Equal(nil) {
 		t.Error("expected false")
@@ -19,11 +18,9 @@ func TestEqual(t *testing.T) {
 	if sl.Equal(sl2) {
 		t.Error("expected false")
 	}
-
 }
 
 func TestListMerge(t *testing.T) {
-
 	sl := SeriesList{testSeries()}
 	if sl.Equal(nil) {
 		t.Error("expected false")
@@ -37,5 +34,4 @@ func TestListMerge(t *testing.T) {
 	if len(sl) != 2 {
 		t.Error("expected 2 got", len(sl))
 	}
-
 }

@@ -29,7 +29,6 @@ import (
 // Trace attaches a Tracer to an HTTP request
 func Trace(tr *tracing.Tracer, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		r, span := tspan.PrepareRequest(r, tr)
 		if span != nil {
 			defer span.End()

@@ -44,7 +44,6 @@ func TestDefaultWrite(t *testing.T) {
 }
 
 func TestProcessVectorTransformations(t *testing.T) {
-
 	c := &Client{}
 	w := httptest.NewRecorder()
 	r, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
@@ -58,5 +57,4 @@ func TestProcessVectorTransformations(t *testing.T) {
 	if w.Code != 200 {
 		t.Errorf("expected %d got %d", 200, w.Code)
 	}
-
 }

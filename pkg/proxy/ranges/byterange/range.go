@@ -41,8 +41,10 @@ type Range struct {
 // Good: [ 1-10, 21-30, 35-40 ]; Bad: [ 1-10, 10-20 ]; Bad: [ 1-10, 5-20 ]
 type Ranges []Range
 
-const byteRequestRangePrefix = "bytes="
-const byteResponsRangePrefix = "bytes "
+const (
+	byteRequestRangePrefix = "bytes="
+	byteResponsRangePrefix = "bytes "
+)
 
 var respRE *regexp.Regexp
 
@@ -51,7 +53,6 @@ func init() {
 }
 
 func (br Range) String() string {
-
 	var start string
 	var end string
 	if br.Start >= 0 {
@@ -96,7 +97,6 @@ func (brs Ranges) String() string {
 
 // CalculateDelta calculates the delta between two Ranges
 func (brs Ranges) CalculateDelta(haves Ranges, fullContentLength int64) Ranges {
-
 	checkpoint := int64(-1)
 	if len(brs) == 0 {
 		return haves
@@ -249,8 +249,8 @@ func ParseRangeHeader(input string) Ranges {
 			return nil
 		}
 
-		var start = int64(-1)
-		var end = int64(-1)
+		start := int64(-1)
+		end := int64(-1)
 		var err error
 
 		if j > 0 {

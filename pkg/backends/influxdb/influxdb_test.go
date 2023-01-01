@@ -30,7 +30,6 @@ import (
 var testModeler = model.NewModeler()
 
 func TestInfluxDBClientInterfacing(t *testing.T) {
-
 	// this test ensures the client will properly conform to the
 	// Client and TimeseriesBackend interfaces
 
@@ -52,7 +51,6 @@ func TestInfluxDBClientInterfacing(t *testing.T) {
 }
 
 func TestNewClient(t *testing.T) {
-
 	conf, _, err := config.Load("trickster", "test", []string{"-provider", "influxdb", "-origin-url", "http://1"})
 	if err != nil {
 		t.Fatalf("Could not load configuration: %s", err.Error())

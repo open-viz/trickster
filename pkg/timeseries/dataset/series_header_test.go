@@ -25,7 +25,6 @@ func testHeader() *SeriesHeader {
 }
 
 func TestCalculateSeriesHeaderSize(t *testing.T) {
-
 	const expected = 492
 	sh := testHeader()
 	i := sh.CalculateSize()
@@ -35,11 +34,9 @@ func TestCalculateSeriesHeaderSize(t *testing.T) {
 }
 
 func TestSeriesHeaderString(t *testing.T) {
-
 	const expected = `{"name":"test","query":"SELECT TRICKSTER!","tags":"tag1=value1;tag2=trickster","fields":["time","value1"],"timestampIndex":0}`
 
 	if s := testHeader().String(); s != expected {
 		t.Errorf("expected %s got %s", expected, s)
 	}
-
 }

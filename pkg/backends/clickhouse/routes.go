@@ -25,7 +25,6 @@ import (
 )
 
 func (c *Client) RegisterHandlers(map[string]http.Handler) {
-
 	c.TimeseriesBackend.RegisterHandlers(
 		map[string]http.Handler{
 			// This is the registry of handlers that Trickster supports for ClickHouse,

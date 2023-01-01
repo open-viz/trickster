@@ -24,7 +24,6 @@ import (
 )
 
 func TestMechsToFuncs(t *testing.T) {
-
 	m := mechsToFuncs()
 	if len(m) != 5 {
 		t.Errorf("expected %d got %d", 5, len(m))
@@ -33,17 +32,14 @@ func TestMechsToFuncs(t *testing.T) {
 	if _, ok := m[RoundRobin]; !ok {
 		t.Error("expected true")
 	}
-
 }
 
 func TestNext(t *testing.T) {
-
 	p := &pool{f: testNextFunc}
 	l := p.Next()
 	if len(l) != 1 {
 		t.Errorf("expected %d got %d", 1, len(l))
 	}
-
 }
 
 func testNextFunc(p *pool) []http.Handler {
@@ -59,7 +55,6 @@ func TestNewTarget(t *testing.T) {
 }
 
 func TestNewPool(t *testing.T) {
-
 	p := New(83, nil, 0)
 	if p != nil {
 		t.Error("expected nil pool")
@@ -75,5 +70,4 @@ func TestNewPool(t *testing.T) {
 	if p == nil {
 		t.Error("expected non-nil")
 	}
-
 }

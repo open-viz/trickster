@@ -11,7 +11,6 @@ import (
 )
 
 func TestStartHupMonitor(t *testing.T) {
-
 	// passing case for this test is no panics or hangs
 
 	w := httptest.NewRecorder()

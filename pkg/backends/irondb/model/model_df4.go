@@ -110,7 +110,8 @@ func (se *DF4SeriesEnvelope) CroppedClone(e timeseries.Extent) timeseries.Timese
 // Merge merges the provided Timeseries list into the base Timeseries (in the
 // order provided) and optionally sorts the merged Timeseries.
 func (se *DF4SeriesEnvelope) Merge(sort bool,
-	collection ...timeseries.Timeseries) {
+	collection ...timeseries.Timeseries,
+) {
 	for _, ts := range collection {
 		if ts != nil && ts.Step() == se.Step() {
 			if se2, ok := ts.(*DF4SeriesEnvelope); ok {
@@ -299,7 +300,8 @@ func (se *DF4SeriesEnvelope) CropToRange(e timeseries.Extent) {
 // to support backfill tolerance. The provided extent will be marked as used
 // during crop.
 func (se *DF4SeriesEnvelope) CropToSize(sz int, t time.Time,
-	lur timeseries.Extent) {
+	lur timeseries.Extent,
+) {
 	// The Series has no extents, so no need to do anything.
 	if len(se.ExtentList) < 1 {
 		se.Data = [][]interface{}{}

@@ -25,7 +25,6 @@ import (
 )
 
 func TestCheckHealth(t *testing.T) {
-
 	ctx, cancel := context.WithCancel(context.Background())
 
 	// s, _, _, c, err := testutil.NewTestInstance("", nil, 200, "pass",
@@ -50,7 +49,6 @@ func TestCheckHealth(t *testing.T) {
 	if len(p.healthy) != 1 {
 		t.Errorf("expected %d got %d", 0, len(p.healthy))
 	}
-
 }
 
 // // NewTarget returns a new Target using the provided inputs

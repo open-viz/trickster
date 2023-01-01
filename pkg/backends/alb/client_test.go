@@ -28,7 +28,6 @@ import (
 )
 
 func TestHandlers(t *testing.T) {
-
 	a := &ao.Options{
 		MechanismName: "fr",
 		OutputFormat:  "prometheus",
@@ -68,7 +67,6 @@ func TestHandlers(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestDefaultPathConfigs(t *testing.T) {
@@ -130,11 +128,9 @@ func TestValidatePools(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestValidateAndStartPool(t *testing.T) {
-
 	o := bo.New()
 	o.ALBOptions = nil
 	tscl, _ := NewClient("test", o, nil, nil, nil, nil)
@@ -174,5 +170,4 @@ func TestValidateAndStartPool(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }

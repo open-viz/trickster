@@ -30,7 +30,6 @@ import (
 )
 
 func TestMarshalTimeseries(t *testing.T) {
-
 	_, err := MarshalTimeseries(nil, nil, 200)
 	if err != timeseries.ErrUnknownFormat {
 		t.Error("expected ErrUnknownFormat got", err)
@@ -81,20 +80,16 @@ func TestMarshalTimeseries(t *testing.T) {
 	if !strings.HasPrefix(w.Header().Get(headers.NameContentType), headers.ValueApplicationCSV) {
 		t.Error("expected CSV content type header")
 	}
-
 }
 
 func TestMarshalTimeseriesJSON(t *testing.T) {
-
 	err := marshalTimeseriesJSON(nil, nil, 200, nil)
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestWriteEpochTime(t *testing.T) {
-
 	now := time.Now()
 	w := httptest.NewRecorder()
 	writeEpochTime(w, epoch.Epoch(now.UnixNano()), 1000000)
@@ -108,11 +103,9 @@ func TestWriteEpochTime(t *testing.T) {
 	if string(b) != expected {
 		t.Errorf("expected %s got %s", expected, string(b))
 	}
-
 }
 
 func TestWriteValue(t *testing.T) {
-
 	tests := []struct {
 		val         interface{}
 		nilVal      string
@@ -173,7 +166,6 @@ func TestWriteValue(t *testing.T) {
 }
 
 func TestWriteCSVValue(t *testing.T) {
-
 	tests := []struct {
 		val         interface{}
 		nilVal      string
@@ -237,20 +229,16 @@ func TestWriteCSVValue(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestMarshalTimeseriesJSONPretty(t *testing.T) {
-
 	err := marshalTimeseriesJSONPretty(nil, nil, 200, nil)
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestGetDateWriter(t *testing.T) {
-
 	rlo := &timeseries.RequestOptions{TimeFormat: 1}
 	dw, m := getDateWriter(rlo)
 	if dw == nil {

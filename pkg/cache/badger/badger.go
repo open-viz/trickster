@@ -91,7 +91,6 @@ func (c *Cache) Retrieve(cacheKey string, allowExpired bool) ([]byte, status.Loo
 		}
 		data, err = item.ValueCopy(nil)
 		return err
-
 	})
 
 	if err == nil {

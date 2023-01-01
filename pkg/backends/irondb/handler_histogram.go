@@ -26,12 +26,12 @@ import (
 	"time"
 
 	"github.com/trickstercache/trickster/v2/pkg/backends/irondb/common"
+	"github.com/trickstercache/trickster/v2/pkg/checksum/md5"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/engines"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/errors"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/request"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/urls"
 	"github.com/trickstercache/trickster/v2/pkg/timeseries"
-	"github.com/trickstercache/trickster/v2/pkg/checksum/md5"
 )
 
 // HistogramHandler handles requests for historgam timeseries data and processes
@@ -45,7 +45,8 @@ func (c *Client) HistogramHandler(w http.ResponseWriter, r *http.Request) {
 // provided Extent.
 func (c *Client) histogramHandlerSetExtent(r *http.Request,
 	trq *timeseries.TimeRangeQuery,
-	extent *timeseries.Extent) {
+	extent *timeseries.Extent,
+) {
 	var err error
 	if trq == nil {
 		if trq, _, _, err = c.ParseTimeRangeQuery(r); err != nil {
@@ -79,7 +80,8 @@ func (c *Client) histogramHandlerSetExtent(r *http.Request,
 // histogramHandlerParseTimeRangeQuerycommon.Parses the key parts of a TimeRangeQuery
 // from the inbound HTTP Request.
 func (c *Client) histogramHandlerParseTimeRangeQuery(
-	r *http.Request) (*timeseries.TimeRangeQuery, error) {
+	r *http.Request,
+) (*timeseries.TimeRangeQuery, error) {
 	trq := &timeseries.TimeRangeQuery{}
 	var ps []string
 	if strings.HasPrefix(r.URL.Path, "/irondb") {
@@ -116,7 +118,8 @@ func (c *Client) histogramHandlerParseTimeRangeQuery(
 // histogramHandlerDeriveCacheKey calculates a query-specific keyname based on
 // the user request.
 func (c *Client) histogramHandlerDeriveCacheKey(path string, params url.Values,
-	headers http.Header, body io.ReadCloser, extra string) (string, io.ReadCloser) {
+	headers http.Header, body io.ReadCloser, extra string,
+) (string, io.ReadCloser) {
 	var sb strings.Builder
 	sb.WriteString(path)
 	var ps []string
@@ -140,8 +143,8 @@ func (c *Client) histogramHandlerDeriveCacheKey(path string, params url.Values,
 // histogramHandlerFastForwardURL returns the url to fetch the Fast Forward value
 // based on a timerange URL.
 func (c *Client) histogramHandlerFastForwardRequest(
-	r *http.Request) (*http.Request, error) {
-
+	r *http.Request,
+) (*http.Request, error) {
 	rsc := request.GetResources(r)
 	trq := rsc.TimeRangeQuery
 

@@ -74,7 +74,6 @@ func New() *Options {
 
 // Clone returns an exact copy of a *CachingConfig
 func (cc *Options) Clone() *Options {
-
 	c := New()
 	c.Name = cc.Name
 	c.Provider = cc.Provider
@@ -118,13 +117,11 @@ func (cc *Options) Clone() *Options {
 	c.Redis.WriteTimeoutMS = cc.Redis.WriteTimeoutMS
 
 	return c
-
 }
 
 // Equal returns true if all values in the Options references and their
 // their child Option references are completely identical
 func (cc *Options) Equal(cc2 *Options) bool {
-
 	if cc2 == nil {
 		return false
 	}
@@ -132,15 +129,15 @@ func (cc *Options) Equal(cc2 *Options) bool {
 	return cc.Name == cc2.Name &&
 		cc.Provider == cc2.Provider &&
 		cc.ProviderID == cc2.ProviderID
-
 }
 
-var errMaxSizeBackoffBytesTooBig = errors.New("MaxSizeBackoffBytes can't be larger than MaxSizeBytes")
-var errMaxSizeBackoffObjectsTooBig = errors.New("MaxSizeBackoffObjects can't be larger than MaxSizeObjects")
+var (
+	errMaxSizeBackoffBytesTooBig   = errors.New("MaxSizeBackoffBytes can't be larger than MaxSizeBytes")
+	errMaxSizeBackoffObjectsTooBig = errors.New("MaxSizeBackoffObjects can't be larger than MaxSizeObjects")
+)
 
 // SetDefaults iterates the provided Options, and overlays user-set values onto the default Options
 func (l Lookup) SetDefaults(metadata yamlx.KeyLookup, activeCaches strutil.Lookup) ([]string, error) {
-
 	// setCachingDefaults assumes that processBackendOptionss was just ran
 
 	lw := make([]string, 0)

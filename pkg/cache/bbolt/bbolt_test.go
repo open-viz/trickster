@@ -31,12 +31,15 @@ import (
 	tl "github.com/trickstercache/trickster/v2/pkg/observability/logging"
 )
 
-const cacheProvider = "bbolt"
-const cacheKey = "cacheKey"
+const (
+	cacheProvider = "bbolt"
+	cacheKey      = "cacheKey"
+)
 
 func newCacheConfig(dbPath string) co.Options {
 	return co.Options{Provider: cacheProvider, BBolt: &bo.Options{
-		Filename: dbPath, Bucket: "trickster_test"}, Index: &io.Options{ReapInterval: time.Second}}
+		Filename: dbPath, Bucket: "trickster_test",
+	}, Index: &io.Options{ReapInterval: time.Second}}
 }
 
 func storeBenchmark(b *testing.B) Cache {
@@ -117,7 +120,6 @@ func TestBboltCache_ConnectBadBucketName(t *testing.T) {
 }
 
 func TestBboltCache_Store(t *testing.T) {
-
 	testDbPath := t.TempDir() + "/test.db"
 	cacheConfig := newCacheConfig(testDbPath)
 	bc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error"), locker: locks.NewNamedLocker()}
@@ -141,7 +143,6 @@ func BenchmarkCache_Store(b *testing.B) {
 }
 
 func TestBboltCache_SetTTL(t *testing.T) {
-
 	testDbPath := t.TempDir() + "/test.db"
 	cacheConfig := newCacheConfig(testDbPath)
 	bc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error"), locker: locks.NewNamedLocker()}
@@ -219,7 +220,6 @@ func BenchmarkCache_SetTTL(b *testing.B) {
 }
 
 func TestBboltCache_StoreNoIndex(t *testing.T) {
-
 	const expected = `value for key [] not in cache`
 
 	testDbPath := t.TempDir() + "/test.db"
@@ -307,7 +307,6 @@ func BenchmarkCache_StoreNoIndex(b *testing.B) {
 }
 
 func TestBboltCache_Remove(t *testing.T) {
-
 	testDbPath := t.TempDir() + "/test.db"
 	cacheConfig := newCacheConfig(testDbPath)
 	bc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error"), locker: locks.NewNamedLocker()}
@@ -346,7 +345,6 @@ func TestBboltCache_Remove(t *testing.T) {
 	if ls != status.LookupStatusKeyMiss {
 		t.Errorf("expected %s got %s", status.LookupStatusKeyMiss, ls)
 	}
-
 }
 
 func BenchmarkCache_Remove(b *testing.B) {
@@ -387,7 +385,6 @@ func BenchmarkCache_Remove(b *testing.B) {
 }
 
 func TestBboltCache_BulkRemove(t *testing.T) {
-
 	testDbPath := t.TempDir() + "/test.db"
 	cacheConfig := newCacheConfig(testDbPath)
 	bc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error"), locker: locks.NewNamedLocker()}
@@ -425,7 +422,6 @@ func TestBboltCache_BulkRemove(t *testing.T) {
 	if ls != status.LookupStatusKeyMiss {
 		t.Errorf("expected %s got %s", status.LookupStatusKeyMiss, ls)
 	}
-
 }
 
 func BenchmarkCache_BulkRemove(b *testing.B) {
@@ -452,7 +448,6 @@ func BenchmarkCache_BulkRemove(b *testing.B) {
 }
 
 func TestBboltCache_Retrieve(t *testing.T) {
-
 	const expected1 = `value for key [cacheKey] not in cache`
 	const expected2 = `value for key [cacheKey-invalid] could not be deserialized from cache`
 

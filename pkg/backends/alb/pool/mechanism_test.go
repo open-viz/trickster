@@ -19,7 +19,6 @@ package pool
 import "testing"
 
 func TestGetMechanismByName(t *testing.T) {
-
 	_, b := GetMechanismByName("test")
 	if b {
 		t.Error("expected false")
@@ -27,7 +26,6 @@ func TestGetMechanismByName(t *testing.T) {
 }
 
 func TestMechansimString(t *testing.T) {
-
 	v, _ := GetMechanismByName("rr")
 	if v.String() != "rr" {
 		t.Errorf("expected %s got %s", "rr", v.String())

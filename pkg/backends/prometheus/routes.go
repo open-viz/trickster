@@ -64,17 +64,17 @@ func (c *Client) MergeablePaths() []string {
 
 // DefaultPathConfigs returns the default PathConfigs for the given Provider
 func (c *Client) DefaultPathConfigs(o *bo.Options) map[string]*po.Options {
-
 	var rhts map[string]string
 	if o != nil {
 		rhts = map[string]string{
-			headers.NameCacheControl: fmt.Sprintf("%s=%d", headers.ValueSharedMaxAge, o.TimeseriesTTLMS/1000)}
+			headers.NameCacheControl: fmt.Sprintf("%s=%d", headers.ValueSharedMaxAge, o.TimeseriesTTLMS/1000),
+		}
 	}
 	rhinst := map[string]string{
-		headers.NameCacheControl: fmt.Sprintf("%s=%d", headers.ValueSharedMaxAge, 30)}
+		headers.NameCacheControl: fmt.Sprintf("%s=%d", headers.ValueSharedMaxAge, 30),
+	}
 
 	paths := po.Lookup{
-
 		APIPath + mnQueryRange: {
 			Path:            APIPath + mnQueryRange,
 			HandlerName:     mnQueryRange,
@@ -224,5 +224,4 @@ func (c *Client) DefaultPathConfigs(o *bo.Options) map[string]*po.Options {
 	o.FastForwardPath = paths[APIPath+mnQuery].Clone()
 
 	return paths
-
 }

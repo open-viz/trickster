@@ -71,7 +71,6 @@ func CloseCaches(caches map[string]cache.Cache) error {
 
 // NewCache returns a Cache object based on the provided config.CachingConfig
 func NewCache(cacheName string, cfg *options.Options, logger interface{}) cache.Cache {
-
 	var c cache.Cache
 
 	switch cfg.Provider {

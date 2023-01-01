@@ -19,7 +19,6 @@ package timeseries
 import "testing"
 
 func TestFieldDefinitionClone(t *testing.T) {
-
 	fd := FieldDefinition{
 		Name:     "test",
 		DataType: FieldDataType(1),
@@ -30,11 +29,9 @@ func TestFieldDefinitionClone(t *testing.T) {
 	if fd2 != fd {
 		t.Error("clone mismatch")
 	}
-
 }
 
 func TestFieldDefinitionString(t *testing.T) {
-
 	fd := FieldDefinitions{
 		FieldDefinition{
 			Name:     "test",
@@ -47,5 +44,4 @@ func TestFieldDefinitionString(t *testing.T) {
 	if fd.String() != expected {
 		t.Errorf("expected `%s` got `%s`", expected, fd.String())
 	}
-
 }

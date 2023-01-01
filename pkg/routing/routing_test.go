@@ -64,7 +64,6 @@ func TestRegisterHealthHandler(t *testing.T) {
 }
 
 func TestRegisterProxyRoutes(t *testing.T) {
-
 	var proxyClients backends.Backends
 
 	log := tl.ConsoleLogger("info")
@@ -156,7 +155,6 @@ func TestRegisterProxyRoutes(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestRegisterProxyRoutesInflux(t *testing.T) {
@@ -177,7 +175,6 @@ func TestRegisterProxyRoutesInflux(t *testing.T) {
 	if len(proxyClients) == 0 {
 		t.Errorf("expected %d got %d", 1, 0)
 	}
-
 }
 
 func TestRegisterProxyRoutesReverseProxy(t *testing.T) {
@@ -198,11 +195,9 @@ func TestRegisterProxyRoutesReverseProxy(t *testing.T) {
 	if len(proxyClients) == 0 {
 		t.Errorf("expected %d got %d", 1, 0)
 	}
-
 }
 
 func TestRegisterProxyRoutesClickHouse(t *testing.T) {
-
 	conf, _, err := config.Load("trickster", "test",
 		[]string{"-log-level", "debug", "-origin-url", "http://1", "-provider", "clickhouse"})
 	if err != nil {
@@ -220,11 +215,9 @@ func TestRegisterProxyRoutesClickHouse(t *testing.T) {
 	if len(proxyClients) == 0 {
 		t.Errorf("expected %d got %d", 1, 0)
 	}
-
 }
 
 func TestRegisterProxyRoutesALB(t *testing.T) {
-
 	conf, _, err := config.Load("trickster", "test",
 		[]string{"-log-level", "debug", "-origin-url", "http://1", "-provider", "alb"})
 	if err != nil {
@@ -244,11 +237,9 @@ func TestRegisterProxyRoutesALB(t *testing.T) {
 	if len(proxyClients) == 0 {
 		t.Errorf("expected %d got %d", 1, 0)
 	}
-
 }
 
 func TestRegisterProxyRoutesIRONdb(t *testing.T) {
-
 	conf, _, err := config.Load("trickster", "test",
 		[]string{"-origin-url", "http://example.com", "-provider", "irondb", "-log-level", "debug"})
 	if err != nil {
@@ -269,7 +260,6 @@ func TestRegisterProxyRoutesIRONdb(t *testing.T) {
 }
 
 func TestRegisterProxyRoutesWithReqRewriters(t *testing.T) {
-
 	conf, _, err := config.Load("trickster", "test",
 		[]string{"-config", "../../testdata/test.routing.req_rewriter.conf"})
 	if err != nil {
@@ -324,11 +314,11 @@ func TestRegisterProxyRoutesInvalidCert(t *testing.T) {
 	keyfile := td + "/key.pem"
 	confFile := td + "/trickster_test_config.conf"
 
-	err := os.WriteFile(certfile, []byte{}, 0600)
+	err := os.WriteFile(certfile, []byte{}, 0o600)
 	if err != nil {
 		t.Error(err)
 	}
-	err = os.WriteFile(keyfile, kb, 0600)
+	err = os.WriteFile(keyfile, kb, 0o600)
 	if err != nil {
 		t.Error(err)
 	}
@@ -336,7 +326,7 @@ func TestRegisterProxyRoutesInvalidCert(t *testing.T) {
 	b, err := os.ReadFile("../../testdata/test.bad_tls_cert.routes.conf")
 	b = []byte(strings.ReplaceAll(string(b), `../../testdata/test.06.`, td+"/"))
 
-	err = os.WriteFile(confFile, b, 0600)
+	err = os.WriteFile(confFile, b, 0o600)
 	if err != nil {
 		t.Error(err)
 	}
@@ -447,17 +437,15 @@ func TestRegisterPathRoutes(t *testing.T) {
 	dpc["/-GET-HEAD"].HandlerName = "testHandler"
 	dpc["/-GET-HEAD"].ReqRewriter = testutil.NewTestRewriteInstructions()
 	RegisterPathRoutes(router, handlers, rpc, oo, nil, dpc, nil, "", tl.ConsoleLogger("INFO"))
-
 }
 
 func TestValidateRuleClients(t *testing.T) {
-
 	c, err := rule.NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
 	}
 
-	var cl = backends.Backends{"test": c}
+	cl := backends.Backends{"test": c}
 	rule.ValidateOptions(cl, nil)
 
 	conf, _, err := config.Load("trickster", "test",
@@ -477,11 +465,9 @@ func TestValidateRuleClients(t *testing.T) {
 	if err == nil {
 		t.Error("expected error")
 	}
-
 }
 
 func TestRegisterDefaultBackendRoutes(t *testing.T) {
-
 	// successful passing of this test is no panic
 
 	router := mux.NewRouter()
@@ -512,5 +498,4 @@ func TestRegisterDefaultBackendRoutes(t *testing.T) {
 	router = mux.NewRouter()
 	po1.MatchType = matching.PathMatchTypeExact
 	RegisterDefaultBackendRoutes(router, b, logger, tr)
-
 }

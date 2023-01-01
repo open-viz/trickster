@@ -25,7 +25,6 @@ import (
 )
 
 func TestProxyHandler(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -62,5 +61,4 @@ func TestProxyHandler(t *testing.T) {
 	if string(bodyBytes) != "test" {
 		t.Errorf("expected 'test' got %s.", bodyBytes)
 	}
-
 }

@@ -36,8 +36,9 @@ import (
 	tu "github.com/trickstercache/trickster/v2/pkg/testutil"
 )
 
-const testMultipartBoundary = `; boundary=------------------------d0509edbe55938c0`
-const testMultipartBody = `--------------------------d0509edbe55938c0
+const (
+	testMultipartBoundary = `; boundary=------------------------d0509edbe55938c0`
+	testMultipartBody     = `--------------------------d0509edbe55938c0
 Content-Disposition: form-data; name="field1"
 
 value1
@@ -47,6 +48,7 @@ Content-Disposition: form-data; name="field2"
 value2
 --------------------------d0509edbe55938c0--
 `
+)
 
 const testJSONDocument = `
 {
@@ -66,7 +68,6 @@ const testJSONDocument = `
 `
 
 func TestDeepSearch(t *testing.T) {
-
 	var document map[string]interface{}
 	err := json.Unmarshal([]byte(testJSONDocument), &document)
 	if err != nil {
@@ -114,7 +115,6 @@ func TestDeepSearch(t *testing.T) {
 }
 
 func TestDeriveCacheKey(t *testing.T) {
-
 	rpath := &po.Options{
 		Path:               "/",
 		CacheKeyParams:     []string{"query", "step", "time"},
@@ -206,12 +206,12 @@ func TestDeriveCacheKey(t *testing.T) {
 }
 
 func exampleKeyHasher(path string, params url.Values, headers http.Header,
-	body io.ReadCloser, extra string) (string, io.ReadCloser) {
+	body io.ReadCloser, extra string,
+) (string, io.ReadCloser) {
 	return "test-key", nil
 }
 
 func TestDeriveCacheKeyAuthHeader(t *testing.T) {
-
 	client, err := NewTestClient("test", &bo.Options{
 		Paths: map[string]*po.Options{
 			"root": {
@@ -240,11 +240,9 @@ func TestDeriveCacheKeyAuthHeader(t *testing.T) {
 	if ck != "60257fa6b18d6072b90a294269a8e6e1" {
 		t.Errorf("expected %s got %s", "60257fa6b18d6072b90a294269a8e6e1", ck)
 	}
-
 }
 
 func TestDeriveCacheKeyNoPathConfig(t *testing.T) {
-
 	client, err := NewTestClient("test", &bo.Options{
 		Paths: map[string]*po.Options{
 			"root": {
@@ -268,11 +266,9 @@ func TestDeriveCacheKeyNoPathConfig(t *testing.T) {
 	if ck != "f53b04ce5c434a7357804ae15a64ee6c" {
 		t.Errorf("expected %s got %s", "f53b04ce5c434a7357804ae15a64ee6c", ck)
 	}
-
 }
 
 func TestDeriveCacheKeyNilURL(t *testing.T) {
-
 	_, w, r, _, _ := tu.NewTestInstance("", nil, 0, "", nil, "rpc",
 		"http://127.0.0.1/?query=12345&start=0&end=0&step=300&time=0", "INFO")
 

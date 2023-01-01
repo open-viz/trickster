@@ -31,7 +31,6 @@ import (
 var ErrInvalidRegularExpression = errors.New("invalid regular expression")
 
 func (c *Client) parseOptions(o *ro.Options, rwi map[string]rewriter.RewriteInstructions) error {
-
 	name := c.Name()
 
 	if o == nil {

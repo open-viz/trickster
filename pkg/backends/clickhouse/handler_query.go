@@ -30,7 +30,6 @@ import (
 
 // QueryHandler handles timeseries requests for ClickHouse and processes them through the delta proxy cache
 func (c *Client) QueryHandler(w http.ResponseWriter, r *http.Request) {
-
 	q := r.URL.Query()
 	sqlQuery := q.Get(upQuery)
 	if methods.HasBody(r.Method) {

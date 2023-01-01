@@ -29,11 +29,12 @@ import (
 	tl "github.com/trickstercache/trickster/v2/pkg/observability/logging"
 )
 
-const provider = "memory"
-const cacheKey = "cacheKey"
+const (
+	provider = "memory"
+	cacheKey = "cacheKey"
+)
 
-type testReferenceObject struct {
-}
+type testReferenceObject struct{}
 
 var testLocker = locks.NewNamedLocker()
 
@@ -73,7 +74,6 @@ func TestConfiguration(t *testing.T) {
 }
 
 func TestCache_Connect(t *testing.T) {
-
 	cacheConfig := newCacheConfig(t)
 	mc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error")}
 
@@ -85,7 +85,6 @@ func TestCache_Connect(t *testing.T) {
 }
 
 func TestCache_StoreReferenceDirect(t *testing.T) {
-
 	cacheConfig := newCacheConfig(t)
 	mc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error"), locker: testLocker}
 
@@ -105,7 +104,6 @@ func TestCache_StoreReferenceDirect(t *testing.T) {
 	if err == nil {
 		t.Errorf("expected nil got %s", err.Error())
 	}
-
 }
 
 func TestCache_StoreReference(t *testing.T) {
@@ -143,7 +141,6 @@ func BenchmarkCache_Store(b *testing.B) {
 }
 
 func TestCache_Retrieve(t *testing.T) {
-
 	cacheConfig := newCacheConfig(t)
 	mc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error"), locker: testLocker}
 
@@ -353,7 +350,6 @@ func TestCache_BulkRemove(t *testing.T) {
 	if ls != status.LookupStatusKeyMiss {
 		t.Errorf("expected %s got %s", status.LookupStatusKeyMiss, ls)
 	}
-
 }
 
 func BenchmarkCache_BulkRemove(b *testing.B) {
@@ -379,7 +375,6 @@ func BenchmarkCache_BulkRemove(b *testing.B) {
 }
 
 func TestMemoryCache_SetTTL(t *testing.T) {
-
 	cacheConfig := newCacheConfig(t)
 	mc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error"), locker: testLocker}
 
@@ -426,7 +421,6 @@ func TestMemoryCache_SetTTL(t *testing.T) {
 	if diff < expected {
 		t.Errorf("expected diff >= %d, got %d from: %d - %d", expected, diff, e2, e1)
 	}
-
 }
 
 func BenchmarkCache_SetTTL(b *testing.B) {

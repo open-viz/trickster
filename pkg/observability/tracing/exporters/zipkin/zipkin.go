@@ -28,7 +28,6 @@ import (
 
 // New returns a new Zipkin Tracer
 func New(options *options.Options) (*tracing.Tracer, error) {
-
 	var tp *sdktrace.TracerProvider
 	var err error
 
@@ -68,5 +67,4 @@ func New(options *options.Options) (*tracing.Tracer, error) {
 		Tracer:  tracer,
 		Options: options,
 	}, nil
-
 }

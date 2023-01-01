@@ -25,7 +25,6 @@ import (
 )
 
 func TestRegisterAll(t *testing.T) {
-
 	// test nil config
 	f, err := RegisterAll(nil, tl.ConsoleLogger("error"), true)
 	if err == nil {
@@ -114,7 +113,6 @@ func TestRegisterAll(t *testing.T) {
 	if err == nil {
 		t.Error("expected error for invalid tracing implementation")
 	}
-
 }
 
 func TestGetTracer(t *testing.T) {

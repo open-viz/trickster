@@ -25,7 +25,6 @@ import (
 )
 
 func TestBackends(t *testing.T) {
-
 	cl, _ := New("test1", bo.New(), nil, mux.NewRouter(), nil)
 	o := Backends{"test1": cl}
 
@@ -61,7 +60,6 @@ func TestBackends(t *testing.T) {
 }
 
 func TestIsVirtual(t *testing.T) {
-
 	if ok := IsVirtual("rule"); !ok {
 		t.Error("expected true")
 	}
@@ -69,11 +67,9 @@ func TestIsVirtual(t *testing.T) {
 	if ok := IsVirtual("prometheus"); ok {
 		t.Error("expected false")
 	}
-
 }
 
 func TestStartHealthChecks(t *testing.T) {
-
 	// 1: rule / Virtual provider
 	o1 := bo.New()
 	o1.Provider = "rule"
@@ -115,7 +111,6 @@ func TestStartHealthChecks(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 type testBackend struct {

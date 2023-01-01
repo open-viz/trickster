@@ -22,7 +22,6 @@ import (
 )
 
 func TestNextRoundRobin(t *testing.T) {
-
 	p := &pool{healthy: []http.Handler{http.NotFoundHandler()}}
 
 	p2 := nextRoundRobin(p)
@@ -35,5 +34,4 @@ func TestNextRoundRobin(t *testing.T) {
 	if len(p2) != 0 {
 		t.Errorf("expected %d got %d", 0, len(p2))
 	}
-
 }

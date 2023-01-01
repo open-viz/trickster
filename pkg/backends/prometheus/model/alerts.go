@@ -24,12 +24,12 @@ import (
 	"net/http"
 	"sort"
 
+	"github.com/trickstercache/trickster/v2/pkg/checksum/fnv"
 	"github.com/trickstercache/trickster/v2/pkg/observability/logging"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/handlers"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/headers"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/response/merge"
 	"github.com/trickstercache/trickster/v2/pkg/timeseries/dataset"
-	"github.com/trickstercache/trickster/v2/pkg/checksum/fnv"
 )
 
 // WFAlerts is the Wire Format Document for the /alerts endpoint
@@ -64,7 +64,6 @@ func (a *WFAlert) CalculateHash() uint64 {
 // Merge merges the passed WFAlerts into the subject WFAlerts
 // by preferring higher-severity states during de-duplication
 func (a *WFAlerts) Merge(results ...*WFAlerts) {
-
 	m := map[uint64]WFAlert{}
 
 	if a.Data != nil && len(a.Data.Alerts) > 0 {
@@ -101,13 +100,11 @@ func (a *WFAlerts) Merge(results ...*WFAlerts) {
 	}
 
 	a.Data.Alerts = alerts
-
 }
 
 // MergeAndWriteAlerts merges the provided Responses into a single prometheus Alerts data object,
 // and writes it to the provided ResponseWriter
 func MergeAndWriteAlerts(w http.ResponseWriter, r *http.Request, rgs merge.ResponseGates) {
-
 	var a *WFAlerts
 
 	responses := make([]int, len(rgs))

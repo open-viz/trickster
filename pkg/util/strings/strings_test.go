@@ -22,7 +22,6 @@ import (
 )
 
 func TestIndexOfString(t *testing.T) {
-
 	arr := []string{"string0", "string1", "string2"}
 
 	i := IndexInSlice(arr, "string0")
@@ -34,11 +33,9 @@ func TestIndexOfString(t *testing.T) {
 	if i != -1 {
 		t.Errorf(`expected -1. got %d`, i)
 	}
-
 }
 
 func TestEqual(t *testing.T) {
-
 	l1 := []string{"test1", "test2"}
 	l2 := []string{"test1", "test2"}
 	l3 := []string{"test3", "test4"}
@@ -62,7 +59,6 @@ func TestEqual(t *testing.T) {
 }
 
 func TestStringMap(t *testing.T) {
-
 	sm := StringMap(map[string]string{"test": "value"})
 	s := sm.String()
 	const expected = `{"test":"value"}`
@@ -70,11 +66,9 @@ func TestStringMap(t *testing.T) {
 	if s != expected {
 		t.Errorf("expected %s got %s", expected, s)
 	}
-
 }
 
 func TestCloneBoolMap(t *testing.T) {
-
 	m1 := CloneBoolMap(nil)
 	if m1 != nil {
 		t.Error("expected nil map")
@@ -93,7 +87,6 @@ func TestCloneBoolMap(t *testing.T) {
 	if v != expected {
 		t.Errorf("expected %t got %t", expected, v)
 	}
-
 }
 
 func TestUnique(t *testing.T) {
@@ -111,7 +104,6 @@ func TestUnique(t *testing.T) {
 }
 
 func TestGetInt(t *testing.T) {
-
 	m := StringMap{"trickster": "proxy", "test": "1"}
 
 	if _, err := m.GetInt("invalid"); err != ErrKeyNotInMap {

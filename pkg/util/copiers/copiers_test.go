@@ -19,7 +19,6 @@ package copiers
 import "testing"
 
 func TestCopyBytes(t *testing.T) {
-
 	m1 := CopyBytes(nil)
 	if m1 != nil {
 		t.Error("expected nil map")
@@ -37,7 +36,6 @@ func TestCopyBytes(t *testing.T) {
 }
 
 func TestCopyInterfaces(t *testing.T) {
-
 	m1 := CopyInterfaces(nil)
 	if m1 != nil {
 		t.Error("expected nil map")
@@ -52,11 +50,9 @@ func TestCopyInterfaces(t *testing.T) {
 	if m2[0].(int) != 1 {
 		t.Errorf("expected %d got %d", 1, m2[0])
 	}
-
 }
 
 func TestCopyStrings(t *testing.T) {
-
 	m1 := CopyStrings(nil)
 	if m1 != nil {
 		t.Error("expected nil map")
@@ -71,11 +67,9 @@ func TestCopyStrings(t *testing.T) {
 	if m2[0] != "test" {
 		t.Errorf("expected %s got %s", "test", m2[0])
 	}
-
 }
 
 func TestCopyStringLookup(t *testing.T) {
-
 	m1 := CopyStringLookup(nil)
 	if m1 != nil {
 		t.Error("expected nil map")
@@ -94,11 +88,9 @@ func TestCopyStringLookup(t *testing.T) {
 	if v != expected {
 		t.Errorf("expected %s got %s", expected, v)
 	}
-
 }
 
 func TestCopyLookup(t *testing.T) {
-
 	m1 := CopyLookup(nil)
 	if m1 != nil {
 		t.Error("expected nil map")
@@ -115,11 +107,9 @@ func TestCopyLookup(t *testing.T) {
 	if v != nil {
 		t.Errorf("expected nil got %v", v)
 	}
-
 }
 
 func TestLookupFromStrings(t *testing.T) {
-
 	m1 := LookupFromStrings(nil)
 	if m1 != nil {
 		t.Error("expected nil map")
@@ -132,5 +122,4 @@ func TestLookupFromStrings(t *testing.T) {
 	if !ok {
 		t.Errorf("expected true got %t", ok)
 	}
-
 }

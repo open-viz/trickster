@@ -42,9 +42,11 @@ func TestSetExtent(t *testing.T) {
 	etFl := time.Unix(end.Unix()-(end.Unix()%300), 0)
 	e := &timeseries.Extent{Start: start, End: end}
 	conf, _, err := config.Load("trickster", "test",
-		[]string{"-origin-url", "none:9090",
+		[]string{
+			"-origin-url", "none:9090",
 			"-provider", "irondb",
-			"-log-level", "debug"})
+			"-log-level", "debug",
+		})
 	if err != nil {
 		t.Fatalf("Could not load configuration: %s", err.Error())
 	}
@@ -169,9 +171,7 @@ func TestSetExtent(t *testing.T) {
 	}
 
 	for i, c := range cases {
-
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-
 			r, _ := http.NewRequest(http.MethodGet, c.u.String(), io.NopCloser(bytes.NewBufferString(c.body)))
 			rsc.PathConfig = c.p
 			r = request.SetResources(r, rsc)
@@ -206,9 +206,11 @@ func TestFastForwardURL(t *testing.T) {
 	start := now - (now % 300)
 	end := start + 300
 	conf, _, err := config.Load("trickster", "test",
-		[]string{"-origin-url", "none:9090",
+		[]string{
+			"-origin-url", "none:9090",
 			"-provider", "irondb",
-			"-log-level", "debug"})
+			"-log-level", "debug",
+		})
 	if err != nil {
 		t.Fatalf("Could not load configuration: %s", err.Error())
 	}
@@ -293,7 +295,6 @@ func TestFastForwardURL(t *testing.T) {
 
 	for i, c := range cases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-
 			r, _ := http.NewRequest(http.MethodGet, c.u.String(), nil)
 			r = r.WithContext(context.Background())
 			rsc.PathConfig = c.p

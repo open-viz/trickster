@@ -81,7 +81,8 @@ func (r *Resources) Clone() *Resources {
 // NewResources returns a new Resources collection based on the provided inputs
 func NewResources(oo *bo.Options, po *po.Options, co *co.Options,
 	c cache.Cache, client backends.Backend, t *tracing.Tracer,
-	logger interface{}) *Resources {
+	logger interface{},
+) *Resources {
 	return &Resources{
 		BackendOptions: oo,
 		PathConfig:     po,

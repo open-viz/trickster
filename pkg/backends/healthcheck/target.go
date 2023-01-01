@@ -66,8 +66,8 @@ type DemandProbe func(w http.ResponseWriter)
 func newTarget(ctx context.Context,
 	name, description string, o *ho.Options,
 	client *http.Client,
-	logger interface{}) (*target, error) {
-
+	logger interface{},
+) (*target, error) {
 	if o == nil {
 		return nil, ho.ErrNoOptionsProvided
 	}
@@ -226,16 +226,20 @@ func (t *target) probe() {
 		t.status.Set(-1)
 		t.ks = -1
 		logging.Info(t.logger, "hc status changed",
-			logging.Pairs{"targetName": t.name, "status": "failed",
-				"detail": t.status.detail, "threshold": t.failureThreshold})
+			logging.Pairs{
+				"targetName": t.name, "status": "failed",
+				"detail": t.status.detail, "threshold": t.failureThreshold,
+			})
 	} else if passed && t.ks != 1 && (successCnt == t.recoveryThreshold || t.ks == 0) {
 		t.status.failingSince = time.Time{}
 		t.status.Set(1)
 		t.ks = 1
 		t.status.detail = "" // this is only populated with failure details, so it is cleared upon recovery
 		logging.Info(t.logger, "hc status changed",
-			logging.Pairs{"targetName": t.name, "status": "available",
-				"threshold": t.recoveryThreshold})
+			logging.Pairs{
+				"targetName": t.name, "status": "available",
+				"threshold": t.recoveryThreshold,
+			})
 	}
 }
 

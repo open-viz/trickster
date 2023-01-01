@@ -107,7 +107,8 @@ func ObjectFromBytes(data []byte) (*Object, error) {
 // NewIndex returns a new Index based on the provided inputs
 func NewIndex(cacheName, cacheProvider string, indexData []byte, o *options.Options,
 	bulkRemoveFunc func([]string), flushFunc func(cacheKey string, data []byte),
-	logger interface{}) *Index {
+	logger interface{},
+) *Index {
 	i := &Index{}
 
 	if len(indexData) > 0 {
@@ -158,7 +159,6 @@ func (idx *Index) UpdateObjectAccessTime(key string) {
 		idx.Objects[key].LastAccess = time.Now()
 	}
 	idx.mtx.Unlock()
-
 }
 
 // UpdateObjectTTL updates the Expiration for the object with the provided key
@@ -172,7 +172,6 @@ func (idx *Index) UpdateObjectTTL(key string, ttl time.Duration) {
 
 // UpdateObject writes or updates the Index Metadata for the provided Object
 func (idx *Index) UpdateObject(obj *Object) {
-
 	key := obj.Key
 	if key == "" {
 		return
@@ -291,7 +290,6 @@ type objectsAtime []*Object
 // reap makes a single iteration through the cache index to to find and remove expired elements
 // and evict least-recently-accessed elements to maintain the Maximum allowed Cache Size
 func (idx *Index) reap(logger interface{}) {
-
 	idx.mtx.Lock()
 	defer idx.mtx.Unlock()
 

@@ -40,7 +40,6 @@ func testDataSet() *DataSet {
 }
 
 func testDataSet2() *DataSet {
-
 	sh1 := testSeriesHeader()
 	sh1.Name = "test1"
 	sh1.CalculateHash()
@@ -219,7 +218,6 @@ func TestMerge(t *testing.T) {
 }
 
 func TestSize(t *testing.T) {
-
 	ds := testDataSet()
 	s := ds.Size()
 	const expected = 237
@@ -230,7 +228,6 @@ func TestSize(t *testing.T) {
 }
 
 func TestVolatileExtents(t *testing.T) {
-
 	ds := testDataSet()
 	expected := 1
 	e := ds.VolatileExtents().Clone()
@@ -251,7 +248,6 @@ func TestVolatileExtents(t *testing.T) {
 }
 
 func TestMarshalDataSet(t *testing.T) {
-
 	_, err := MarshalDataSet(nil, &timeseries.RequestOptions{}, 200)
 	if err != timeseries.ErrUnknownFormat {
 		t.Errorf("expected unknown format error, got %s", err.Error())
@@ -277,7 +273,6 @@ func TestMarshalDataSet(t *testing.T) {
 }
 
 func TestCroppedClone(t *testing.T) {
-
 	// an extent fully inside of time series's extent
 	ex := timeseries.Extent{Start: time.Unix(15, 0), End: time.Unix(20, 0)}
 
@@ -318,7 +313,6 @@ func TestCroppedClone(t *testing.T) {
 }
 
 func TestCropToRange(t *testing.T) {
-
 	// an extent fully inside of time series's extent
 	ex := timeseries.Extent{Start: time.Unix(15, 0), End: time.Unix(20, 0)}
 

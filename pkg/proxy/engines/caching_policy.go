@@ -102,7 +102,6 @@ func (cp *CachingPolicy) ResetClientConditionals() {
 
 // Merge merges the source CachingPolicy into the subject CachingPolicy
 func (cp *CachingPolicy) Merge(src *CachingPolicy) {
-
 	if src == nil {
 		return
 	}
@@ -126,7 +125,6 @@ func (cp *CachingPolicy) Merge(src *CachingPolicy) {
 
 	// request policies (e.g., IfModifiedSince) are intentionally omitted,
 	// assuming a response policy is always merged into a request policy
-
 }
 
 // TTL returns a TTL based on the subject caching policy and the provided multiplier and max values
@@ -154,7 +152,6 @@ func (cp *CachingPolicy) String() string {
 // GetResponseCachingPolicy examines HTTP response headers for caching headers
 // a returns a CachingPolicy reference
 func GetResponseCachingPolicy(code int, negativeCache map[int]time.Duration, h http.Header) *CachingPolicy {
-
 	cp := &CachingPolicy{LocalDate: time.Now()}
 
 	if d, ok := negativeCache[code]; ok {
@@ -314,7 +311,6 @@ func (cp *CachingPolicy) parseCacheControlDirectives(directives string) {
 			cp.NoTransform = true
 		}
 	}
-
 }
 
 func hasPragmaNoCache(h http.Header) bool {
@@ -364,7 +360,6 @@ func GetRequestCachingPolicy(h http.Header) *CachingPolicy {
 // ResolveClientConditionals ensures any client conditionals are handled before
 // responding to the client request
 func (cp *CachingPolicy) ResolveClientConditionals(ls status.LookupStatus) {
-
 	cp.IsClientFresh = false
 	if !cp.IsClientConditional {
 		return
@@ -395,7 +390,6 @@ func (cp *CachingPolicy) ParseClientConditionals() {
 // CheckIfNoneMatch determines if the provided match value satisfies an "If-None-Match"
 // condition against the cached object. As Trickster is a cache, matching is always weak.
 func CheckIfNoneMatch(etag string, headerValue string, ls status.LookupStatus) bool {
-
 	if etag == "" || headerValue == "" {
 		return etag == headerValue
 	}

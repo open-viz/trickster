@@ -31,7 +31,6 @@ import (
 // Any matching ContentType handled by the compression handler will be compressed
 func HandleCompression(next http.Handler, compressTypes strutil.Lookup) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		// if the client requested a No-Transform, then serve as-is
 		if strings.Contains(r.Header.Get(headers.NameCacheControl), headers.ValueNoTransform) {
 			next.ServeHTTP(w, r)
@@ -54,6 +53,5 @@ func HandleCompression(next http.Handler, compressTypes strutil.Lookup) http.Han
 		ew := NewEncoder(w, ep)
 		next.ServeHTTP(ew, r)
 		ew.Close()
-
 	})
 }

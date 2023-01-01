@@ -28,8 +28,8 @@ import (
 	"github.com/trickstercache/trickster/v2/pkg/backends"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/headers"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/request"
-	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 	tu "github.com/trickstercache/trickster/v2/pkg/testutil"
+	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 )
 
 // test queries
@@ -43,7 +43,6 @@ const (
 var testConfigFile string
 
 func setupTestHarnessDPC() (*httptest.Server, *httptest.ResponseRecorder, *http.Request, *request.Resources, error) {
-
 	client := &TestClient{}
 	ts, w, r, _, err := tu.NewTestInstance(testConfigFile,
 		client.DefaultPathConfigs, 200, "", nil, "promsim", "/prometheus/api/v1/query_range", "debug")
@@ -75,7 +74,6 @@ func setupTestHarnessDPC() (*httptest.Server, *httptest.ResponseRecorder, *http.
 }
 
 func TestDeltaProxyCacheRequestMissThenHit(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -155,7 +153,6 @@ func TestDeltaProxyCacheRequestMissThenHit(t *testing.T) {
 }
 
 func TestDeltaProxyCacheRequestRemoveStale(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -226,7 +223,6 @@ func TestDeltaProxyCacheRequestRemoveStale(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 // Will understand why this test is failing, and if it's due to an application or test defect,
@@ -311,7 +307,6 @@ func TestDeltaProxyCacheRequestRemoveStale(t *testing.T) {
 // }
 
 func TestDeltaProxyCacheRequestMarshalFailure(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -352,16 +347,14 @@ func TestDeltaProxyCacheRequestMarshalFailure(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func normalizeTime(t time.Time, d time.Duration) time.Time {
 	return time.Unix((t.Unix()/int64(d.Seconds()))*int64(d.Seconds()), 0)
-	//return t.Truncate(d)
+	// return t.Truncate(d)
 }
 
 func TestDeltaProxyCacheRequestPartialHit(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -554,7 +547,6 @@ func TestDeltaProxyCacheRequestPartialHit(t *testing.T) {
 }
 
 func TestDeltayProxyCacheRequestDeltaFetchError(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -609,11 +601,11 @@ func TestDeltayProxyCacheRequestDeltaFetchError(t *testing.T) {
 	}
 
 	// test partial hit (needing an upper fragment)
-	//phitStart := extr.End.Add(step)
+	// phitStart := extr.End.Add(step)
 	extr.End = extr.End.Add(time.Duration(1) * time.Hour) // Extend the top by 1 hour to generate partial hit
 	extn.End = extr.End.Truncate(step)
 
-	//expectedFetched := fmt.Sprintf("[%d:%d]", phitStart.Truncate(step).Unix(), extn.End.Unix())
+	// expectedFetched := fmt.Sprintf("[%d:%d]", phitStart.Truncate(step).Unix(), extn.End.Unix())
 	mockprom.GetTimeSeriesData(queryReturnsOKNoLatency, extn.Start, extn.End, step)
 
 	client.InstantCacheKey = "foo1"
@@ -642,11 +634,9 @@ func TestDeltayProxyCacheRequestDeltaFetchError(t *testing.T) {
 	// if err != nil {
 	// 	t.Error(err)
 	// }
-
 }
 
 func TestDeltaProxyCacheRequestRangeMiss(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -791,7 +781,6 @@ func TestDeltaProxyCacheRequestRangeMiss(t *testing.T) {
 }
 
 func TestDeltaProxyCacheRequestFastForward(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -914,7 +903,6 @@ func TestDeltaProxyCacheRequestFastForward(t *testing.T) {
 }
 
 func TestDeltaProxyCacheRequestFastForwardUrlError(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -970,11 +958,9 @@ func TestDeltaProxyCacheRequestFastForwardUrlError(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestDeltaProxyCacheRequestWithRefresh(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -1029,7 +1015,6 @@ func TestDeltaProxyCacheRequestWithRefresh(t *testing.T) {
 }
 
 func TestDeltaProxyCacheRequestWithRefreshError(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -1063,11 +1048,9 @@ func TestDeltaProxyCacheRequestWithRefreshError(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestDeltaProxyCacheRequestWithUnmarshalAndUpstreamErrors(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -1164,11 +1147,9 @@ func TestDeltaProxyCacheRequestWithUnmarshalAndUpstreamErrors(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestDeltaProxyCacheRequest_BadParams(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -1205,11 +1186,9 @@ func TestDeltaProxyCacheRequest_BadParams(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestDeltaProxyCacheRequestCacheMissUnmarshalFailed(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -1269,11 +1248,9 @@ func TestDeltaProxyCacheRequestCacheMissUnmarshalFailed(t *testing.T) {
 	if err == nil {
 		t.Errorf("expected unmarshaling error for %s", string(body))
 	}
-
 }
 
 func TestDeltaProxyCacheRequestOutOfWindow(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -1348,7 +1325,6 @@ func TestDeltaProxyCacheRequestOutOfWindow(t *testing.T) {
 }
 
 func TestDeltaProxyCacheRequestBadGateway(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -1382,11 +1358,9 @@ func TestDeltaProxyCacheRequestBadGateway(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestDeltaProxyCacheRequest_BackfillTolerance(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -1464,11 +1438,9 @@ func TestDeltaProxyCacheRequest_BackfillTolerance(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestDeltaProxyCacheRequestFFTTLBiggerThanStep(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -1523,11 +1495,9 @@ func TestDeltaProxyCacheRequestFFTTLBiggerThanStep(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestDeltaProxyCacheRequestShardByPoints(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessDPC()
 	if err != nil {
 		t.Error(err)
@@ -1625,5 +1595,4 @@ func TestDeltaProxyCacheRequestShardByPoints(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }

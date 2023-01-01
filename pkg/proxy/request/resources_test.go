@@ -36,7 +36,6 @@ func TestNewAndCloneResources(t *testing.T) {
 }
 
 func TestGetAndSetResources(t *testing.T) {
-
 	r := GetResources(nil)
 	if r != nil {
 		t.Error("expected nil reference")
@@ -65,5 +64,4 @@ func TestGetAndSetResources(t *testing.T) {
 	if r3 != nil {
 		t.Errorf("expected nil result, got %v", r3)
 	}
-
 }

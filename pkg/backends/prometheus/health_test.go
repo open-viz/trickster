@@ -24,7 +24,6 @@ import (
 )
 
 func TestDefaultHealthCheckConfig(t *testing.T) {
-
 	c, _ := NewClient("test", bo.New(), nil, nil, nil, nil)
 
 	dho := c.DefaultHealthCheckConfig()
@@ -35,5 +34,4 @@ func TestDefaultHealthCheckConfig(t *testing.T) {
 	if !strings.HasSuffix(dho.Path, "/api/v1/query") {
 		t.Error("expected path to end with /api/v1/query", dho.Path)
 	}
-
 }

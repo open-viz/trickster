@@ -28,8 +28,6 @@ import (
 //
 // Example Input: s1="zstd, gzip,deflate, gzip" s2="br,gzip, deflate"
 // Example Output: "zstd, gzip, deflate, br"
-//
-//
 func MergeCommaSeparated(s1, s2 string) string {
 	return MergeDelimeterSeparated(s1, s2, ",", true)
 }

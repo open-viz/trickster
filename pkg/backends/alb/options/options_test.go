@@ -37,7 +37,6 @@ type testOptions2 struct {
 }
 
 func fromYAML(conf string) (*Options, yamlx.KeyLookup, error) {
-
 	to := &testOptions1{}
 	err := yaml.Unmarshal([]byte(conf), to)
 	if err != nil {
@@ -57,16 +56,13 @@ func fromYAML(conf string) (*Options, yamlx.KeyLookup, error) {
 }
 
 func TestNew(t *testing.T) {
-
 	o := New()
 	if o == nil {
 		t.Error("expected non-nil")
 	}
-
 }
 
 func TestClone(t *testing.T) {
-
 	o := New()
 	o.Pool = []string{"test"}
 	if o == nil {
@@ -80,7 +76,6 @@ func TestClone(t *testing.T) {
 }
 
 func TestSetDefaults(t *testing.T) {
-
 	o2, err := SetDefaults("test", nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -127,5 +122,4 @@ func TestSetDefaults(t *testing.T) {
 	if err == nil {
 		t.Error("expected output_format error")
 	}
-
 }

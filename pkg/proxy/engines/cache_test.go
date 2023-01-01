@@ -44,7 +44,6 @@ import (
 const testRangeBody = "This is a test file, to see how the byte range requests work.\n"
 
 func newRangeRequestTestServer() *httptest.Server {
-
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeContent(w, r, "", time.Now(),
 			strings.NewReader(testRangeBody))
@@ -61,7 +60,6 @@ func TestInvalidContentRange(t *testing.T) {
 }
 
 func TestMultiPartByteRange(t *testing.T) {
-
 	conf, _, err := config.Load("trickster", "test", []string{"-origin-url", "http://1", "-provider", "test"})
 	if err != nil {
 		t.Errorf("Could not load configuration: %s", err.Error())
@@ -130,7 +128,6 @@ func TestCacheHitRangeRequest(t *testing.T) {
 }
 
 func TestCacheHitRangeRequest2(t *testing.T) {
-
 	conf, _, err := config.Load("trickster", "test", []string{"-origin-url", "http://1", "-provider", "test"})
 	if err != nil {
 		t.Errorf("Could not load configuration: %s", err.Error())
@@ -300,7 +297,6 @@ func TestFullCacheMissRangeRequest(t *testing.T) {
 }
 
 func TestRangeRequestFromClient(t *testing.T) {
-
 	want := byterange.Ranges{byterange.Range{Start: 15, End: 20}}
 	haves := byterange.Ranges{byterange.Range{Start: 10, End: 25}}
 
@@ -308,7 +304,6 @@ func TestRangeRequestFromClient(t *testing.T) {
 	defer s.Close()
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodGet, s.URL, nil)
-
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -362,7 +357,6 @@ func TestRangeRequestFromClient(t *testing.T) {
 }
 
 func TestQueryCache(t *testing.T) {
-
 	expected := "1234"
 
 	conf, _, err := config.Load("trickster", "test", []string{"-origin-url", "http://1", "-provider", "test"})
@@ -436,7 +430,6 @@ func TestQueryCache(t *testing.T) {
 	if d2.StatusCode != 200 {
 		t.Errorf("expected %d got %d", 200, d2.StatusCode)
 	}
-
 }
 
 // Mock Cache for testing error conditions

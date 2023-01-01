@@ -55,7 +55,6 @@ const ClockOffsetWarning = "clock offset between trickster host and origin is hi
 
 // DoProxy proxies an inbound request to its corresponding upstream origin with no caching features
 func DoProxy(w io.Writer, r *http.Request, closeResponse bool) *http.Response {
-
 	rsc := request.GetResources(r)
 	o := rsc.BackendOptions
 
@@ -153,7 +152,6 @@ func PrepareResponseWriter(w io.Writer, code int, header http.Header) io.Writer 
 // provide the response data, the response object and the content length.
 // Used in Fetch.
 func PrepareFetchReader(r *http.Request) (io.ReadCloser, *http.Response, int64) {
-
 	rsc := request.GetResources(r)
 
 	ep := profile.FromContext(r.Context())
@@ -207,8 +205,10 @@ func PrepareFetchReader(r *http.Request) (io.ReadCloser, *http.Response, int64) 
 		// if there is an err and the response is nil, the server could not be reached
 		// so make a 502 for the downstream response
 		if resp == nil {
-			resp = &http.Response{StatusCode: http.StatusBadGateway,
-				Request: r, Header: make(http.Header)}
+			resp = &http.Response{
+				StatusCode: http.StatusBadGateway,
+				Request:    r, Header: make(http.Header),
+			}
 		}
 
 		if pc != nil {
@@ -300,8 +300,8 @@ func setStatusHeader(httpStatus int, header http.Header) status.LookupStatus {
 
 func recordResults(r *http.Request, engine string, cacheStatus status.LookupStatus,
 	statusCode int, path, ffStatus string, elapsed float64, extents timeseries.ExtentList,
-	header http.Header) {
-
+	header http.Header,
+) {
 	rsc := request.GetResources(r)
 	pc := rsc.PathConfig
 	o := rsc.BackendOptions

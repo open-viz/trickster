@@ -23,7 +23,6 @@ import (
 )
 
 func testNegativeCaches() negative.Lookups {
-
 	m := make(negative.Lookups)
 	m["test"] = negative.Lookup{}
 

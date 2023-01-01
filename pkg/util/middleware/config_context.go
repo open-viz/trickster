@@ -37,9 +37,9 @@ func init() {
 // WithResourcesContext ...
 func WithResourcesContext(client backends.Backend, o *bo.Options,
 	c cache.Cache, p *po.Options, t *tracing.Tracer,
-	l interface{}, next http.Handler) http.Handler {
+	l interface{}, next http.Handler,
+) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		if o != nil && (o.LatencyMinMS > 0 || o.LatencyMaxMS > 0) {
 			processSimulatedLatency(w, o.LatencyMinMS, o.LatencyMaxMS)
 		}

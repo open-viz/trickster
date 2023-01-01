@@ -152,7 +152,6 @@ func MarshalTimeseries(ts timeseries.Timeseries, rlo *timeseries.RequestOptions,
 
 // MarshalTimeseriesWriter converts a Timeseries into a JSON blob via an io.Writer
 func MarshalTimeseriesWriter(ts timeseries.Timeseries, rlo *timeseries.RequestOptions, status int, w io.Writer) error {
-
 	ds, ok := ts.(*dataset.DataSet)
 	if !ok {
 		return timeseries.ErrUnknownFormat

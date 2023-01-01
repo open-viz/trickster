@@ -94,7 +94,6 @@ func builder(hc healthcheck.HealthChecker, hd *healthDetail) {
 const title = "Trickster Backend Health Status"
 
 func udpateStatusText(hc healthcheck.HealthChecker, hd *healthDetail) {
-
 	ut := time.Now().Truncate(time.Second).UTC().String()[:20] + "UTC"
 
 	txt := strings.Builder{}

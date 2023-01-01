@@ -345,7 +345,6 @@ func TestMarshalDF4Timeseries(t *testing.T) {
 	if string(bytes) != exp {
 		t.Errorf("Expected JSON: %s, got: %s", exp, string(bytes))
 	}
-
 }
 
 func TestUnmarshalDF4Timeseries(t *testing.T) {
@@ -379,11 +378,9 @@ func TestUnmarshalDF4Timeseries(t *testing.T) {
 }
 
 func TestSize(t *testing.T) {
-
 	s, _ := UnmarshalTimeseries([]byte(testDF4Response), nil)
 
 	if s.Size() != 136 {
 		t.Errorf("expected %d got %d", 136, s.Size())
 	}
-
 }

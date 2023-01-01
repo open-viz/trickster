@@ -30,7 +30,6 @@ import (
 )
 
 func TestSetExtent(t *testing.T) {
-
 	start := time.Now().Add(time.Duration(-6) * time.Hour)
 	end := time.Now()
 
@@ -73,11 +72,9 @@ func TestSetExtent(t *testing.T) {
 	if r.ContentLength != 31 {
 		t.Errorf("expected 31 got %d", r.ContentLength)
 	}
-
 }
 
 func TestFastForwardURL(t *testing.T) {
-
 	expected := "q=up"
 
 	conf, _, err := config.Load("trickster", "test",
@@ -114,5 +111,4 @@ func TestFastForwardURL(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }

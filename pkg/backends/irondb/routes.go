@@ -25,7 +25,6 @@ import (
 )
 
 func (c *Client) RegisterHandlers(map[string]http.Handler) {
-
 	c.TimeseriesBackend.RegisterHandlers(
 		map[string]http.Handler{
 			"health":    http.HandlerFunc(c.HealthHandler),
@@ -44,9 +43,7 @@ func (c *Client) RegisterHandlers(map[string]http.Handler) {
 
 // DefaultPathConfigs returns the default PathConfigs for the given Provider
 func (c *Client) DefaultPathConfigs(o *bo.Options) map[string]*po.Options {
-
 	paths := map[string]*po.Options{
-
 		"/" + mnRaw + "/": {
 			Path:            "/" + mnRaw + "/",
 			HandlerName:     "RawHandler",
@@ -150,5 +147,4 @@ func (c *Client) DefaultPathConfigs(o *bo.Options) map[string]*po.Options {
 	}
 
 	return paths
-
 }

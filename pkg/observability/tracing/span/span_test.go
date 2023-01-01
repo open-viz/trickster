@@ -28,13 +28,11 @@ import (
 )
 
 func TestNewChildSpan(t *testing.T) {
-
 	// test with nil context and tracer:
 	_, span := NewChildSpan(nil, nil, "test")
 
 	if span != nil {
 		t.Error("expected nil span")
-
 	}
 
 	// test with nil context but non-nil tracer
@@ -62,7 +60,6 @@ func TestNewChildSpan(t *testing.T) {
 }
 
 func TestPrepareRequest(t *testing.T) {
-
 	r, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	_, sp := PrepareRequest(r, nil)

@@ -34,7 +34,6 @@ type firstResponseGate struct {
 }
 
 func (c *Client) handleFirstResponse(w http.ResponseWriter, r *http.Request) {
-
 	hl := c.pool.Next() // should return a fanout list
 	l := len(hl)
 	if l == 0 {
@@ -68,7 +67,8 @@ func (c *Client) handleFirstResponse(w http.ResponseWriter, r *http.Request) {
 }
 
 func newFirstResponseGate(w http.ResponseWriter, c *responderClaim, i int, fgr bool,
-	fgrCodes map[int]interface{}) *firstResponseGate {
+	fgrCodes map[int]interface{},
+) *firstResponseGate {
 	return &firstResponseGate{ResponseWriter: w, c: c, fh: http.Header{}, i: i, fgr: fgr}
 }
 
@@ -77,7 +77,7 @@ func (frg *firstResponseGate) Header() http.Header {
 }
 
 func (frg *firstResponseGate) WriteHeader(i int) {
-	var custom = frg.fgr && len(frg.fgrCodes) > 0
+	custom := frg.fgr && len(frg.fgrCodes) > 0
 	var isGood bool
 	if custom {
 		_, isGood = frg.fgrCodes[i]

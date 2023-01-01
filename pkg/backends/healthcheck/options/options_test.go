@@ -27,7 +27,6 @@ import (
 )
 
 func TestNew(t *testing.T) {
-
 	o := New()
 	if o == nil {
 		t.Error("expected non-nil options")
@@ -52,7 +51,6 @@ func TestClone(t *testing.T) {
 	if o2.Verb != "trickster" {
 		t.Error("clone mismatch")
 	}
-
 }
 
 func TestURL(t *testing.T) {
@@ -68,7 +66,6 @@ func TestURL(t *testing.T) {
 	if u.String() != expected {
 		t.Errorf("expected %s got %s", expected, u.String())
 	}
-
 }
 
 func TestHasExpectedBody(t *testing.T) {
@@ -91,7 +88,6 @@ func TestSetExpectedBody(t *testing.T) {
 }
 
 func TestOverlay(t *testing.T) {
-
 	o := New()
 	o.Overlay("", nil)
 	if o.IntervalMS != 0 {
@@ -136,7 +132,6 @@ backends:
 `
 
 func TestCalibrateTimeout(t *testing.T) {
-
 	const defaultTimeout = time.Duration(DefaultHealthCheckTimeoutMS) * time.Millisecond
 	const maxTimeout = time.Duration(MaxProbeWaitMS) * time.Millisecond
 	const minTimeout = time.Duration(MinProbeWaitMS) * time.Millisecond

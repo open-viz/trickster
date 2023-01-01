@@ -29,7 +29,8 @@ import (
 )
 
 func testPool(mech pool.Mechanism, healthyFloor int, hs []http.Handler) (pool.Pool,
-	[]*pool.Target, []*healthcheck.Status) {
+	[]*pool.Target, []*healthcheck.Status,
+) {
 	var targets []*pool.Target
 	var statuses []*healthcheck.Status
 	if len(hs) > 0 {
@@ -46,7 +47,6 @@ func testPool(mech pool.Mechanism, healthyFloor int, hs []http.Handler) (pool.Po
 }
 
 func TestHandleRoundRobin(t *testing.T) {
-
 	w := httptest.NewRecorder()
 	c := &Client{}
 	c.handleRoundRobin(w, nil)
@@ -77,5 +77,4 @@ func TestHandleRoundRobin(t *testing.T) {
 	if w.Code != http.StatusBadGateway {
 		t.Error("expected 502 got", w.Code)
 	}
-
 }

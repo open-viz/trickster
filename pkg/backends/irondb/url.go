@@ -28,7 +28,6 @@ import (
 
 // SetExtent will change the upstream request query to use the provided Extent.
 func (c *Client) SetExtent(r *http.Request, trq *timeseries.TimeRangeQuery, extent *timeseries.Extent) {
-
 	rsc := request.GetResources(r)
 	if rsc == nil || rsc.PathConfig == nil {
 		return
@@ -42,7 +41,6 @@ func (c *Client) SetExtent(r *http.Request, trq *timeseries.TimeRangeQuery, exte
 // FastForwardRequest returns an *http.Request crafted to collect Fast Forward
 // data from the Origin, based on the provided HTTP Request
 func (c *Client) FastForwardRequest(r *http.Request) (*http.Request, error) {
-
 	rsc := request.GetResources(r)
 	if rsc == nil || rsc.PathConfig == nil {
 		return nil, errors.New("missing path config")
@@ -64,8 +62,8 @@ func (c *Client) FastForwardRequest(r *http.Request) (*http.Request, error) {
 // inbound HTTP Request.
 func (c *Client) ParseTimeRangeQuery(
 	r *http.Request) (*timeseries.TimeRangeQuery, *timeseries.RequestOptions,
-	bool, error) {
-
+	bool, error,
+) {
 	rsc := request.GetResources(r)
 	if rsc == nil || rsc.PathConfig == nil {
 		return nil, nil, false, errors.New("missing path config")

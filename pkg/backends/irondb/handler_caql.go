@@ -42,8 +42,8 @@ func (c *Client) CAQLHandler(w http.ResponseWriter, r *http.Request) {
 // provided Extent.
 func (c *Client) caqlHandlerSetExtent(r *http.Request,
 	trq *timeseries.TimeRangeQuery,
-	extent *timeseries.Extent) {
-
+	extent *timeseries.Extent,
+) {
 	if r == nil || extent == nil || (extent.Start.IsZero() && extent.End.IsZero()) {
 		return
 	}
@@ -70,7 +70,8 @@ func (c *Client) caqlHandlerSetExtent(r *http.Request,
 // caqlHandlerParseTimeRangeQuery parses the key parts of a TimeRangeQuery
 // from the inbound HTTP Request.
 func (c *Client) caqlHandlerParseTimeRangeQuery(
-	r *http.Request) (*timeseries.TimeRangeQuery, error) {
+	r *http.Request,
+) (*timeseries.TimeRangeQuery, error) {
 	trq := &timeseries.TimeRangeQuery{}
 	trq.Statement = r.URL.Path
 
@@ -120,8 +121,8 @@ func (c *Client) caqlHandlerParseTimeRangeQuery(
 // caqlHandlerFastForwardURL returns the url to fetch the Fast Forward value
 // based on a timerange URL.
 func (c *Client) caqlHandlerFastForwardRequest(
-	r *http.Request) (*http.Request, error) {
-
+	r *http.Request,
+) (*http.Request, error) {
 	rsc := request.GetResources(r)
 	trq := rsc.TimeRangeQuery
 

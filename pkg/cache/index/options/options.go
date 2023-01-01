@@ -60,7 +60,6 @@ func New() *Options {
 // Equal returns true if all members of the subject and provided Options
 // are identical
 func (o *Options) Equal(o2 *Options) bool {
-
 	if o2 == nil {
 		return false
 	}

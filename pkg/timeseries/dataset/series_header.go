@@ -24,8 +24,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 	"github.com/trickstercache/trickster/v2/pkg/checksum/fnv"
+	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 )
 
 // SeriesHeader is the header section of a series, and describes its
@@ -71,14 +71,14 @@ func (sh *SeriesHeader) Clone() SeriesHeader {
 		Name:       sh.Name,
 		Tags:       sh.Tags.Clone(),
 		FieldsList: make([]timeseries.FieldDefinition, len(sh.FieldsList)),
-		//FieldsLookup:   make(map[string]*FieldDefinition),
+		// FieldsLookup:   make(map[string]*FieldDefinition),
 		TimestampIndex: sh.TimestampIndex,
 		QueryStatement: sh.QueryStatement,
 		Size:           sh.Size,
 	}
 	for i, fd := range sh.FieldsList {
 		clone.FieldsList[i] = fd.Clone()
-		//clone.FieldsLookup[fd.Name] = clone.FieldsList[i]
+		// clone.FieldsLookup[fd.Name] = clone.FieldsList[i]
 	}
 	return clone
 }

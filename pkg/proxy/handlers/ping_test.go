@@ -25,7 +25,6 @@ import (
 )
 
 func TestPingHandler(t *testing.T) {
-
 	conf, _, err := config.Load("trickster-test", "test",
 		[]string{"-provider", "reverseproxycache", "-origin-url", "http://0/"})
 	if err != nil {
@@ -52,5 +51,4 @@ func TestPingHandler(t *testing.T) {
 	if string(bodyBytes) != "pong" {
 		t.Errorf("expected 'pong' got %s.", bodyBytes)
 	}
-
 }

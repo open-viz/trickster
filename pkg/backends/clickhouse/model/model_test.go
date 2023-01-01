@@ -276,7 +276,6 @@ func TestMarshalTSVWithNamesAndTypes(t *testing.T) {
 }
 
 func TestUnmarshalTimeseries(t *testing.T) {
-
 	ts, err := UnmarshalTimeseries([]byte(testDataTSVWithNamesAndTypes), testTRQ.Clone())
 	if err != nil {
 		t.Error(err)
@@ -292,7 +291,6 @@ func TestUnmarshalTimeseries(t *testing.T) {
 		!ds.ExtentList[0].End.Equal(testDataset.ExtentList[0].End) {
 		t.Error("unexpected extents: ", ds.ExtentList)
 	}
-
 }
 
 func TestMarshalTimeseries(t *testing.T) {
@@ -303,5 +301,4 @@ func TestMarshalTimeseries(t *testing.T) {
 	if string(b) != testDataTSVWithNamesAndTypes {
 		t.Errorf("unexpected output:\n%s", string(b))
 	}
-
 }

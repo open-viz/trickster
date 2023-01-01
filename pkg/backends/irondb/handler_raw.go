@@ -37,7 +37,8 @@ func (c *Client) RawHandler(w http.ResponseWriter, r *http.Request) {
 // provided Extent.
 func (c *Client) rawHandlerSetExtent(r *http.Request,
 	trq *timeseries.TimeRangeQuery,
-	extent *timeseries.Extent) {
+	extent *timeseries.Extent,
+) {
 	q := r.URL.Query()
 	q.Set(upStart, common.FormatTimestamp(extent.Start, true))
 	q.Set(upEnd, common.FormatTimestamp(extent.End, true))
@@ -47,7 +48,8 @@ func (c *Client) rawHandlerSetExtent(r *http.Request,
 // rawHandlerParseTimeRangeQuerycommon.Parses the key parts of a TimeRangeQuery
 // from the inbound HTTP Request.
 func (c *Client) rawHandlerParseTimeRangeQuery(
-	r *http.Request) (*timeseries.TimeRangeQuery, error) {
+	r *http.Request,
+) (*timeseries.TimeRangeQuery, error) {
 	trq := &timeseries.TimeRangeQuery{}
 	trq.Statement = r.URL.Path
 

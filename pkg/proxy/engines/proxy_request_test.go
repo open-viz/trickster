@@ -34,17 +34,14 @@ import (
 )
 
 func TestCheckCacheFreshness(t *testing.T) {
-
 	// CachingPolicy should be nil and will return false
 	pr := proxyRequest{}
 	if pr.checkCacheFreshness() {
 		t.Errorf("got %t expected %t", pr.checkCacheFreshness(), false)
 	}
-
 }
 
 func TestParseRequestRanges(t *testing.T) {
-
 	r, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1/", nil)
 	r.Header.Set(headers.NameRange, "bytes=0-10")
 
@@ -83,7 +80,6 @@ func TestStripConditionalHeaders(t *testing.T) {
 }
 
 func TestSetBodyWriter(t *testing.T) {
-
 	buff := make([]byte, 0)
 	pr := proxyRequest{
 		writeToCache:     true,
@@ -109,11 +105,9 @@ func TestSetBodyWriter(t *testing.T) {
 	if pr.cacheBuffer == nil {
 		t.Error("expected non-nil cacheBody")
 	}
-
 }
 
 func TestWriteResponseBody(t *testing.T) {
-
 	pr := proxyRequest{}
 	pr.writeResponseBody()
 	if pr.responseWriter != nil {
@@ -122,7 +116,6 @@ func TestWriteResponseBody(t *testing.T) {
 }
 
 func TestDetermineCacheability(t *testing.T) {
-
 	conf, _, err := config.Load("trickster", "test",
 		[]string{"-origin-url", "http://1", "-provider", "test"})
 	if err != nil {
@@ -180,7 +173,6 @@ func TestUpdateContentLengthNilResponse(t *testing.T) {
 }
 
 func TestPrepareResponse(t *testing.T) {
-
 	r, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1/", nil)
 	r.Header.Set(headers.NameRange, "bytes=0-10")
 
@@ -223,7 +215,7 @@ func TestPrepareResponse(t *testing.T) {
 	pr.wantedRanges = nil
 	pr.prepareResponse()
 
-	//t.Errorf("%s", "foo")
+	// t.Errorf("%s", "foo")
 
 }
 
@@ -250,7 +242,6 @@ func TestPrepareResponsePreconditionFailed(t *testing.T) {
 }
 
 func TestPrepareRevalidationRequest(t *testing.T) {
-
 	r, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1/", nil)
 	r.Header.Set(headers.NameRange, "bytes=0-10,12-20")
 
@@ -274,11 +265,9 @@ func TestPrepareRevalidationRequest(t *testing.T) {
 	if v != expected {
 		t.Errorf("expected %s got %s", expected, v)
 	}
-
 }
 
 func TestPrepareRevalidationRequestNoRange(t *testing.T) {
-
 	r, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1/", nil)
 	r.Header.Set(headers.NameRange, "bytes=0-10,12-20")
 
@@ -290,7 +279,7 @@ func TestPrepareRevalidationRequestNoRange(t *testing.T) {
 		upstreamRequest:  r,
 		cachingPolicy:    &CachingPolicy{},
 		upstreamResponse: &http.Response{},
-		cacheDocument:    &HTTPDocument{}, //Ranges: byterange.Ranges{byterange.Range{Start: 30, End: 40}}},
+		cacheDocument:    &HTTPDocument{}, // Ranges: byterange.Ranges{byterange.Range{Start: 30, End: 40}}},
 		cacheStatus:      status.LookupStatusPartialHit,
 		wantedRanges:     byterange.Ranges{{Start: 0, End: 10}, {Start: 12, End: 20}},
 	}
@@ -305,7 +294,6 @@ func TestPrepareRevalidationRequestNoRange(t *testing.T) {
 }
 
 func TestPrepareUpstreamRequests(t *testing.T) {
-
 	r, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1/", nil)
 	r.Header.Set(headers.NameRange, "bytes=0-10,12-20")
 
@@ -334,7 +322,6 @@ func TestPrepareUpstreamRequests(t *testing.T) {
 }
 
 func TestStoreTrueContentType(t *testing.T) {
-
 	ts, _, r, _, _ := setupTestHarnessOPC("", "test", http.StatusOK, nil)
 	defer ts.Close()
 
@@ -357,16 +344,13 @@ func TestStoreTrueContentType(t *testing.T) {
 	if pr.cacheDocument.ContentType != expected {
 		t.Errorf("expected %s got %s", expected, pr.cacheDocument.ContentType)
 	}
-
 }
 
 func TestReconstituteResponses(t *testing.T) {
-
 	pr := &proxyRequest{}
 
 	pr.reconstituteResponses()
 	if len(pr.originRequests) != 0 {
 		t.Errorf("expected %d got %d", 0, len(pr.originRequests))
 	}
-
 }

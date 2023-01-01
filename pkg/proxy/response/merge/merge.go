@@ -62,7 +62,6 @@ func (rg *ResponseGate) Body() []byte {
 
 // Write is not used with a ResponseGate
 func (rg *ResponseGate) Write(b []byte) (int, error) {
-
 	l := len(b)
 
 	if l == 0 {

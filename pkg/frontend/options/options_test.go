@@ -19,7 +19,6 @@ package options
 import "testing"
 
 func TestFrontendOptions(t *testing.T) {
-
 	f1 := New()
 	f2 := New()
 

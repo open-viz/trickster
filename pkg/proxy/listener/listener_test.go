@@ -55,7 +55,6 @@ func TestListeners(t *testing.T) {
 	var err error
 	wg.Add(1)
 	go func() {
-
 		tc := &tls.Config{
 			Certificates: make([]tls.Certificate, 1),
 		}
@@ -135,7 +134,6 @@ func TestListenerAccept(t *testing.T) {
 }
 
 func TestNewListenerTLS(t *testing.T) {
-
 	c := config.NewConfig()
 	o := c.Backends["default"]
 	c.Frontend.ServeTLS = true
@@ -165,11 +163,9 @@ func TestNewListenerTLS(t *testing.T) {
 	} else {
 		defer l.Close()
 	}
-
 }
 
 func TestListenerConnectionLimitWorks(t *testing.T) {
-
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		fmt.Fprint(w, "hello!")
@@ -248,7 +244,6 @@ func TestListenerConnectionLimitWorks(t *testing.T) {
 					res.Body.Close()
 				}()
 			}
-
 		})
 	}
 }
@@ -320,7 +315,6 @@ func TestUpdateRouters(t *testing.T) {
 }
 
 func TestCloseObservedConnection(t *testing.T) {
-
 	s := httptest.NewServer(http.HandlerFunc(testutil.BasicHTTPHandler))
 	defer s.Close()
 	address := s.URL[7:]

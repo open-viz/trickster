@@ -24,11 +24,11 @@ import (
 	"strings"
 
 	"github.com/trickstercache/trickster/v2/pkg/backends/irondb/common"
+	"github.com/trickstercache/trickster/v2/pkg/checksum/md5"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/engines"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/errors"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/urls"
 	"github.com/trickstercache/trickster/v2/pkg/timeseries"
-	"github.com/trickstercache/trickster/v2/pkg/checksum/md5"
 )
 
 // TextHandler handles requests for text timeseries data and processes them
@@ -42,7 +42,8 @@ func (c *Client) TextHandler(w http.ResponseWriter, r *http.Request) {
 // provided Extent.
 func (c *Client) textHandlerSetExtent(r *http.Request,
 	trq *timeseries.TimeRangeQuery,
-	extent *timeseries.Extent) {
+	extent *timeseries.Extent,
+) {
 	ps := strings.SplitN(strings.TrimPrefix(r.URL.Path, "/"), "/", 5)
 	if len(ps) < 5 || ps[0] != "read" {
 		return
@@ -63,7 +64,8 @@ func (c *Client) textHandlerSetExtent(r *http.Request,
 // textHandlerParseTimeRangeQuery parses the key parts of a TimeRangeQuery
 // from the inbound HTTP Request.
 func (c *Client) textHandlerParseTimeRangeQuery(
-	r *http.Request) (*timeseries.TimeRangeQuery, error) {
+	r *http.Request,
+) (*timeseries.TimeRangeQuery, error) {
 	trq := &timeseries.TimeRangeQuery{}
 	ps := strings.SplitN(strings.TrimPrefix(r.URL.Path, "/"), "/", 5)
 	if len(ps) < 5 || ps[0] != "read" {
@@ -87,7 +89,8 @@ func (c *Client) textHandlerParseTimeRangeQuery(
 // textHandlerDeriveCacheKey calculates a query-specific keyname based on the
 // user request.
 func (c *Client) textHandlerDeriveCacheKey(path string, params url.Values,
-	headers http.Header, body io.ReadCloser, extra string) (string, io.ReadCloser) {
+	headers http.Header, body io.ReadCloser, extra string,
+) (string, io.ReadCloser) {
 	var sb strings.Builder
 	sb.WriteString(path)
 	ps := strings.SplitN(strings.TrimPrefix(path, "/"), "/", 5)

@@ -27,12 +27,11 @@ import (
 	tl "github.com/trickstercache/trickster/v2/pkg/observability/logging"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/errors"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/request"
-	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 	tu "github.com/trickstercache/trickster/v2/pkg/testutil"
+	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 )
 
 func TestRollupHandler(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -73,7 +72,6 @@ func TestRollupHandler(t *testing.T) {
 }
 
 func TestRollupHandlerSetExtent(t *testing.T) {
-
 	// provide bad URL with no TimeRange query params
 	// hc := tu.NewTestWebClient()
 	o := bo.New()
@@ -100,11 +98,9 @@ func TestRollupHandlerSetExtent(t *testing.T) {
 	client.rollupHandlerSetExtent(r, nil, &timeseries.Extent{Start: then, End: now})
 	r.URL.RawQuery = "start_ts=0&end_ts=900&rollup_span=300s&type=average"
 	client.rollupHandlerSetExtent(r, nil, &timeseries.Extent{Start: now, End: now})
-
 }
 
 func TestRollupHandlerParseTimeRangeQuery(t *testing.T) {
-
 	// provide bad URL with no TimeRange query params
 	// hc := tu.NewTestWebClient()
 	o := bo.New()
@@ -178,11 +174,9 @@ func TestRollupHandlerParseTimeRangeQuery(t *testing.T) {
 	if err.Error() != expectedS {
 		t.Errorf("expected %s got %s", expectedS, err.Error())
 	}
-
 }
 
 func TestRollupHandlerFastForwardRequestError(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -207,5 +201,4 @@ func TestRollupHandlerFastForwardRequestError(t *testing.T) {
 	if err == nil {
 		t.Errorf("expected error: %s", "invalid parameters")
 	}
-
 }

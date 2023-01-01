@@ -46,11 +46,9 @@ func TestLoadConfiguration(t *testing.T) {
 	if conf.Caches["default"].Index.ReapInterval != time.Duration(3)*time.Second {
 		t.Errorf("expected 3, got %s", conf.Caches["default"].Index.ReapInterval)
 	}
-
 }
 
 func TestLoadConfigurationFileFailures(t *testing.T) {
-
 	tests := []struct {
 		filename string
 		expected string
@@ -97,14 +95,11 @@ func TestLoadConfigurationFileFailures(t *testing.T) {
 			} else if !strings.HasSuffix(err.Error(), test.expected) {
 				t.Errorf("expected error `%s` got `%s`", test.expected, err.Error())
 			}
-
 		})
 	}
-
 }
 
 func TestFullLoadConfiguration(t *testing.T) {
-
 	td := t.TempDir()
 
 	kb, cb, _ := tlstest.GetTestKeyAndCert(false)
@@ -112,12 +107,12 @@ func TestFullLoadConfiguration(t *testing.T) {
 	keyfile := td + "/key.pem"
 	confFile := td + "/trickster_test_config.conf"
 
-	err := os.WriteFile(certfile, cb, 0600)
+	err := os.WriteFile(certfile, cb, 0o600)
 	if err != nil {
 		t.Error(err)
 	}
 
-	err = os.WriteFile(keyfile, kb, 0600)
+	err = os.WriteFile(keyfile, kb, 0o600)
 	if err != nil {
 		t.Error(err)
 	}
@@ -125,7 +120,7 @@ func TestFullLoadConfiguration(t *testing.T) {
 	b, err := os.ReadFile("../../../testdata/test.full.02.conf")
 	b = []byte(strings.ReplaceAll(string(b), `../../testdata/test.02.`, td+"/"))
 
-	err = os.WriteFile(confFile, b, 0600)
+	err = os.WriteFile(confFile, b, 0o600)
 	if err != nil {
 		t.Error(err)
 	}
@@ -579,7 +574,6 @@ func TestLoadConfigurationBadArg(t *testing.T) {
 }
 
 func TestLoadConfigurationWarning1(t *testing.T) {
-
 	a := []string{"-config", "../../../testdata/test.warning1.conf"}
 	// it should not error if config path is not set
 	conf, _, err := Load("trickster-test", "0", a)
@@ -593,11 +587,9 @@ func TestLoadConfigurationWarning1(t *testing.T) {
 	if l != expected {
 		t.Errorf("expected %d got %d", expected, l)
 	}
-
 }
 
 func TestLoadConfigurationWarning2(t *testing.T) {
-
 	a := []string{"-config", "../../../testdata/test.warning2.conf"}
 	// it should not error if config path is not set
 	conf, _, err := Load("trickster-test", "0", a)
@@ -611,7 +603,6 @@ func TestLoadConfigurationWarning2(t *testing.T) {
 	if l != expected {
 		t.Errorf("expected %d got %d", expected, l)
 	}
-
 }
 
 func TestLoadEmptyArgs(t *testing.T) {

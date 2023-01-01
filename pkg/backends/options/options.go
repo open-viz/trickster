@@ -47,7 +47,6 @@ type Lookup map[string]*Options
 
 // Options is a collection of configurations for Trickster backends
 type Options struct {
-
 	// HTTP and Proxy Configurations
 	//
 	// Hosts identifies the frontend hostnames this backend should handle (virtual hosting)
@@ -74,7 +73,7 @@ type Options struct {
 	// timestamps worth of data to store in cache for each query
 	TimeseriesRetentionFactor int `json:"timeseries_retention_factor,omitempty"`
 	// TimeseriesEvictionMethodName specifies which methodology ("oldest", "lru") is used to identify
-	//timeseries to evict from a full cache object
+	// timeseries to evict from a full cache object
 	TimeseriesEvictionMethodName string `json:"timeseries_eviction_method,omitempty"`
 	// BackfillToleranceMS prevents values with timestamps newer than the provided number of
 	// milliseconds from being cached. this allows propagation of upstream backfill operations
@@ -261,7 +260,6 @@ func New() *Options {
 
 // Clone returns an exact copy of an *backends.Options
 func (o *Options) Clone() *Options {
-
 	no := &Options{}
 	no.DearticulateUpstreamRanges = o.DearticulateUpstreamRanges
 	no.BackfillTolerance = o.BackfillTolerance
@@ -503,7 +501,6 @@ func SetDefaults(
 	backends Lookup,
 	activeCaches map[string]interface{},
 ) (*Options, error) {
-
 	if metadata == nil {
 		return nil, ErrInvalidMetadata
 	}
@@ -705,7 +702,6 @@ func SetDefaults(
 // CloneYAMLSafe returns a copy of the Options that is safe to export to YAML without
 // exposing credentials (by masking known credential fields with "*****")
 func (o *Options) CloneYAMLSafe() *Options {
-
 	co := o.Clone()
 	for _, w := range co.Paths {
 		w.Handler = nil

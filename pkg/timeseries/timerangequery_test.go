@@ -25,7 +25,6 @@ import (
 )
 
 func TestNormalizeExtent(t *testing.T) {
-
 	tmrw := time.Now().Add(time.Duration(24) * time.Hour).Unix()
 	expected := (time.Now().Unix() / 10) * 10
 
@@ -56,9 +55,10 @@ func TestNormalizeExtent(t *testing.T) {
 
 	for i, test := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-
-			trq := TimeRangeQuery{Statement: "up", Extent: Extent{Start: time.Unix(test.start, 0),
-				End: time.Unix(test.end, 0)}, Step: time.Duration(test.stepSecs) * time.Second}
+			trq := TimeRangeQuery{Statement: "up", Extent: Extent{
+				Start: time.Unix(test.start, 0),
+				End:   time.Unix(test.end, 0),
+			}, Step: time.Duration(test.stepSecs) * time.Second}
 
 			trq.NormalizeExtent()
 
@@ -74,8 +74,10 @@ func TestNormalizeExtent(t *testing.T) {
 
 func TestClone(t *testing.T) {
 	u, _ := url.Parse("http://127.0.0.1/")
-	trq := &TimeRangeQuery{Statement: "1234", Extent: Extent{Start: time.Unix(5, 0),
-		End: time.Unix(10, 0)}, Step: time.Duration(5) * time.Second, TemplateURL: u}
+	trq := &TimeRangeQuery{Statement: "1234", Extent: Extent{
+		Start: time.Unix(5, 0),
+		End:   time.Unix(10, 0),
+	}, Step: time.Duration(5) * time.Second, TemplateURL: u}
 
 	trq.TagFieldDefintions = []FieldDefinition{{}}
 	trq.ValueFieldDefinitions = []FieldDefinition{{}}
@@ -87,10 +89,11 @@ func TestClone(t *testing.T) {
 }
 
 func TestSizeTRQ(t *testing.T) {
-
 	u, _ := url.Parse("http://127.0.0.1/")
-	trq := &TimeRangeQuery{Statement: "1234", Extent: Extent{Start: time.Unix(5, 0),
-		End: time.Unix(10, 0)}, Step: time.Duration(5) * time.Second, TemplateURL: u}
+	trq := &TimeRangeQuery{Statement: "1234", Extent: Extent{
+		Start: time.Unix(5, 0),
+		End:   time.Unix(10, 0),
+	}, Step: time.Duration(5) * time.Second, TemplateURL: u}
 
 	size := trq.Size()
 
@@ -100,7 +103,6 @@ func TestSizeTRQ(t *testing.T) {
 }
 
 func TestExtractBackfillTolerance(t *testing.T) {
-
 	trq := &TimeRangeQuery{}
 
 	trq.ExtractBackfillTolerance("testing trickster-backfill-tolerance:30 ")
@@ -112,8 +114,10 @@ func TestExtractBackfillTolerance(t *testing.T) {
 
 func TestStringTRQ(t *testing.T) {
 	const expected = `{ "statement": "1234", "step": "5s", "extent": "5000-10000", "tsd": "{"name":"","type":0,"pos":0,"stype":"","provider1":0}", "td": [], "vd": [] }`
-	trq := &TimeRangeQuery{Statement: "1234", Extent: Extent{Start: time.Unix(5, 0),
-		End: time.Unix(10, 0)}, Step: time.Duration(5) * time.Second}
+	trq := &TimeRangeQuery{Statement: "1234", Extent: Extent{
+		Start: time.Unix(5, 0),
+		End:   time.Unix(10, 0),
+	}, Step: time.Duration(5) * time.Second}
 	s := trq.String()
 
 	if s != expected {
@@ -122,7 +126,6 @@ func TestStringTRQ(t *testing.T) {
 }
 
 func TestGetBackfillTolerance(t *testing.T) {
-
 	expected := time.Second * 5
 
 	trq := &TimeRangeQuery{Statement: "1234"}
@@ -151,5 +154,4 @@ func TestGetBackfillTolerance(t *testing.T) {
 	if i != 0 {
 		t.Errorf("expected %d got %d", 0, i)
 	}
-
 }

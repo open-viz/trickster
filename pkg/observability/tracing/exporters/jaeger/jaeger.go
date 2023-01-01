@@ -32,7 +32,6 @@ import (
 
 // New returns a new Jaeger Tracer based on the provided options
 func New(options *options.Options) (*tracing.Tracer, error) {
-
 	var tp trace.TracerProvider
 	var err error
 
@@ -99,5 +98,4 @@ func New(options *options.Options) (*tracing.Tracer, error) {
 		Options:      options,
 		ShutdownFunc: exporter.Shutdown,
 	}, nil
-
 }

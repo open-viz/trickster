@@ -25,12 +25,11 @@ import (
 	bo "github.com/trickstercache/trickster/v2/pkg/backends/options"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/errors"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/request"
-	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 	tu "github.com/trickstercache/trickster/v2/pkg/testutil"
+	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 )
 
 func TestTextHandler(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -70,7 +69,6 @@ func TestTextHandler(t *testing.T) {
 }
 
 func TestTextHandlerDeriveCacheKey(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -87,11 +85,9 @@ func TestTextHandlerDeriveCacheKey(t *testing.T) {
 	if result != expected {
 		t.Errorf("expected %s got %s", expected, result)
 	}
-
 }
 
 func TestTextHandlerParseTimeRangeQuery(t *testing.T) {
-
 	path := "/read/0/900/00112233-4455-6677-8899-aabbccddeeff/metric"
 	r, err := http.NewRequest(http.MethodGet, "http://0"+path, nil)
 	if err != nil {
@@ -108,7 +104,7 @@ func TestTextHandlerParseTimeRangeQuery(t *testing.T) {
 	client := backendClient.(*Client)
 	o.Paths = client.DefaultPathConfigs(o)
 
-	//tr := model.NewRequest("RollupHandler", r.Method, r.URL, r.Header, cfg.Timeout, r, hc)
+	// tr := model.NewRequest("RollupHandler", r.Method, r.URL, r.Header, cfg.Timeout, r, hc)
 
 	// case where everything is good
 	_, err = client.textHandlerParseTimeRangeQuery(r)
@@ -138,11 +134,9 @@ func TestTextHandlerParseTimeRangeQuery(t *testing.T) {
 	if err == nil || err.Error() != expected2 {
 		t.Errorf("expected %s got %s", expected2, err.Error())
 	}
-
 }
 
 func TestTextHandlerSetExtent(t *testing.T) {
-
 	// provide bad URL with no TimeRange query params
 	// hc := tu.NewTestWebClient()
 	o := bo.New()
@@ -156,7 +150,7 @@ func TestTextHandlerSetExtent(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	//tr := model.NewRequest("TextHandler", r.Method, r.URL, r.Header, cfg.Timeout, r, hc)
+	// tr := model.NewRequest("TextHandler", r.Method, r.URL, r.Header, cfg.Timeout, r, hc)
 
 	now := time.Now()
 	then := now.Add(-5 * time.Hour)
@@ -165,5 +159,4 @@ func TestTextHandlerSetExtent(t *testing.T) {
 	if r.URL.Path != "/test" {
 		t.Errorf("expected %s got %s", "/test", r.URL.Path)
 	}
-
 }

@@ -28,7 +28,6 @@ import (
 )
 
 func (c *Client) RegisterHandlers(map[string]http.Handler) {
-
 	c.Backend.RegisterHandlers(
 		map[string]http.Handler{
 			"health":        http.HandlerFunc(c.HealthHandler),
@@ -36,12 +35,10 @@ func (c *Client) RegisterHandlers(map[string]http.Handler) {
 			"localresponse": http.HandlerFunc(handlers.HandleLocalResponse),
 		},
 	)
-
 }
 
 // DefaultPathConfigs returns the default PathConfigs for the given Provider
 func (c *Client) DefaultPathConfigs(o *bo.Options) map[string]*po.Options {
-
 	am := methods.AllHTTPMethods()
 
 	paths := map[string]*po.Options{

@@ -27,7 +27,6 @@ import (
 )
 
 func TestRawHandler(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -68,9 +67,8 @@ func TestRawHandler(t *testing.T) {
 }
 
 func TestRawHandlerParseTimeRangeQuery(t *testing.T) {
-
 	// provide bad URL with no TimeRange query params
-	//hc := tu.NewTestWebClient()
+	// hc := tu.NewTestWebClient()
 	o := bo.New()
 	backendClient, err := NewClient("test", o, nil, nil, nil, nil)
 	if err != nil {
@@ -83,7 +81,7 @@ func TestRawHandlerParseTimeRangeQuery(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	//tr := model.NewRequest("RawHandler", r.Method, r.URL, r.Header, cfg.Timeout, r, hc)
+	// tr := model.NewRequest("RawHandler", r.Method, r.URL, r.Header, cfg.Timeout, r, hc)
 
 	// case where everything is good
 	r.URL.RawQuery = "start_ts=9012&end_ts=3456"
@@ -122,5 +120,4 @@ func TestRawHandlerParseTimeRangeQuery(t *testing.T) {
 	if err == nil {
 		t.Errorf("expected error for parameter missing")
 	}
-
 }

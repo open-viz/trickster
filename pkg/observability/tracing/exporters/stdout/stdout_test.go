@@ -24,7 +24,6 @@ import (
 )
 
 func TestNew(t *testing.T) {
-
 	_, err := New(nil)
 	if err != nil {
 		t.Error(err)
@@ -59,5 +58,4 @@ func TestNew(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }

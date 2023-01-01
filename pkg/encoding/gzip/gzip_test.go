@@ -40,7 +40,6 @@ func TestDecodeEncode(t *testing.T) {
 	if err == nil {
 		t.Error("expected EOF error")
 	}
-
 }
 
 func TestNewDecoder(t *testing.T) {
@@ -61,7 +60,6 @@ func TestNewDecoder(t *testing.T) {
 	if err == nil {
 		t.Error("expected EOF error")
 	}
-
 }
 
 func TestNewEncoder(t *testing.T) {

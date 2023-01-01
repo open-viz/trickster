@@ -78,7 +78,6 @@ func (o *Options) Equal(o2 *Options) bool {
 
 // Validate returns true if the TLS Options are validated
 func (o *Options) Validate() (bool, error) {
-
 	if (o.FullChainCertPath == "" || o.PrivateKeyPath == "") &&
 		(o.CertificateAuthorityPaths == nil || len(o.CertificateAuthorityPaths) == 0) {
 		return false, nil

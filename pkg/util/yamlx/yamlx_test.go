@@ -32,7 +32,6 @@ frontend:
 `
 
 func TestGetKeyList(t *testing.T) {
-
 	keys, err := GetKeyList(testYML)
 	if err != nil {
 		t.Error(err)
@@ -41,43 +40,34 @@ func TestGetKeyList(t *testing.T) {
 	if _, ok := keys["frontend.test.subkey.types"]; !ok {
 		t.Error("missing key")
 	}
-
 }
 
 func TestIsDefined(t *testing.T) {
-
 	k := KeyLookup{"test": nil}
 	if k.IsDefined("testing") {
 		t.Error("expected false")
 	}
-
 }
 
 func TestGetIndentDepth(t *testing.T) {
-
 	i := getIndentDepth("      ")
 	if i != 6 {
 		t.Errorf("expected %d got %d", 6, i)
 	}
-
 }
 
 func TestGetDepthData(t *testing.T) {
-
 	_, err := getDepthData(1, nil)
 	if err != errDepthNotInList {
 		t.Error("expected err for depth not in list", err)
 	}
-
 }
 
 func TestGetParentDepthData(t *testing.T) {
-
 	_, err := getParentDepthData(1, nil, nil)
 	if err != errEmptyDepthList {
 		t.Error("expected err for empty depth list", err)
 	}
-
 }
 
 func TestGetKeyword(t *testing.T) {

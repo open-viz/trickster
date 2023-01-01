@@ -29,6 +29,7 @@ const testResponse = `[
 	[300.000,1.5]
 ]
 `
+
 const testResponse2 = `[
 	[300.000,2],
 	[900.000,2.75],
@@ -91,7 +92,6 @@ func TestDataPointMarshalJSON(t *testing.T) {
 	if err == nil {
 		t.Error("expected error for invalid character")
 	}
-
 }
 
 func TestSeriesEnvelopeSetTimeRangeQuery(t *testing.T) {
@@ -372,7 +372,6 @@ func TestMarshalTimeseries(t *testing.T) {
 	if string(bytes) != exp {
 		t.Errorf("Expected JSON: %s, got: %s", exp, string(bytes))
 	}
-
 }
 
 func TestUnmarshalTimeseries(t *testing.T) {
@@ -472,7 +471,6 @@ func TestUnmarshalInstantaneous(t *testing.T) {
 }
 
 func TestTSSize(t *testing.T) {
-
 	bytes := []byte(`[[99000,1.5],[99000.500,1.5]]`)
 
 	s, _ := UnmarshalTimeseries(bytes, nil)
@@ -482,26 +480,21 @@ func TestTSSize(t *testing.T) {
 	if size != 96 {
 		t.Errorf("expected %d got %d", 96, size)
 	}
-
 }
 
 func TestMarshalJSONEnvelope(t *testing.T) {
-
 	se := SeriesEnvelope{StepDuration: time.Duration(1) * time.Hour}
 	_, err := se.MarshalJSON()
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestUnMarshalJSONEnvelope(t *testing.T) {
-
 	bytes := []byte(`"data"."extents"."step"`)
 	se := &SeriesEnvelope{}
 	err := se.UnmarshalJSON(bytes)
 	if err == nil {
 		t.Error("expected error for invalid character")
 	}
-
 }

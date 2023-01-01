@@ -30,9 +30,9 @@ import (
 )
 
 func TestReloadHandleFunc(t *testing.T) {
-
-	var emptyFunc = func(*config.Config, *sync.WaitGroup, *tl.Logger,
-		map[string]cache.Cache, []string, func()) error {
+	emptyFunc := func(*config.Config, *sync.WaitGroup, *tl.Logger,
+		map[string]cache.Cache, []string, func(),
+	) error {
 		return nil
 	}
 
@@ -43,7 +43,7 @@ func TestReloadHandleFunc(t *testing.T) {
 		t.Error(err)
 	}
 
-	err = os.WriteFile(testFile, tml, 0666)
+	err = os.WriteFile(testFile, tml, 0o666)
 	if err != nil {
 		t.Error(err)
 	}
@@ -58,7 +58,7 @@ func TestReloadHandleFunc(t *testing.T) {
 	f(w, r)
 	os.Remove(testFile)
 	time.Sleep(time.Millisecond * 500)
-	os.WriteFile(testFile, []byte(string(tml)), 0666)
+	os.WriteFile(testFile, []byte(string(tml)), 0o666)
 	time.Sleep(time.Millisecond * 500)
 	f(w, r)
 }

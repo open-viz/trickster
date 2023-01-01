@@ -30,11 +30,9 @@ import (
 )
 
 func testMergeFunc(w http.ResponseWriter, r *http.Request, rgs merge.ResponseGates) {
-
 }
 
 func TestHandleResponseMerge(t *testing.T) {
-
 	r, _ := http.NewRequest("GET", "http://trickstercache.org/", nil)
 	rsc := request.NewResources(nil, nil, nil, nil, nil, nil, nil)
 	rsc.ResponseMergeFunc = testMergeFunc
@@ -82,5 +80,4 @@ func TestHandleResponseMerge(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Error("expected 200 got", w.Code)
 	}
-
 }

@@ -41,8 +41,8 @@ import (
 
 // QueryCache queries the cache for an HTTPDocument and returns it
 func QueryCache(ctx context.Context, c cache.Cache, key string,
-	ranges byterange.Ranges) (*HTTPDocument, status.LookupStatus, byterange.Ranges, error) {
-
+	ranges byterange.Ranges,
+) (*HTTPDocument, status.LookupStatus, byterange.Ranges, error) {
 	rsc := tc.Resources(ctx).(*request.Resources)
 
 	ctx, span := tspan.NewChildSpan(ctx, rsc.Tracer, "QueryCache")
@@ -86,7 +86,6 @@ func QueryCache(ctx context.Context, c cache.Cache, key string,
 			var nr byterange.Ranges
 			if lookupStatus == status.LookupStatusKeyMiss && ranges != nil && len(ranges) > 0 {
 				nr = ranges
-
 			}
 			tspan.SetAttributes(rsc.Tracer, span, attribute.String("cache.status", lookupStatus.String()))
 			return d, lookupStatus, nr, err
@@ -164,8 +163,8 @@ func stripConditionalHeaders(h http.Header) {
 
 // WriteCache writes an HTTPDocument to the cache
 func WriteCache(ctx context.Context, c cache.Cache, key string, d *HTTPDocument,
-	ttl time.Duration, compressTypes map[string]interface{}) error {
-
+	ttl time.Duration, compressTypes map[string]interface{},
+) error {
 	rsc := tc.Resources(ctx).(*request.Resources)
 
 	ctx, span := tspan.NewChildSpan(ctx, rsc.Tracer, "WriteCache")
@@ -255,13 +254,13 @@ func WriteCache(ctx context.Context, c cache.Cache, key string, d *HTTPDocument,
 		)
 	}
 	return nil
-
 }
 
 // DocumentFromHTTPResponse returns an HTTPDocument from the provided
 // HTTP Response and Body
 func DocumentFromHTTPResponse(resp *http.Response, body []byte,
-	cp *CachingPolicy, logger interface{}) *HTTPDocument {
+	cp *CachingPolicy, logger interface{},
+) *HTTPDocument {
 	d := &HTTPDocument{}
 	d.StatusCode = resp.StatusCode
 	d.Status = resp.Status

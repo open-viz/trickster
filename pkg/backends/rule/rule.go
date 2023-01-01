@@ -55,15 +55,16 @@ type ruleCase struct {
 	rewriter     rewriter.RewriteInstructions
 }
 
-type caseMap map[string]*ruleCase
-type caseList []*ruleCase
+type (
+	caseMap  map[string]*ruleCase
+	caseList []*ruleCase
+)
 
 type evaluatorFunc func(*http.Request) (http.Handler, *http.Request, error)
 
 var badRequestHandler = http.HandlerFunc(handlers.HandleBadRequestResponse)
 
 func (r *rule) EvaluateOpArg(hr *http.Request) (http.Handler, *http.Request, error) {
-
 	currentHops, maxHops := context.Hops(hr.Context())
 	if r.maxRuleExecutions < maxHops {
 		maxHops = r.maxRuleExecutions
@@ -119,7 +120,6 @@ func (r *rule) EvaluateOpArg(hr *http.Request) (http.Handler, *http.Request, err
 }
 
 func (r *rule) EvaluateCaseArg(hr *http.Request) (http.Handler, *http.Request, error) {
-
 	currentHops, maxHops := context.Hops(hr.Context())
 	if r.maxRuleExecutions < maxHops {
 		maxHops = r.maxRuleExecutions

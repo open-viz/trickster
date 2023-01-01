@@ -100,8 +100,10 @@ func DeltaProxyCacheRequest(w http.ResponseWriter, r *http.Request, modeler *tim
 		OldestRetainedTimestamp = now.Truncate(trq.Step).Add(-(trq.Step * o.TimeseriesRetention))
 		if trq.Extent.End.Before(OldestRetainedTimestamp) {
 			tl.Debug(pr.Logger, "timerange end is too old to consider caching",
-				tl.Pairs{"oldestRetainedTimestamp": OldestRetainedTimestamp,
-					"step": trq.Step, "retention": o.TimeseriesRetention})
+				tl.Pairs{
+					"oldestRetainedTimestamp": OldestRetainedTimestamp,
+					"step":                    trq.Step, "retention": o.TimeseriesRetention,
+				})
 			DoProxy(w, r, true)
 			return
 		}
@@ -468,7 +470,7 @@ checkCache:
 		rts.Merge(false, ffts)
 	}
 	rts.SetExtents(nil) // so they are not included in the client response json
-	//rts.SetTimeRangeQuery(&timeseries.TimeRangeQuery{})
+	// rts.SetTimeRangeQuery(&timeseries.TimeRangeQuery{})
 	rh := doc.SafeHeaderClone()
 	sc := doc.StatusCode
 
@@ -503,8 +505,8 @@ var dpcEncodingProfile = &profile.Profile{
 
 func fetchTimeseries(pr *proxyRequest, trq *timeseries.TimeRangeQuery,
 	client backends.TimeseriesBackend, modeler *timeseries.Modeler) (timeseries.Timeseries,
-	*HTTPDocument, time.Duration, error) {
-
+	*HTTPDocument, time.Duration, error,
+) {
 	rsc := request.GetResources(pr.Request).Clone()
 	o := rsc.BackendOptions
 	pc := rsc.PathConfig
@@ -558,7 +560,8 @@ func fetchTimeseries(pr *proxyRequest, trq *timeseries.TimeRangeQuery,
 }
 
 func recordDPCResult(r *http.Request, cacheStatus status.LookupStatus, httpStatus int, path,
-	ffStatus string, elapsed float64, needed []timeseries.Extent, header http.Header) {
+	ffStatus string, elapsed float64, needed []timeseries.Extent, header http.Header,
+) {
 	recordResults(r, "DeltaProxyCache", cacheStatus, httpStatus, path, ffStatus, elapsed,
 		timeseries.ExtentList(needed), header)
 }
@@ -579,8 +582,8 @@ func getDecoderReader(resp *http.Response) io.Reader {
 // this will concurrently fetch provided requested extents
 func fetchExtents(el timeseries.ExtentList, rsc *request.Resources, h http.Header,
 	client backends.TimeseriesBackend, pr *proxyRequest, wur timeseries.UnmarshalerReaderFunc,
-	span trace.Span) ([]timeseries.Timeseries, int64, *http.Response, error) {
-
+	span trace.Span,
+) ([]timeseries.Timeseries, int64, *http.Response, error) {
 	var uncachedValueCount int64
 	var wg sync.WaitGroup
 	var appendLock, respLock sync.Mutex

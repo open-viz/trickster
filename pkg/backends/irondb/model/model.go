@@ -235,7 +235,8 @@ func (se *SeriesEnvelope) TimestampCount() int64 {
 // Merge merges the provided Timeseries list into the base Timeseries (in the
 // order provided) and optionally sorts the merged Timeseries.
 func (se *SeriesEnvelope) Merge(sort bool,
-	collection ...timeseries.Timeseries) {
+	collection ...timeseries.Timeseries,
+) {
 	for _, ts := range collection {
 		if ts != nil {
 			if se2, ok := ts.(*SeriesEnvelope); ok {
@@ -291,7 +292,8 @@ func (se *SeriesEnvelope) CropToRange(e timeseries.Extent) {
 // to support backfill tolerance. The provided extent will be marked as used
 // during crop.
 func (se *SeriesEnvelope) CropToSize(sz int, t time.Time,
-	lur timeseries.Extent) {
+	lur timeseries.Extent,
+) {
 	// The Series has no extents, so no need to do anything.
 	if len(se.ExtentList) < 1 {
 		se.Data = DataPoints{}
@@ -398,7 +400,8 @@ func UnmarshalTimeseriesReader(reader io.Reader, trq *timeseries.TimeRangeQuery)
 
 // UnmarshalTimeseries converts a JSON blob into a Timeseries value.
 func UnmarshalTimeseries(data []byte, trq *timeseries.TimeRangeQuery) (timeseries.Timeseries,
-	error) {
+	error,
+) {
 	if strings.Contains(strings.Replace(string(data), " ", "", -1),
 		`"version":"DF4"`) {
 		se := &DF4SeriesEnvelope{timeRangeQuery: trq}
@@ -420,7 +423,8 @@ func UnmarshalTimeseries(data []byte, trq *timeseries.TimeRangeQuery) (timeserie
 // UnmarshalInstantaneous is not used for IRONdb backends and is here to conform
 // to the Client interface.
 func UnmarshalInstantaneous(
-	data []byte) (timeseries.Timeseries, error) {
+	data []byte,
+) (timeseries.Timeseries, error) {
 	return UnmarshalTimeseries(data, nil) // TODO fix Instantaneous prototype
 }
 

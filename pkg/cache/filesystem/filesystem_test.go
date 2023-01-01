@@ -32,13 +32,17 @@ import (
 	tl "github.com/trickstercache/trickster/v2/pkg/observability/logging"
 )
 
-const cacheProvider = "filesystem"
-const cacheKey = "cacheKey"
+const (
+	cacheProvider = "filesystem"
+	cacheKey      = "cacheKey"
+)
 
 func storeBenchmark(b *testing.B) Cache {
 	dir := b.TempDir() + "/cache/" + cacheProvider
-	cacheConfig := co.Options{Provider: cacheProvider,
-		Filesystem: &flo.Options{CachePath: dir}, Index: &io.Options{ReapInterval: time.Second}}
+	cacheConfig := co.Options{
+		Provider:   cacheProvider,
+		Filesystem: &flo.Options{CachePath: dir}, Index: &io.Options{ReapInterval: time.Second},
+	}
 	fc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error"), locker: locks.NewNamedLocker()}
 
 	err := fc.Connect()
@@ -59,8 +63,10 @@ func storeBenchmark(b *testing.B) Cache {
 
 func newCacheConfig(t *testing.T) co.Options {
 	dir := t.TempDir() + "/cache/" + cacheProvider
-	return co.Options{Provider: cacheProvider, Filesystem: &flo.Options{CachePath: dir},
-		Index: &io.Options{ReapInterval: time.Second}}
+	return co.Options{
+		Provider: cacheProvider, Filesystem: &flo.Options{CachePath: dir},
+		Index: &io.Options{ReapInterval: time.Second},
+	}
 }
 
 func TestConfiguration(t *testing.T) {
@@ -74,7 +80,6 @@ func TestConfiguration(t *testing.T) {
 }
 
 func TestFilesystemCache_Connect(t *testing.T) {
-
 	cacheConfig := newCacheConfig(t)
 	cacheConfig.Filesystem.CachePath = t.TempDir() + "/cache"
 	fc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error"), locker: locks.NewNamedLocker()}
@@ -103,7 +108,6 @@ func TestFilesystemCache_ConnectFailed(t *testing.T) {
 }
 
 func TestFilesystemCache_Store(t *testing.T) {
-
 	const expected1 = "invalid ttl: -1"
 	const expected2 = "open /root/noaccess.trickster.filesystem.cache/cacheKey.data:"
 
@@ -140,7 +144,6 @@ func TestFilesystemCache_Store(t *testing.T) {
 	if !strings.HasPrefix(err.Error(), expected2) {
 		t.Errorf("expected error '%s' got '%s'", expected2, err.Error())
 	}
-
 }
 
 func BenchmarkCache_Store(b *testing.B) {
@@ -149,7 +152,6 @@ func BenchmarkCache_Store(b *testing.B) {
 }
 
 func TestFilesystemCache_StoreNoIndex(t *testing.T) {
-
 	const expected = "value for key [] not in cache"
 
 	cacheConfig := newCacheConfig(t)
@@ -236,7 +238,6 @@ func BenchmarkCache_StoreNoIndex(b *testing.B) {
 }
 
 func TestFilesystemCache_SetTTL(t *testing.T) {
-
 	cacheConfig := newCacheConfig(t)
 	cacheConfig.Filesystem.CachePath = t.TempDir() + "/cache"
 	fc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error"), locker: locks.NewNamedLocker()}
@@ -282,7 +283,6 @@ func TestFilesystemCache_SetTTL(t *testing.T) {
 	if diff < expected {
 		t.Errorf("expected diff >= %d, got %d from: %d - %d", expected, diff, e2, e1)
 	}
-
 }
 
 func BenchmarkCache_SetTTL(b *testing.B) {
@@ -315,7 +315,6 @@ func BenchmarkCache_SetTTL(b *testing.B) {
 }
 
 func TestFilesystemCache_Retrieve(t *testing.T) {
-
 	const expected1 = `value for key [cacheKey] not in cache`
 	const expected2 = `value for key [cacheKey-invalid] could not be deserialized from cache`
 
@@ -386,7 +385,7 @@ func TestFilesystemCache_Retrieve(t *testing.T) {
 
 	// should fail
 	filename := fc.getFileName(cacheKey + "-invalid")
-	err = os.WriteFile(filename, []byte("junk"), os.FileMode(0777))
+	err = os.WriteFile(filename, []byte("junk"), os.FileMode(0o777))
 	if err != nil {
 		t.Error(err)
 	}
@@ -442,7 +441,7 @@ func BenchmarkCache_Retrieve(b *testing.B) {
 
 		filename := fc.getFileName(cacheKey + strconv.Itoa(n))
 		// create a corrupted cache entry and expect an error
-		os.WriteFile(filename, []byte("junk"), os.FileMode(0777))
+		os.WriteFile(filename, []byte("junk"), os.FileMode(0o777))
 
 		// it should fail to retrieve a value
 		data, ls, err = fc.Retrieve(cacheKey+strconv.Itoa(n), false)
@@ -463,7 +462,6 @@ func BenchmarkCache_Retrieve(b *testing.B) {
 }
 
 func TestFilesystemCache_Remove(t *testing.T) {
-
 	cacheConfig := newCacheConfig(t)
 	cacheConfig.Filesystem.CachePath = t.TempDir() + "/cache"
 	fc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error"), locker: locks.NewNamedLocker()}
@@ -544,7 +542,6 @@ func BenchmarkCache_Remove(b *testing.B) {
 }
 
 func TestFilesystemCache_BulkRemove(t *testing.T) {
-
 	cacheConfig := newCacheConfig(t)
 	cacheConfig.Filesystem.CachePath = t.TempDir() + "/cache"
 	fc := Cache{Config: &cacheConfig, Logger: tl.ConsoleLogger("error"), locker: locks.NewNamedLocker()}

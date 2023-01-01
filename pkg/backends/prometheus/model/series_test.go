@@ -46,7 +46,6 @@ const testSeries = `{
   }`
 
 func TestSeries(t *testing.T) {
-
 	s := &WFSeries{}
 	json.Unmarshal([]byte(testSeries), &s)
 
@@ -127,11 +126,9 @@ func TestSeries(t *testing.T) {
 	if len(s1.Warnings) != 1 || s1.Warnings[0] != "test warning" {
 		t.Error("expected test warning")
 	}
-
 }
 
 func TestMergeAndWriteSeries(t *testing.T) {
-
 	var nilRG *merge.ResponseGate
 
 	tests := []struct {
@@ -170,11 +167,9 @@ func TestMergeAndWriteSeries(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func testResponseGates5() merge.ResponseGates {
-
 	b1 := []byte(`{"status":"success","data":[{"__name__":"test1","instance":"i1","job":"trickster"}]}`)
 	closer1 := io.NopCloser(bytes.NewReader(b1))
 	rsc1 := request.NewResources(nil, nil, nil, nil, nil, nil, nil)
@@ -218,11 +213,9 @@ func testResponseGates5() merge.ResponseGates {
 	rg3.Write(b3)
 
 	return merge.ResponseGates{rg1, rg2, rg3}
-
 }
 
 func testResponseGates6() merge.ResponseGates {
-
 	b1 := []byte(`{"status":"error"`)
 	closer1 := io.NopCloser(bytes.NewReader(b1))
 	rsc1 := request.NewResources(nil, nil, nil, nil, nil, nil, nil)
@@ -252,5 +245,4 @@ func testResponseGates6() merge.ResponseGates {
 	rg2.Write(b2)
 
 	return merge.ResponseGates{rg1, rg2}
-
 }

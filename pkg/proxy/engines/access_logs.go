@@ -23,7 +23,8 @@ import (
 )
 
 func logUpstreamRequest(logger interface{}, backendName, backendProvider, handlerName, method,
-	path, userAgent string, responseCode, size int, requestDuration float64) {
+	path, userAgent string, responseCode, size int, requestDuration float64,
+) {
 	tl.Debug(logger, "upstream request",
 		tl.Pairs{
 			"backendName":     backendName,

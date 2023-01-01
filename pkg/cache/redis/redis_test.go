@@ -73,8 +73,10 @@ func setupRedisCache(ct clientType) (*Cache, func()) {
 
 func TestClientSelectionSentinel(t *testing.T) {
 	const expected1 = "ERR unknown command `sentinel`"
-	args := []string{"-config", "../../../testdata/test.redis-sentinel.conf",
-		"-origin-url", "http://0.0.0.0", "-provider", "rpc", "-log-level", "info"}
+	args := []string{
+		"-config", "../../../testdata/test.redis-sentinel.conf",
+		"-origin-url", "http://0.0.0.0", "-provider", "rpc", "-log-level", "info",
+	}
 	conf, _, err := config.Load("trickster", "test", args)
 	if err != nil {
 		t.Fatal(err)
@@ -95,7 +97,6 @@ func TestClientSelectionSentinel(t *testing.T) {
 }
 
 func TestSentinelOpts(t *testing.T) {
-
 	const expected1 = `invalid 'endpoints' config`
 	const expected2 = `invalid 'sentinel_master' config`
 
@@ -120,7 +121,6 @@ func TestSentinelOpts(t *testing.T) {
 }
 
 func TestClusterOpts(t *testing.T) {
-
 	const expected1 = `invalid 'endpoints' config`
 
 	rc, close := setupRedisCache(clientTypeCluster)
@@ -135,7 +135,6 @@ func TestClusterOpts(t *testing.T) {
 }
 
 func TestClientOpts(t *testing.T) {
-
 	const expected1 = `invalid endpoint: `
 
 	rc, close := setupRedisCache(clientTypeStandard)
@@ -151,8 +150,10 @@ func TestClientOpts(t *testing.T) {
 
 func TestClientSelectionCluster(t *testing.T) {
 	expected1 := "invalid endpoint"
-	args := []string{"-config", "../../../testdata/test.redis-cluster.conf",
-		"-origin-url", "http://0.0.0.0", "-provider", "rpc", "-log-level", "info"}
+	args := []string{
+		"-config", "../../../testdata/test.redis-cluster.conf",
+		"-origin-url", "http://0.0.0.0", "-provider", "rpc", "-log-level", "info",
+	}
 	conf, _, err := config.Load("trickster", "test", args)
 	if err != nil {
 		t.Fatal(err)
@@ -174,8 +175,10 @@ func TestClientSelectionCluster(t *testing.T) {
 
 func TestClientSelectionStandard(t *testing.T) {
 	expected1 := "invalid endpoint"
-	args := []string{"-config", "../../../testdata/test.redis-standard.conf",
-		"-origin-url", "http://0.0.0.0", "-provider", "rpc", "-log-level", "info"}
+	args := []string{
+		"-config", "../../../testdata/test.redis-standard.conf",
+		"-origin-url", "http://0.0.0.0", "-provider", "rpc", "-log-level", "info",
+	}
 	conf, _, err := config.Load("trickster", "test", args)
 	if err != nil {
 		t.Fatal(err)
@@ -196,7 +199,6 @@ func TestClientSelectionStandard(t *testing.T) {
 }
 
 func TestDurationFromMS(t *testing.T) {
-
 	tests := []struct {
 		input    int
 		expected time.Duration
@@ -208,7 +210,6 @@ func TestDurationFromMS(t *testing.T) {
 
 	for i, test := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-
 			res := durationFromMS(test.input)
 
 			if res != test.expected {
@@ -216,11 +217,9 @@ func TestDurationFromMS(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestRedisCache_SetTTL(t *testing.T) {
-
 	const expected = "data"
 
 	cache, closer := setupRedisCache(clientTypeStandard)
@@ -254,7 +253,6 @@ func TestRedisCache_SetTTL(t *testing.T) {
 	if string(val) != expected {
 		t.Errorf("expected %s got %s", expected, string(val))
 	}
-
 }
 
 func BenchmarkCache_SetTTL(b *testing.B) {
@@ -264,7 +262,7 @@ func BenchmarkCache_SetTTL(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		expected := "data" + strconv.Itoa(n)
 		rc.SetTTL(cacheKey+strconv.Itoa(n), time.Duration(3600)*time.Second)
-		//time.Sleep(1010 * time.Millisecond)
+		// time.Sleep(1010 * time.Millisecond)
 		val, ls, err := rc.Retrieve(cacheKey+strconv.Itoa(n), false)
 		if err != nil {
 			b.Error(err)
@@ -384,7 +382,6 @@ func TestRedisCache_Close(t *testing.T) {
 }
 
 func TestCache_Remove(t *testing.T) {
-
 	rc, close := setupRedisCache(clientTypeStandard)
 	defer close()
 
@@ -454,7 +451,6 @@ func BenchmarkCache_Remove(b *testing.B) {
 }
 
 func TestCache_BulkRemove(t *testing.T) {
-
 	rc, close := setupRedisCache(clientTypeStandard)
 	defer close()
 

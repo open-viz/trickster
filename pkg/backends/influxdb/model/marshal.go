@@ -194,7 +194,6 @@ func marshalTimeseriesJSON(ds *dataset.DataSet, rlo *timeseries.RequestOptions, 
 }
 
 func marshalTimeseriesJSONPretty(ds *dataset.DataSet, rlo *timeseries.RequestOptions, status int, w io.Writer) error {
-
 	if ds == nil {
 		return nil
 	}

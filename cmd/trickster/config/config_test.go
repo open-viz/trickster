@@ -94,7 +94,6 @@ func TestString(t *testing.T) {
 }
 
 func TestCloneBackendOptions(t *testing.T) {
-
 	o := bo.New()
 	o.Hosts = []string{"test"}
 
@@ -108,11 +107,9 @@ func TestCloneBackendOptions(t *testing.T) {
 	if oc2.Hosts[0] != "test" {
 		t.Errorf("expected %s got %s", "test", oc2.Hosts[0])
 	}
-
 }
 
 func TestCheckFileLastModified(t *testing.T) {
-
 	c := NewConfig()
 
 	if !c.CheckFileLastModified().IsZero() {
@@ -126,7 +123,6 @@ func TestCheckFileLastModified(t *testing.T) {
 }
 
 func TestProcessPprofConfig(t *testing.T) {
-
 	c := NewConfig()
 	c.Main.PprofServer = ""
 
@@ -145,22 +141,20 @@ func TestProcessPprofConfig(t *testing.T) {
 	if err == nil {
 		t.Error("expected error for invalid pprof server name")
 	}
-
 }
 
 func TestSetDefaults(t *testing.T) {
-
 	c, _ := emptyTestConfig()
 
 	c.Main.PprofServer = "x"
-	err := c.setDefaults(nil)
+	err := c.SetDefaults(nil)
 	if err == nil {
 		t.Error("expected error for invalid pprof server name")
 	}
 
 	c.Main.PprofServer = "both"
 	c.RequestRewriters = make(map[string]*rwo.Options)
-	err = c.setDefaults(nil)
+	err = c.SetDefaults(nil)
 	if err == nil {
 		t.Error("expected error for invalid pprof server name")
 	}
@@ -211,7 +205,6 @@ backends:
 `
 
 func TestProcessBackendOptions(t *testing.T) {
-
 	c, _ := emptyTestConfig()
 	c.Backends["test"].ReqRewriterName = "invalid"
 	yml := c.String() + testRewriter
@@ -261,11 +254,9 @@ func TestProcessBackendOptions(t *testing.T) {
 	if err == nil || !strings.Contains(err.Error(), "invalid rewriter name") {
 		t.Error("expected yaml parsing error", err)
 	}
-
 }
 
 func TestLoadYAMLConfig(t *testing.T) {
-
 	c := NewConfig()
 	err := c.loadYAMLConfig("[[", nil)
 
@@ -281,11 +272,10 @@ func TestLoadYAMLConfig(t *testing.T) {
 }
 
 func TestIsStale(t *testing.T) {
-
 	testFile := t.TempDir() + "/trickster_test.conf"
 	_, tml := emptyTestConfig()
 
-	err := os.WriteFile(testFile, []byte(tml), 0666)
+	err := os.WriteFile(testFile, []byte(tml), 0o666)
 	if err != nil {
 		t.Error(err)
 	}
@@ -306,7 +296,7 @@ func TestIsStale(t *testing.T) {
 
 	time.Sleep(time.Millisecond * 10)
 
-	err = os.WriteFile(testFile, []byte(tml), 0666)
+	err = os.WriteFile(testFile, []byte(tml), 0o666)
 	if err != nil {
 		t.Error(err)
 	}
@@ -326,7 +316,6 @@ func TestIsStale(t *testing.T) {
 }
 
 func TestConfigFilePath(t *testing.T) {
-
 	c, _ := emptyTestConfig()
 
 	if c.ConfigFilePath() != emptyFilePath {
@@ -337,11 +326,9 @@ func TestConfigFilePath(t *testing.T) {
 	if c.ConfigFilePath() != "" {
 		t.Errorf("expected %s got %s", "", c.ConfigFilePath())
 	}
-
 }
 
 func TestSetStalenessInfo(t *testing.T) {
-
 	fp := "trickster"
 	t1 := time.Now()
 	t2 := t1.Add(-1 * time.Minute)

@@ -23,7 +23,6 @@ import (
 )
 
 func TestRanges_CalculateDelta(t *testing.T) {
-
 	tests := []struct {
 		want, have, expected Ranges
 		cl                   int64
@@ -146,7 +145,6 @@ func TestRanges_CalculateDelta(t *testing.T) {
 }
 
 func TestRangesString(t *testing.T) {
-
 	tests := []struct {
 		out, expected string
 	}{
@@ -178,7 +176,6 @@ func TestRangesString(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestParseContentRangeHeader(t *testing.T) {
@@ -217,12 +214,10 @@ func TestParseContentRangeHeader(t *testing.T) {
 }
 
 func TestRangesEqual(t *testing.T) {
-
 	want := Ranges{Range{Start: 0, End: 20}}
 	if want.Equal(nil) {
 		t.Errorf("expected %t got %t", false, true)
 	}
-
 }
 
 func TestRangeSort(t *testing.T) {
@@ -242,7 +237,6 @@ func TestRangeLess(t *testing.T) {
 }
 
 func TestContentRangeHeader(t *testing.T) {
-
 	const expected = "bytes 0-20/100"
 
 	r := Range{Start: 0, End: 20}
@@ -251,7 +245,6 @@ func TestContentRangeHeader(t *testing.T) {
 	if h != expected {
 		t.Errorf("expected %s got %s", expected, h)
 	}
-
 }
 
 func TestParseRangeHeader_EmptyString(t *testing.T) {
@@ -333,7 +326,6 @@ func TestParseRangeHeader_Ends(t *testing.T) {
 	if res[0].Start != -1 || res[0].End != 500 {
 		t.Errorf("expected start %d end %d, got start %d end %d", 500, -1, res[0].Start, res[0].End)
 	}
-
 }
 
 func TestParseRangeHeader_MultiRange(t *testing.T) {

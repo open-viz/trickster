@@ -40,12 +40,14 @@ import (
 
 func setupTestHarnessOPC(file, body string, code int,
 	headers map[string]string) (*httptest.Server, *httptest.ResponseRecorder,
-	*http.Request, *request.Resources, error) {
+	*http.Request, *request.Resources, error,
+) {
 	return setupTestHarnessOPCByType(file, "test", "/opc", body, code, headers)
 }
 
 func setupTestHarnessOPCRange(hdr map[string]string) (*httptest.Server,
-	*httptest.ResponseRecorder, *http.Request, *request.Resources, error) {
+	*httptest.ResponseRecorder, *http.Request, *request.Resources, error,
+) {
 	s, rr, r, rsc, err := setupTestHarnessOPCByType("", "rangesim", "/byterange/opc", "", 0, hdr)
 	return s, rr, r, rsc, err
 }
@@ -53,7 +55,6 @@ func setupTestHarnessOPCRange(hdr map[string]string) (*httptest.Server,
 func setupTestHarnessOPCByType(
 	file, serverType, path, body string, code int, headers map[string]string,
 ) (*httptest.Server, *httptest.ResponseRecorder, *http.Request, *request.Resources, error) {
-
 	backendClient, err := NewTestClient("test", nil, nil, nil, nil)
 	if err != nil {
 		return nil, nil, nil, nil, fmt.Errorf("Could not load configuration: %s", err.Error())
@@ -85,8 +86,8 @@ func setupTestHarnessOPCByType(
 }
 
 func setupTestHarnessOPCWithPCF(file, body string, code int, headers map[string]string) (*httptest.Server,
-	*httptest.ResponseRecorder, *http.Request, *request.Resources, error) {
-
+	*httptest.ResponseRecorder, *http.Request, *request.Resources, error,
+) {
 	backendClient, err := NewTestClient("test", nil, nil, nil, nil)
 	if err != nil {
 		return nil, nil, nil, nil, fmt.Errorf("Could not load configuration: %s", err.Error())
@@ -121,7 +122,6 @@ func setupTestHarnessOPCWithPCF(file, body string, code int, headers map[string]
 }
 
 func TestObjectProxyCacheRequest(t *testing.T) {
-
 	hdrs := map[string]string{"Cache-Control": "max-age=60"}
 	ts, _, r, rsc, err := setupTestHarnessOPC("", "test", http.StatusPartialContent, hdrs)
 	if err != nil {
@@ -156,11 +156,9 @@ func TestObjectProxyCacheRequest(t *testing.T) {
 
 	// add cache hit back
 	cacheResponseHandlers[status.LookupStatusHit] = handleCacheKeyHit
-
 }
 
 func TestObjectProxyCachePartialHit(t *testing.T) {
-
 	ts, _, r, rsc, err := setupTestHarnessOPCRange(nil)
 	if err != nil {
 		t.Error(err)
@@ -236,7 +234,6 @@ func TestObjectProxyCachePartialHit(t *testing.T) {
 }
 
 func TestFullArticuation(t *testing.T) {
-
 	ts, _, r, rsc, err := setupTestHarnessOPCRange(nil)
 	if err != nil {
 		t.Error(err)
@@ -381,11 +378,9 @@ func TestFullArticuation(t *testing.T) {
 	for _, err = range e {
 		t.Error(err)
 	}
-
 }
 
 func TestObjectProxyCachePartialHitNotFresh(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessOPCRange(nil)
 	if err != nil {
 		t.Error(err)
@@ -420,7 +415,6 @@ func TestObjectProxyCachePartialHitNotFresh(t *testing.T) {
 }
 
 func TestObjectProxyCachePartialHitFullResponse(t *testing.T) {
-
 	ts, w, r, rsc, err := setupTestHarnessOPCRange(nil)
 	if err != nil {
 		t.Error(err)
@@ -444,7 +438,6 @@ func TestObjectProxyCachePartialHitFullResponse(t *testing.T) {
 }
 
 func TestObjectProxyCacheRangeMiss(t *testing.T) {
-
 	ts, _, r, _, err := setupTestHarnessOPCRange(nil)
 	if err != nil {
 		t.Error(err)
@@ -473,7 +466,6 @@ func TestObjectProxyCacheRangeMiss(t *testing.T) {
 }
 
 func TestObjectProxyCacheRevalidation(t *testing.T) {
-
 	ts, _, r, rsc, err := setupTestHarnessOPCRange(nil)
 	if err != nil {
 		t.Error(err)
@@ -558,7 +550,6 @@ func TestObjectProxyCacheRevalidation(t *testing.T) {
 }
 
 func TestObjectProxyCacheRequestWithPCF(t *testing.T) {
-
 	headers := map[string]string{"Cache-Control": "max-age=60"}
 	ts, _, r, rsc, err := setupTestHarnessOPCWithPCF("", "test", http.StatusOK, headers)
 	if err != nil {
@@ -576,11 +567,9 @@ func TestObjectProxyCacheRequestWithPCF(t *testing.T) {
 	for _, err = range e {
 		t.Error(err)
 	}
-
 }
 
 func TestObjectProxyCacheTrueHitNoDocumentErr(t *testing.T) {
-
 	pr := &proxyRequest{}
 	err := handleTrueCacheHit(pr)
 	if err != errors.ErrNilCacheDocument {
@@ -589,7 +578,6 @@ func TestObjectProxyCacheTrueHitNoDocumentErr(t *testing.T) {
 }
 
 func TestObjectProxyCacheRequestClientNoCache(t *testing.T) {
-
 	ts, _, r, _, err := setupTestHarnessOPC("", "test", http.StatusOK, nil)
 	if err != nil {
 		t.Error(err)
@@ -605,7 +593,6 @@ func TestObjectProxyCacheRequestClientNoCache(t *testing.T) {
 }
 
 func TestFetchViaObjectProxyCacheRequestClientNoCache(t *testing.T) {
-
 	ts, _, r, _, err := setupTestHarnessOPC("", "test", http.StatusOK, nil)
 	if err != nil {
 		t.Error(err)
@@ -626,7 +613,6 @@ func TestFetchViaObjectProxyCacheRequestClientNoCache(t *testing.T) {
 }
 
 func TestObjectProxyCacheRequestOriginNoCache(t *testing.T) {
-
 	headers := map[string]string{"Cache-Control": "no-cache"}
 	ts, _, r, _, err := setupTestHarnessOPC("", "test", http.StatusOK, headers)
 	if err != nil {
@@ -641,7 +627,6 @@ func TestObjectProxyCacheRequestOriginNoCache(t *testing.T) {
 }
 
 func TestObjectProxyCacheIMS(t *testing.T) {
-
 	hdrs := map[string]string{"Cache-Control": "max-age=1"}
 	ts, _, r, rsc, err := setupTestHarnessOPCRange(hdrs)
 	if err != nil {
@@ -674,7 +659,6 @@ func TestObjectProxyCacheIMS(t *testing.T) {
 }
 
 func TestObjectProxyCacheINM(t *testing.T) {
-
 	rh := map[string]string{headers.NameCacheControl: "max-age=60", headers.NameETag: "test"}
 	ts, _, r, _, err := setupTestHarnessOPC("", "test", http.StatusOK, rh)
 	if err != nil {
@@ -701,7 +685,6 @@ func TestObjectProxyCacheINM(t *testing.T) {
 }
 
 func TestObjectProxyCacheNoRevalidate(t *testing.T) {
-
 	headers := map[string]string{headers.NameCacheControl: headers.ValueMaxAge + "=1"}
 	ts, _, r, rsc, err := setupTestHarnessOPC("", "test", http.StatusOK, headers)
 	if err != nil {
@@ -726,7 +709,6 @@ func TestObjectProxyCacheNoRevalidate(t *testing.T) {
 }
 
 func TestObjectProxyCacheCanRevalidate(t *testing.T) {
-
 	headers := map[string]string{
 		headers.NameCacheControl: headers.ValueMaxAge + "=1",
 		headers.NameETag:         "test-etag",
@@ -755,7 +737,6 @@ func TestObjectProxyCacheCanRevalidate(t *testing.T) {
 }
 
 func TestObjectProxyCacheRevalidated(t *testing.T) {
-
 	const dt = "Sun, 16 Jun 2019 14:19:04 GMT"
 
 	hdr := map[string]string{
@@ -783,7 +764,6 @@ func TestObjectProxyCacheRevalidated(t *testing.T) {
 }
 
 func TestObjectProxyCacheRequestNegativeCache(t *testing.T) {
-
 	ts, _, r, rsc, err := setupTestHarnessOPC("", "test", http.StatusNotFound, nil)
 	if err != nil {
 		t.Error(err)
@@ -819,7 +799,6 @@ func TestObjectProxyCacheRequestNegativeCache(t *testing.T) {
 }
 
 func TestHandleCacheRevalidation(t *testing.T) {
-
 	ts, _, r, _, err := setupTestHarnessOPC("", "test", http.StatusNotFound, nil)
 	if err != nil {
 		t.Error(err)
@@ -837,7 +816,6 @@ func TestHandleCacheRevalidation(t *testing.T) {
 }
 
 func getExpectedRangeBody(r *http.Request, boundary string) (string, error) {
-
 	client := &http.Client{}
 	resp, err := client.Do(r)
 	if err != nil {
@@ -854,7 +832,6 @@ func getExpectedRangeBody(r *http.Request, boundary string) (string, error) {
 }
 
 func TestRangesExhaustive(t *testing.T) {
-
 	ts, _, r, rsc, err := setupTestHarnessOPCRange(nil)
 	if err != nil {
 		t.Error(err)
@@ -1112,8 +1089,8 @@ func TestRangesExhaustive(t *testing.T) {
 }
 
 func testFetchOPC(r *http.Request, sc int, body string,
-	match map[string]string) (*httptest.ResponseRecorder, []error) {
-
+	match map[string]string,
+) (*httptest.ResponseRecorder, []error) {
 	e := make([]error, 0)
 
 	w := httptest.NewRecorder()
@@ -1146,11 +1123,9 @@ func testFetchOPC(r *http.Request, sc int, body string,
 	}
 
 	return w, e
-
 }
 
 func TestFetchViaObjectProxyCacheRequestErroringCache(t *testing.T) {
-
 	ts, _, r, rsc, err := setupTestHarnessOPC("", "test", http.StatusOK, nil)
 	if err != nil {
 		t.Error(err)

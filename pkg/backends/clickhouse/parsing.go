@@ -36,24 +36,26 @@ type chParser struct {
 	*sqlparser.Parser
 }
 
-var lexOpts = LexerOptions()
-var lexer = lsql.NewLexer(lexOpts)
-var parser = &chParser{
-	Parser: sqlparser.New(
-		parsing.New(nil, lexer, lexOpts).
-			WithDecisions("FindVerb",
-				parsing.DecisionSet{
-					lsql.TokenWith: atWith,
-				},
-			).
-			WithDecisions("SelectQueryKeywords",
-				parsing.DecisionSet{
-					tokenPreWhere: atPreWhere,
-					tokenFormat:   atFormat,
-				},
-			),
-	).(*sqlparser.Parser),
-}
+var (
+	lexOpts = LexerOptions()
+	lexer   = lsql.NewLexer(lexOpts)
+	parser  = &chParser{
+		Parser: sqlparser.New(
+			parsing.New(nil, lexer, lexOpts).
+				WithDecisions("FindVerb",
+					parsing.DecisionSet{
+						lsql.TokenWith: atWith,
+					},
+				).
+				WithDecisions("SelectQueryKeywords",
+					parsing.DecisionSet{
+						tokenPreWhere: atPreWhere,
+						tokenFormat:   atFormat,
+					},
+				),
+		).(*sqlparser.Parser),
+	}
+)
 
 // parse parses the Time Range Query
 func parse(statement string) (*timeseries.TimeRangeQuery, *timeseries.RequestOptions, bool, error) {
@@ -97,8 +99,10 @@ const (
 	tkFormat = "<$FORMAT$>"
 )
 
-const day = time.Hour * 24
-const week = day * 7
+const (
+	day  = time.Hour * 24
+	week = day * 7
+)
 
 var tokenToStartOfLookup = map[string]time.Duration{
 	"tomonday":                week,
@@ -174,7 +178,8 @@ func atWith(bp, ip parsing.Parser, rs *parsing.RunState) parsing.StateFn {
 
 // parseWithTokens parses the withTokens list into a key=value map
 func (p *chParser) parseWithTokens(rs *parsing.RunState, trq *timeseries.TimeRangeQuery,
-	ro *timeseries.RequestOptions, tl token.Tokens) error {
+	ro *timeseries.RequestOptions, tl token.Tokens,
+) error {
 	l := len(tl)
 	// this puts the tokens between with and select into a map[variableName]value
 	if l == 0 {
@@ -266,7 +271,8 @@ func scanForCommentsUntilEOF(bp, ip parsing.Parser, rs *parsing.RunState) parsin
 }
 
 func parseSelectTokens(results map[string]interface{},
-	trq *timeseries.TimeRangeQuery, ro *timeseries.RequestOptions) (*token.Token, error) {
+	trq *timeseries.TimeRangeQuery, ro *timeseries.RequestOptions,
+) (*token.Token, error) {
 	if results == nil {
 		return nil, sqlparser.ErrMissingTimeseries
 	}
@@ -412,8 +418,7 @@ func parseSelectTokens(results map[string]interface{},
 		}
 		if isTimeSeries && !expectAlias {
 			last := fieldParts[len(fieldParts)-1]
-			trq.TimestampDefinition.Name =
-				trq.Statement[fieldParts[0].Pos : last.Pos+len(last.Val)]
+			trq.TimestampDefinition.Name = trq.Statement[fieldParts[0].Pos : last.Pos+len(last.Val)]
 		}
 	}
 	if !foundTimeSeries {
@@ -446,7 +451,8 @@ func getInt(t *token.Token) (int, error) {
 // unless startValue is <= 0.  the solved expression, the number of indexes in fieldParts
 // advanced and the error state are returned
 func SolveMathExpression(fieldParts token.Tokens, startValue int64,
-	withVars token.Lookup) (int64, int, error) {
+	withVars token.Lookup,
+) (int64, int, error) {
 	var i, j int
 	var v int64
 	var t *token.Token
@@ -494,7 +500,8 @@ func SolveMathExpression(fieldParts token.Tokens, startValue int64,
 
 // This parses the WhereTokens list for any Time Ranges pertaining to the detected Timestamp Field
 func parseWhereTokens(results map[string]interface{},
-	trq *timeseries.TimeRangeQuery, ro *timeseries.RequestOptions) (*token.Token, error) {
+	trq *timeseries.TimeRangeQuery, ro *timeseries.RequestOptions,
+) (*token.Token, error) {
 	if ro == nil {
 		return nil, nil
 	}
@@ -594,12 +601,12 @@ func parseWhereTokens(results map[string]interface{},
 					v -= int64(trq.Step.Seconds())
 				}
 				if atLowerBound {
-					//e.Start = time.Unix(v, 0)
+					// e.Start = time.Unix(v, 0)
 					e.Start, _, _ = lsql.TokenToTime(t)
 					tsr1 = t.Val
 					atLowerBound = false
 				} else {
-					//e.End = time.Unix(v, 0)
+					// e.End = time.Unix(v, 0)
 					e.End, _, _ = lsql.TokenToTime(t)
 					tsr2 = t.Val
 				}
@@ -678,7 +685,8 @@ func parseTimeField(t *token.Token) (int64, error) {
 }
 
 func parseGroupByTokens(results map[string]interface{},
-	trq *timeseries.TimeRangeQuery, ro *timeseries.RequestOptions) (*token.Token, error) {
+	trq *timeseries.TimeRangeQuery, ro *timeseries.RequestOptions,
+) (*token.Token, error) {
 	v, ok := results["groupByTokens"]
 	if !ok {
 		return nil, lsql.ErrInvalidGroupByClause

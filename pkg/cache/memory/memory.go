@@ -71,8 +71,10 @@ func (c *Cache) Configuration() *options.Options {
 
 // Connect initializes the Cache
 func (c *Cache) Connect() error {
-	tl.Info(c.Logger, "memorycache setup", tl.Pairs{"name": c.Name,
-		"maxSizeBytes": c.Config.Index.MaxSizeBytes, "maxSizeObjects": c.Config.Index.MaxSizeObjects})
+	tl.Info(c.Logger, "memorycache setup", tl.Pairs{
+		"name":         c.Name,
+		"maxSizeBytes": c.Config.Index.MaxSizeBytes, "maxSizeObjects": c.Config.Index.MaxSizeObjects,
+	})
 	c.lockPrefix = c.Name + ".memory."
 	c.client = sync.Map{}
 	c.Index = index.NewIndex(c.Name, c.Config.Provider, nil, c.Config.Index, c.BulkRemove, nil, c.Logger)
@@ -90,8 +92,8 @@ func (c *Cache) Store(cacheKey string, data []byte, ttl time.Duration) error {
 }
 
 func (c *Cache) store(cacheKey string, byteData []byte, refData cache.ReferenceObject,
-	ttl time.Duration, updateIndex bool) error {
-
+	ttl time.Duration, updateIndex bool,
+) error {
 	var exp time.Time
 	if ttl > 0 {
 		exp = time.Now().Add(ttl)
@@ -127,7 +129,8 @@ func (c *Cache) store(cacheKey string, byteData []byte, refData cache.ReferenceO
 
 // RetrieveReference looks for an object in cache and returns it (or an error if not found)
 func (c *Cache) RetrieveReference(cacheKey string, allowExpired bool) (interface{},
-	status.LookupStatus, error) {
+	status.LookupStatus, error,
+) {
 	o, s, err := c.retrieve(cacheKey, allowExpired, true)
 	if err != nil {
 		return nil, s, err
@@ -151,8 +154,8 @@ func (c *Cache) Retrieve(cacheKey string, allowExpired bool) ([]byte, status.Loo
 }
 
 func (c *Cache) retrieve(cacheKey string, allowExpired bool, atime bool) (*index.Object,
-	status.LookupStatus, error) {
-
+	status.LookupStatus, error,
+) {
 	nl, _ := c.locker.RAcquire(c.lockPrefix + cacheKey)
 	record, ok := c.client.Load(cacheKey)
 	nl.RRelease()

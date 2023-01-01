@@ -27,12 +27,16 @@ import (
 	tl "github.com/trickstercache/trickster/v2/pkg/observability/logging"
 )
 
-const provider = "badger"
-const cacheKey = "cacheKey"
+const (
+	provider = "badger"
+	cacheKey = "cacheKey"
+)
 
 func newCacheConfig(dbPath string) *co.Options {
-	return &co.Options{Provider: provider,
-		Badger: &bo.Options{Directory: dbPath, ValueDirectory: dbPath}}
+	return &co.Options{
+		Provider: provider,
+		Badger:   &bo.Options{Directory: dbPath, ValueDirectory: dbPath},
+	}
 }
 
 func TestConfiguration(t *testing.T) {
@@ -167,7 +171,6 @@ func TestBadgerCache_BulkRemove(t *testing.T) {
 	if ls != status.LookupStatusKeyMiss {
 		t.Errorf("expected %s got %s", status.LookupStatusKeyMiss, ls)
 	}
-
 }
 
 func TestBadgerCache_Retrieve(t *testing.T) {
@@ -249,7 +252,6 @@ func TestBadgerCache_Retrieve(t *testing.T) {
 }
 
 func TestBadgerCache_Close(t *testing.T) {
-
 	testDbPath := t.TempDir() + "/test.db"
 	cacheConfig := &co.Options{Provider: provider, Badger: &bo.Options{Directory: testDbPath, ValueDirectory: testDbPath}}
 	bc := Cache{Config: cacheConfig, Logger: tl.ConsoleLogger("error")}

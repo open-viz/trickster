@@ -30,7 +30,6 @@ import (
 )
 
 func TestConsoleLogger(t *testing.T) {
-
 	testCases := []string{
 		"debug",
 		"info",
@@ -248,7 +247,6 @@ func TestNewLoggerFatal_LogFile(t *testing.T) {
 }
 
 func TestSetLogLevel(t *testing.T) {
-
 	l := DefaultLogger()
 	if l.level != "info" {
 		t.Errorf("expected %s got %s", "info", l.level)
@@ -258,7 +256,6 @@ func TestSetLogLevel(t *testing.T) {
 	if l.Level() != "warn" {
 		t.Errorf("expected %s got %s", "warn", l.level)
 	}
-
 }
 
 func TestDebug(t *testing.T) {
@@ -281,13 +278,15 @@ func TestFatal(t *testing.T) {
 	testLogFunction(nil, nil, Fatal, "ERROR", t)
 }
 
-type basicLogFunc func(interface{}, string, Pairs)
-type onceLogFunc func(interface{}, string, string, Pairs)
-type fatalLogFunc func(interface{}, int, string, Pairs)
+type (
+	basicLogFunc func(interface{}, string, Pairs)
+	onceLogFunc  func(interface{}, string, string, Pairs)
+	fatalLogFunc func(interface{}, int, string, Pairs)
+)
 
 func testLogFunction(f1 basicLogFunc, f2 onceLogFunc, f3 fatalLogFunc,
-	level string, t *testing.T) {
-
+	level string, t *testing.T,
+) {
 	tw := httptest.NewRecorder()
 	gw := httptest.NewRecorder()
 	kw := httptest.NewRecorder()
@@ -335,16 +334,13 @@ func testLogFunction(f1 basicLogFunc, f2 onceLogFunc, f3 fatalLogFunc,
 	if sw.Body.String() == "" {
 		t.Error("expected non-empty string")
 	}
-
 }
 
 func TestStreamLogger(t *testing.T) {
-
 	w := httptest.NewRecorder()
 	sl := StreamLogger(w, "ERROR")
 	sl.Error("test error", Pairs{"testKey": "testVal"})
 	if w.Body.String() == "" {
 		t.Error("expected non-empty string")
 	}
-
 }

@@ -46,7 +46,6 @@ const testDocInvalid01 = `{"results":[{"statement_id":0,"series":[` +
 	`"values":[["z",0]]}]}]}`
 
 func TestUnmarshalTimeseries(t *testing.T) {
-
 	_, err := UnmarshalTimeseries([]byte(testDoc01), nil)
 	if err != timeseries.ErrNoTimerangeQuery {
 		t.Error("expected ErrNoTimerangeQuery got", err)
@@ -78,7 +77,6 @@ func TestUnmarshalTimeseries(t *testing.T) {
 }
 
 func TestPointFromValues(t *testing.T) {
-
 	v := make([]interface{}, 6)
 
 	v[0] = int64(1577836800000)

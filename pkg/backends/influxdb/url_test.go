@@ -33,7 +33,6 @@ import (
 const expectedTokenized = "SELECT * FROM some_column WHERE time >= '$START_TIME$' AND time < '$END_TIME$' GROUP BY time(1m)"
 
 func TestSetExtent(t *testing.T) {
-
 	start := time.Now().UTC().Add(time.Duration(-6) * time.Hour).Truncate(time.Second)
 	end := time.Now().UTC().Truncate(time.Second)
 
@@ -78,5 +77,4 @@ func TestSetExtent(t *testing.T) {
 	if expected != v.Get("q") {
 		t.Errorf("\nexpected [%s]\ngot    [%s]", expected, v.Get("q'"))
 	}
-
 }

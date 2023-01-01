@@ -28,7 +28,6 @@ import (
 )
 
 func TestConfiguration(t *testing.T) {
-
 	o := &bo.Options{Provider: "TEST"}
 	client := &backend{config: o}
 	c := client.Configuration()
@@ -38,7 +37,6 @@ func TestConfiguration(t *testing.T) {
 }
 
 func TestCache(t *testing.T) {
-
 	conf, _, err := config.Load("trickster", "test", []string{"-provider", "influxdb", "-origin-url", "http://1"})
 	if err != nil {
 		t.Fatalf("Could not load configuration: %s", err.Error())
@@ -59,14 +57,12 @@ func TestCache(t *testing.T) {
 }
 
 func TestName(t *testing.T) {
-
 	client := &backend{name: "TEST"}
 	c := client.Name()
 
 	if c != "TEST" {
 		t.Errorf("expected %s got %s", "TEST", c)
 	}
-
 }
 
 func TestRouter(t *testing.T) {
@@ -88,7 +84,6 @@ func TestHTTPClient(t *testing.T) {
 }
 
 func TestSetCache(t *testing.T) {
-
 	c := &backend{name: "test", config: bo.New()}
 	c.SetCache(nil)
 	if c.Cache() != nil {
@@ -97,7 +92,6 @@ func TestSetCache(t *testing.T) {
 }
 
 func TestBaseUpstreamURL(t *testing.T) {
-
 	u, _ := url.Parse("https://trickstercache.org/test")
 	b := &backend{name: "test", baseUpstreamURL: u}
 	u = b.BaseUpstreamURL()
@@ -107,7 +101,6 @@ func TestBaseUpstreamURL(t *testing.T) {
 }
 
 func TestHandlers(t *testing.T) {
-
 	b := &backend{name: "test"}
 	testRegistrar := func(map[string]http.Handler) {
 		b.RegisterHandlers(map[string]http.Handler{"test": nil})
@@ -119,7 +112,6 @@ func TestHandlers(t *testing.T) {
 	if _, ok := h["test"]; !ok {
 		t.Error("expected true")
 	}
-
 }
 
 func TestSetHealthCheckProbe(t *testing.T) {
@@ -131,7 +123,6 @@ func TestSetHealthCheckProbe(t *testing.T) {
 }
 
 func TestHealthHandler(t *testing.T) {
-
 	b := &backend{name: "test"}
 	testProber := func(w http.ResponseWriter) {
 		b.name = "trickster"

@@ -32,7 +32,6 @@ import (
 // MergeAndWriteVector merges the provided Responses into a single prometheus Vector data object,
 // and writes it to the provided ResponseWriter
 func MergeAndWriteVector(w http.ResponseWriter, r *http.Request, rgs merge.ResponseGates) {
-
 	var ts *dataset.DataSet
 	var trq *timeseries.TimeRangeQuery
 
@@ -108,5 +107,4 @@ func MergeAndWriteVector(w http.ResponseWriter, r *http.Request, rgs merge.Respo
 	}
 
 	MarshalTSOrVectorWriter(ts, nil, statusCode, w, true)
-
 }

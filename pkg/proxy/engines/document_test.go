@@ -27,7 +27,6 @@ import (
 )
 
 func TestDocumentFromHTTPResponse(t *testing.T) {
-
 	expected := []byte("1234")
 
 	resp := &http.Response{}
@@ -44,11 +43,9 @@ func TestDocumentFromHTTPResponse(t *testing.T) {
 	if d.StatusCode != 206 {
 		t.Errorf("expected %d got %d", 206, d.StatusCode)
 	}
-
 }
 
 func TestCachingPolicyString(t *testing.T) {
-
 	cp := &CachingPolicy{NoTransform: true}
 	s := cp.String()
 
@@ -56,15 +53,17 @@ func TestCachingPolicyString(t *testing.T) {
 	if i < 1 {
 		t.Errorf("expected value > 1, got %d", i)
 	}
-
 }
 
 func TestSetBody(t *testing.T) {
-
 	r := byterange.Range{Start: 0, End: 10}
-	d := &HTTPDocument{ContentLength: -1,
-		RangeParts: byterange.MultipartByteRanges{r: &byterange.MultipartByteRange{Range: r,
-			Content: []byte("01234567890")}}}
+	d := &HTTPDocument{
+		ContentLength: -1,
+		RangeParts: byterange.MultipartByteRanges{r: &byterange.MultipartByteRange{
+			Range:   r,
+			Content: []byte("01234567890"),
+		}},
+	}
 	d.SetBody([]byte("testing"))
 
 	if d.ContentLength < 0 {
@@ -74,16 +73,19 @@ func TestSetBody(t *testing.T) {
 
 func TestSize(t *testing.T) {
 	r := byterange.Range{Start: 0, End: 10}
-	d := &HTTPDocument{ContentLength: -1,
-		RangeParts: byterange.MultipartByteRanges{r: &byterange.MultipartByteRange{Range: r,
-			Content: []byte("01234567890")}}}
+	d := &HTTPDocument{
+		ContentLength: -1,
+		RangeParts: byterange.MultipartByteRanges{r: &byterange.MultipartByteRange{
+			Range:   r,
+			Content: []byte("01234567890"),
+		}},
+	}
 
 	i := d.Size()
 
 	if i != 62 {
 		t.Errorf("expected %d got %d", 62, i)
 	}
-
 }
 
 func TestFulfillContentBody(t *testing.T) {
@@ -99,7 +101,6 @@ func TestFulfillContentBody(t *testing.T) {
 }
 
 func TestParsePartialContentBodyNoRanges(t *testing.T) {
-
 	d := &HTTPDocument{}
 	resp := &http.Response{Header: make(http.Header)}
 	d.ParsePartialContentBody(resp, []byte("test"), testLogger)
@@ -107,7 +108,6 @@ func TestParsePartialContentBodyNoRanges(t *testing.T) {
 	if string(d.Body) != "test" {
 		t.Errorf("expected %s got %s", "test", string(d.Body))
 	}
-
 }
 
 func TestParsePartialContentBodySingleRange(t *testing.T) {
@@ -201,11 +201,9 @@ m dolor sit
 	if len(d.RangeParts) != 0 {
 		t.Errorf("expected %d got %d", 0, len(d.RangeParts))
 	}
-
 }
 
 func TestLoadRangeParts(t *testing.T) {
-
 	d := &HTTPDocument{
 		rangePartsLoaded: true,
 		StoredRangeParts: map[string]*byterange.MultipartByteRange{
@@ -228,5 +226,4 @@ func TestLoadRangeParts(t *testing.T) {
 	if len(d.Ranges) != 1 {
 		t.Errorf("expected %d got %d", 1, len(d.Ranges))
 	}
-
 }

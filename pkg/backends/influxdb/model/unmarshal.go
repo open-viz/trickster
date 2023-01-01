@@ -146,7 +146,8 @@ func UnmarshalTimeseriesReader(reader io.Reader, trq *timeseries.TimeRangeQuery)
 }
 
 func pointFromValues(v []interface{}, tsIndex int) (dataset.Point,
-	[]timeseries.FieldDataType, error) {
+	[]timeseries.FieldDataType, error,
+) {
 	p := dataset.Point{}
 	ns, ok := v[tsIndex].(int64)
 	if !ok {

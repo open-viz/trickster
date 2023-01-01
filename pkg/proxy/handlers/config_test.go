@@ -26,7 +26,6 @@ import (
 )
 
 func TestConfigHandler(t *testing.T) {
-
 	conf, _, err := config.Load("trickster-test", "test",
 		[]string{"-origin-url", "http://1.2.3.4", "-provider", "prometheus"})
 	if err != nil {
@@ -59,5 +58,4 @@ func TestConfigHandler(t *testing.T) {
 	if !strings.HasSuffix(lines[0], ":") {
 		t.Errorf("response is not yaml format")
 	}
-
 }

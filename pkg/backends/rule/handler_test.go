@@ -17,9 +17,9 @@
 package rule
 
 import (
-	tu "github.com/trickstercache/trickster/v2/pkg/testutil"
-
 	"testing"
+
+	tu "github.com/trickstercache/trickster/v2/pkg/testutil"
 )
 
 func TestHandler(t *testing.T) {

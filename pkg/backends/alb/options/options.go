@@ -58,7 +58,6 @@ func New() *Options {
 
 // Clone returns a perfect copy of the Options
 func (o *Options) Clone() *Options {
-
 	var fsc []int
 	var fscm map[int]interface{}
 
@@ -87,7 +86,6 @@ func (o *Options) Clone() *Options {
 
 // SetDefaults iterates the provided Options, and overlays user-set values onto the default Options
 func SetDefaults(name string, options *Options, metadata yamlx.KeyLookup) (*Options, error) {
-
 	if metadata == nil {
 		return nil, nil // todo: add error
 	}

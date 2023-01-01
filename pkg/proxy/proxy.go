@@ -32,7 +32,6 @@ import (
 // NewHTTPClient returns an HTTP client configured to the specifications of the
 // running Trickster config.
 func NewHTTPClient(o *bo.Options) (*http.Client, error) {
-
 	if o == nil {
 		return nil, nil
 	}
@@ -89,5 +88,4 @@ func NewHTTPClient(o *bo.Options) (*http.Client, error) {
 			TLSClientConfig:     TLSConfig,
 		},
 	}, nil
-
 }

@@ -26,12 +26,11 @@ import (
 	bo "github.com/trickstercache/trickster/v2/pkg/backends/options"
 	tl "github.com/trickstercache/trickster/v2/pkg/observability/logging"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/request"
-	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 	tu "github.com/trickstercache/trickster/v2/pkg/testutil"
+	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 )
 
 func TestFetchHandler(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -72,7 +71,6 @@ func TestFetchHandler(t *testing.T) {
 }
 
 func TestFetchHandlerDeriveCacheKey(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -92,13 +90,11 @@ func TestFetchHandlerDeriveCacheKey(t *testing.T) {
 	if result != expected {
 		t.Errorf("expected %s got %s", expected, result)
 	}
-
 }
 
 func TestFetchHandlerSetExtent(t *testing.T) {
-
 	// provide bad URL with no TimeRange query params
-	//hc := tu.NewTestWebClient()
+	// hc := tu.NewTestWebClient()
 	o := bo.New()
 
 	backendClient, err := NewClient("test", o, nil, nil, nil, nil)
@@ -126,11 +122,9 @@ func TestFetchHandlerSetExtent(t *testing.T) {
 	client.fetchHandlerSetExtent(r, nil, &timeseries.Extent{Start: now, End: now})
 	r.Body = io.NopCloser(bytes.NewReader([]byte(`{a}`)))
 	client.fetchHandlerSetExtent(r, nil, &timeseries.Extent{Start: then, End: now})
-
 }
 
 func TestFetchHandlerParseTimeRangeQuery(t *testing.T) {
-
 	// provide bad URL with no TimeRange query params
 	// hc := tu.NewTestWebClient()
 	o := bo.New()

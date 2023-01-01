@@ -61,7 +61,7 @@ func (c col) String() string {
 type cols []col
 
 func (cs cols) String() string {
-	var sb = strings.Builder{}
+	sb := strings.Builder{}
 	sb.WriteString("		{\n")
 	j := len(cs) - 1
 	for i, c := range cs {
@@ -88,8 +88,8 @@ func NewModeler() *timeseries.Modeler {
 }
 
 func marshalTimeseriesJSON(ds *dataset.DataSet, rlo *timeseries.RequestOptions,
-	status int, w io.Writer) error {
-
+	status int, w io.Writer,
+) error {
 	type md struct {
 		name  string
 		typ   string
@@ -170,7 +170,7 @@ func marshalTimeseriesJSON(ds *dataset.DataSet, rlo *timeseries.RequestOptions,
 	))
 
 	var j int64
-	var ending = ""
+	ending := ""
 	for _, s := range ds.Results[0].SeriesList {
 		for _, p := range s.Points {
 			c := make(cols, fieldCount)
@@ -247,19 +247,22 @@ func shouldQuote(in string) bool {
 }
 
 func marshalTimeseriesCSV(ds *dataset.DataSet, rlo *timeseries.RequestOptions,
-	status int, w io.Writer) error {
+	status int, w io.Writer,
+) error {
 	return marshalTimeseriesXSV(ds, rlo, status,
 		&tsvWriter{Writer: w, separator: ","})
 }
 
 func marshalTimeseriesCSVWithNames(ds *dataset.DataSet, rlo *timeseries.RequestOptions,
-	status int, w io.Writer) error {
+	status int, w io.Writer,
+) error {
 	return marshalTimeseriesXSV(ds, rlo, status,
 		&tsvWriter{Writer: w, writeNames: true, separator: ","})
 }
 
 func marshalTimeseriesXSV(ds *dataset.DataSet, rlo *timeseries.RequestOptions,
-	status int, tw *tsvWriter) error {
+	status int, tw *tsvWriter,
+) error {
 	trq := ds.TimeRangeQuery
 	if trq == nil {
 		return timeseries.ErrNoTimerangeQuery
@@ -387,19 +390,22 @@ func wrapCSVCell(in, separator string) string {
 }
 
 func marshalTimeseriesTSV(ds *dataset.DataSet, rlo *timeseries.RequestOptions,
-	status int, w io.Writer) error {
+	status int, w io.Writer,
+) error {
 	return marshalTimeseriesXSV(ds, rlo, status,
 		&tsvWriter{Writer: w, separator: "\t"})
 }
 
 func marshalTimeseriesTSVWithNames(ds *dataset.DataSet, rlo *timeseries.RequestOptions,
-	status int, w io.Writer) error {
+	status int, w io.Writer,
+) error {
 	return marshalTimeseriesXSV(ds, rlo, status,
 		&tsvWriter{Writer: w, writeNames: true, separator: "\t"})
 }
 
 func marshalTimeseriesTSVWithNamesAndTypes(ds *dataset.DataSet, rlo *timeseries.RequestOptions,
-	status int, w io.Writer) error {
+	status int, w io.Writer,
+) error {
 	return marshalTimeseriesXSV(ds, rlo, status,
 		&tsvWriter{Writer: w, writeNames: true, writeTypes: true, separator: "\t"})
 }
@@ -413,7 +419,8 @@ func MarshalTimeseries(ts timeseries.Timeseries, rlo *timeseries.RequestOptions,
 
 // MarshalTimeseriesWriter converts a Timeseries into a JSON blob via an io.Writer
 func MarshalTimeseriesWriter(ts timeseries.Timeseries, rlo *timeseries.RequestOptions,
-	status int, w io.Writer) error {
+	status int, w io.Writer,
+) error {
 	if ts == nil {
 		return timeseries.ErrUnknownFormat
 	}
@@ -440,7 +447,6 @@ func UnmarshalTimeseries(data []byte, trq *timeseries.TimeRangeQuery) (timeserie
 
 // UnmarshalTimeseriesReader converts a TSV blob into a Timeseries via io.Reader
 func UnmarshalTimeseriesReader(reader io.Reader, trq *timeseries.TimeRangeQuery) (timeseries.Timeseries, error) {
-
 	if trq == nil {
 		return nil, timeseries.ErrNoTimerangeQuery
 	}

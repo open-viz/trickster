@@ -85,11 +85,9 @@ func TestClone(t *testing.T) {
 	if o2.CacheName != "test" {
 		t.Error("clone failed")
 	}
-
 }
 
 func TestValidateBackendName(t *testing.T) {
-
 	err := ValidateBackendName("test")
 	if err != nil {
 		t.Error(err)
@@ -99,7 +97,6 @@ func TestValidateBackendName(t *testing.T) {
 	if err == nil {
 		t.Error("expected error for invalid backend name")
 	}
-
 }
 
 func testConfig() (Lookup, string) {
@@ -117,7 +114,6 @@ func testConfig() (Lookup, string) {
 }
 
 func TestValidateConfigMappings(t *testing.T) {
-
 	o, err := fromTestYAML()
 	if err != nil {
 		t.Error(err)
@@ -161,7 +157,6 @@ func TestValidateConfigMappings(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func testStringValueValidationError(to *testOptions, location *string, testValue string) error {
@@ -192,7 +187,6 @@ func testIntegerValueValidationError(to *testOptions, sws []intSwapper) error {
 }
 
 func TestValidate(t *testing.T) {
-
 	ncl := testNegativeCaches()
 	o, err := fromTestYAML()
 	if err != nil {
@@ -201,9 +195,9 @@ func TestValidate(t *testing.T) {
 	to := &testOptions{Backends: Lookup{o.Name: o}}
 	to.ncl = ncl
 
-	var errType01 = NewErrInvalidNegativeCacheName("invalid").(*ErrInvalidNegativeCacheName)
-	var errType02 = NewErrMissingOriginURL("test").(*ErrMissingOriginURL)
-	var errType03 = NewErrMissingProvider("test").(*ErrMissingProvider)
+	errType01 := NewErrInvalidNegativeCacheName("invalid").(*ErrInvalidNegativeCacheName)
+	errType02 := NewErrMissingOriginURL("test").(*ErrMissingOriginURL)
+	errType03 := NewErrMissingProvider("test").(*ErrMissingProvider)
 
 	// string value tests
 	tests := []struct {
@@ -258,7 +252,6 @@ func TestValidate(t *testing.T) {
 
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("strings %d", i), func(t *testing.T) {
-
 			err = testStringValueValidationError(test.to, test.loc, test.val)
 			if err == nil && test.expected == nil {
 				return
@@ -344,11 +337,9 @@ func TestValidate(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestSetDefaults(t *testing.T) {
-
 	o, err := fromTestYAML()
 	if err != nil {
 		t.Error(err)
@@ -409,11 +400,9 @@ func TestSetDefaults(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestValidateTLSConfigs(t *testing.T) {
-
 	o, err := fromTestYAML()
 	if err != nil {
 		t.Error(err)
@@ -455,11 +444,9 @@ func TestValidateTLSConfigs(t *testing.T) {
 	if !b {
 		t.Error("expected true")
 	}
-
 }
 
 func TestCloneYAMLSafe(t *testing.T) {
-
 	o, err := fromTestYAML()
 	if err != nil {
 		t.Error(err)
@@ -482,7 +469,6 @@ func TestCloneYAMLSafe(t *testing.T) {
 	}
 
 	p.RequestHeaders = map[string]string{headers.NameAuthorization: "trickster"}
-
 }
 
 func TestToYAML(t *testing.T) {

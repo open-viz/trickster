@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	const secs time.Duration = 3
 	const ttl = time.Second * secs
 
@@ -83,5 +82,4 @@ func main() {
 	// close the cache when you're ready for it to be garbage collected,
 	// or the background goroutines will continue to run
 	c.Close()
-
 }

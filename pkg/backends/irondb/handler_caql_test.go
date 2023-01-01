@@ -25,12 +25,11 @@ import (
 	bo "github.com/trickstercache/trickster/v2/pkg/backends/options"
 	tl "github.com/trickstercache/trickster/v2/pkg/observability/logging"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/request"
-	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 	tu "github.com/trickstercache/trickster/v2/pkg/testutil"
+	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 )
 
 func TestCAQLHandler(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -72,7 +71,6 @@ func TestCAQLHandler(t *testing.T) {
 }
 
 func TestCaqlHandlerSetExtent(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -100,11 +98,9 @@ func TestCaqlHandlerSetExtent(t *testing.T) {
 	client.caqlHandlerSetExtent(r, nil, &timeseries.Extent{Start: then, End: now})
 	r.URL.RawQuery = "q=1234&query=5678&start=9012&end=3456&period=7890"
 	client.caqlHandlerSetExtent(r, nil, &timeseries.Extent{Start: now, End: now})
-
 }
 
 func TestCaqlHandlerParseTimeRangeQuery(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -192,11 +188,9 @@ func TestCaqlHandlerParseTimeRangeQuery(t *testing.T) {
 	if err == nil {
 		t.Errorf("expected error for parameter missing")
 	}
-
 }
 
 func TestCaqlHandlerFastForwardRequestError(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)

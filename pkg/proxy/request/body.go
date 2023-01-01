@@ -27,7 +27,6 @@ import (
 )
 
 func SetBody(r *http.Request, body []byte) *http.Request {
-
 	if len(body) == 0 {
 		r.Body = io.NopCloser(bytes.NewReader([]byte{}))
 		r.ContentLength = 0

@@ -30,7 +30,6 @@ import (
 )
 
 func (c *Client) handleResponseMerge(w http.ResponseWriter, r *http.Request) {
-
 	hl := c.pool.Next() // should return a fanout list
 	l := len(hl)
 	if l == 0 {

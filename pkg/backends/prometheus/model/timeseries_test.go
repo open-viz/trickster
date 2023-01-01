@@ -61,11 +61,9 @@ func TestUnmarshalTimeseriesReader(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestPointFromValues(t *testing.T) {
-
 	tests := []struct {
 		values []interface{}
 		expP   epoch.Epoch
@@ -101,7 +99,6 @@ func TestPointFromValues(t *testing.T) {
 }
 
 func TestMarshalTSOrVectorWriter(t *testing.T) {
-
 	w := httptest.NewRecorder()
 
 	err := MarshalTSOrVectorWriter(nil, nil, 0, nil, false)
@@ -139,5 +136,4 @@ func TestMarshalTSOrVectorWriter(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }

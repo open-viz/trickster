@@ -35,7 +35,6 @@ func TestRegisterHandlers(t *testing.T) {
 }
 
 func TestDefaultPathConfigs(t *testing.T) {
-
 	backendClient, err := NewClient("test", nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -66,7 +65,6 @@ func TestDefaultPathConfigs(t *testing.T) {
 	if len(dpc) != expectedLen {
 		t.Errorf("expected ordered length to be: %d got %d", expectedLen, len(dpc))
 	}
-
 }
 
 func TestMergeablePaths(t *testing.T) {

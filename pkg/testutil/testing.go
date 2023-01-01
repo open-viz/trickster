@@ -92,7 +92,6 @@ func NewTestInstance(
 	respCode int, respBody string, respHeaders map[string]string,
 	backendProvider, urlPath, logLevel string,
 ) (*httptest.Server, *httptest.ResponseRecorder, *http.Request, *http.Client, error) {
-
 	isBasicTestServer := false
 
 	var ts *httptest.Server
@@ -206,7 +205,6 @@ func BasicHTTPHandler(w http.ResponseWriter, r *http.Request) {
 // NewTestRewriterInstructions returns a set of example Rewriter Instructions
 // for use in unit testing
 func NewTestRewriteInstructions() rewriter.RewriteInstructions {
-
 	trwl := options.RewriteList{
 		[]string{"method", "set", "POST"},
 		[]string{"host", "set", "example.com:9090"},

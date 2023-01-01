@@ -64,8 +64,10 @@ const (
 	rbPeriod = "period"
 )
 
-type trqParser func(*http.Request) (*timeseries.TimeRangeQuery, error)
-type extentSetter func(*http.Request, *timeseries.TimeRangeQuery, *timeseries.Extent)
+type (
+	trqParser    func(*http.Request) (*timeseries.TimeRangeQuery, error)
+	extentSetter func(*http.Request, *timeseries.TimeRangeQuery, *timeseries.Extent)
+)
 
 // Client values provide access to IRONdb and implement the Trickster proxy
 // client interface.
@@ -81,7 +83,8 @@ var _ types.NewBackendClientFunc = NewClient
 // NewClient returns a new Client Instance
 func NewClient(name string, o *bo.Options, router http.Handler,
 	cache cache.Cache, _ backends.Backends,
-	_ types.Lookup) (backends.Backend, error) {
+	_ types.Lookup,
+) (backends.Backend, error) {
 	c := &Client{}
 	b, err := backends.NewTimeseriesBackend(name, o, c.RegisterHandlers,
 		router, cache, modeliron.NewModeler())

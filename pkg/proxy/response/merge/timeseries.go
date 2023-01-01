@@ -29,7 +29,6 @@ import (
 // Timeseries merges the provided Responses into a single Timeseries Dataset
 // and writes it to the provided responsewriter
 func Timeseries(w http.ResponseWriter, r *http.Request, rgs ResponseGates) {
-
 	var ts timeseries.Timeseries
 	var f timeseries.MarshalWriterFunc
 	var rlo *timeseries.RequestOptions

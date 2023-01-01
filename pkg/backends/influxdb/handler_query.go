@@ -34,7 +34,6 @@ import (
 
 // QueryHandler handles timeseries requests for InfluxDB and processes them through the delta proxy cache
 func (c *Client) QueryHandler(w http.ResponseWriter, r *http.Request) {
-
 	qp, _, _ := params.GetRequestValues(r)
 	q := strings.Trim(strings.ToLower(qp.Get(upQuery)), " \t\n")
 	if q == "" {
@@ -63,12 +62,12 @@ var epochToFlag = map[string]byte{
 
 // ParseTimeRangeQuery parses the key parts of a TimeRangeQuery from the inbound HTTP Request
 func (c *Client) ParseTimeRangeQuery(r *http.Request) (*timeseries.TimeRangeQuery,
-	*timeseries.RequestOptions, bool, error) {
-
+	*timeseries.RequestOptions, bool, error,
+) {
 	trq := &timeseries.TimeRangeQuery{Extent: timeseries.Extent{}}
 	rlo := &timeseries.RequestOptions{}
 
-	var valuer = &influxql.NowValuer{Now: time.Now()}
+	valuer := &influxql.NowValuer{Now: time.Now()}
 
 	v, _, _ := params.GetRequestValues(r)
 	if trq.Statement = v.Get(upQuery); trq.Statement == "" {
@@ -160,5 +159,4 @@ func (c *Client) ParseTimeRangeQuery(r *http.Request) (*timeseries.TimeRangeQuer
 	}
 
 	return trq, rlo, false, nil
-
 }

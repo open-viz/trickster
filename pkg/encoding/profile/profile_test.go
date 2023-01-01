@@ -60,7 +60,6 @@ func TestClientAcceptsEncoding(t *testing.T) {
 }
 
 func TestGetEncoderInitializer(t *testing.T) {
-
 	p := &Profile{}
 	f, s := p.GetEncoderInitializer()
 	if f != nil {

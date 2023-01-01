@@ -30,7 +30,6 @@ import (
 )
 
 func TestHandleLocalResponse(t *testing.T) {
-
 	HandleLocalResponse(nil, nil)
 
 	_, _, err := config.Load("trickster-test", "test",
@@ -78,11 +77,9 @@ func TestHandleLocalResponse(t *testing.T) {
 	if resp.Header.Get(headers.NameTricksterResult) == "" {
 		t.Errorf("expected header valuef for %s", headers.NameTricksterResult)
 	}
-
 }
 
 func TestHandleLocalResponseBadResponseCode(t *testing.T) {
-
 	_, _, err := config.Load("trickster-test", "test",
 		[]string{"-origin-url", "http://1.2.3.4", "-provider", "prometheus"})
 	if err != nil {
@@ -124,11 +121,9 @@ func TestHandleLocalResponseBadResponseCode(t *testing.T) {
 	if resp.Header.Get(headers.NameTricksterResult) == "" {
 		t.Errorf("expected header valuef for %s", headers.NameTricksterResult)
 	}
-
 }
 
 func TestHandleLocalResponseNoPathConfig(t *testing.T) {
-
 	_, _, err := config.Load("trickster-test", "test",
 		[]string{"-origin-url", "http://1.2.3.4", "-provider", "prometheus"})
 	if err != nil {
@@ -157,7 +152,6 @@ func TestHandleLocalResponseNoPathConfig(t *testing.T) {
 	if len(bodyBytes) > 0 {
 		t.Errorf("body should be empty")
 	}
-
 }
 
 func TestHandleBadRequestResponse(t *testing.T) {

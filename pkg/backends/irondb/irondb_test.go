@@ -28,7 +28,6 @@ import (
 )
 
 func TestIRONdbClientInterfacing(t *testing.T) {
-
 	// this test ensures the client will properly conform to the
 	// Client and TimeseriesBackend interfaces
 

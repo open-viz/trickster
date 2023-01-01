@@ -35,9 +35,9 @@ import (
 	"github.com/trickstercache/trickster/v2/pkg/proxy/headers"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/params"
 	po "github.com/trickstercache/trickster/v2/pkg/proxy/paths/options"
+	tst "github.com/trickstercache/trickster/v2/pkg/testutil/timeseries/model"
 	"github.com/trickstercache/trickster/v2/pkg/timeseries"
 	"github.com/trickstercache/trickster/v2/pkg/timeseries/dataset"
-	tst "github.com/trickstercache/trickster/v2/pkg/testutil/timeseries/model"
 	tt "github.com/trickstercache/trickster/v2/pkg/util/timeconv"
 )
 
@@ -76,8 +76,8 @@ type TestClient struct {
 }
 
 func NewTestClient(name string, o *bo.Options, router http.Handler,
-	cache cache.Cache, modeler *timeseries.Modeler) (backends.TimeseriesBackend, error) {
-
+	cache cache.Cache, modeler *timeseries.Modeler,
+) (backends.TimeseriesBackend, error) {
 	c := &TestClient{}
 	b, err := backends.NewTimeseriesBackend(name, o, c.RegisterHandlers, router, cache, modeler)
 	c.TimeseriesBackend = b
@@ -99,9 +99,7 @@ func (c *TestClient) RegisterHandlers(map[string]http.Handler) {
 
 // DefaultPathConfigs returns the default PathConfigs for the given Provider
 func (c *TestClient) DefaultPathConfigs(o *bo.Options) map[string]*po.Options {
-
 	paths := map[string]*po.Options{
-
 		APIPath + mnQueryRange: {
 			Path:            APIPath + mnQueryRange,
 			HandlerName:     mnQueryRange,
@@ -209,7 +207,6 @@ func (c *TestClient) DefaultPathConfigs(o *bo.Options) map[string]*po.Options {
 	o.FastForwardPath = paths[APIPath+mnQuery]
 
 	return paths
-
 }
 
 // parseTime converts a query time URL parameter to time.Time.
@@ -239,8 +236,8 @@ func parseDuration(input string) (time.Duration, error) {
 
 // ParseTimeRangeQuery parses the key parts of a TimeRangeQuery from the inbound HTTP Request
 func (c *TestClient) ParseTimeRangeQuery(r *http.Request) (*timeseries.TimeRangeQuery,
-	*timeseries.RequestOptions, bool, error) {
-
+	*timeseries.RequestOptions, bool, error,
+) {
 	trq := &timeseries.TimeRangeQuery{Extent: timeseries.Extent{}}
 	rlo := &timeseries.RequestOptions{}
 	qp, _, _ := params.GetRequestValues(r)
@@ -431,7 +428,6 @@ func (c *TestClient) marshalTimeseriesWriter(ts timeseries.Timeseries, w io.Writ
 	}
 	w.Write([]byte("]}}"))
 	return nil
-
 }
 
 func (c *TestClient) testModeler() *timeseries.Modeler {

@@ -34,7 +34,8 @@ func init() {
 }
 
 func startHupMonitor(conf *config.Config, wg *sync.WaitGroup, log *tl.Logger,
-	caches map[string]cache.Cache, args []string) {
+	caches map[string]cache.Cache, args []string,
+) {
 	if conf == nil || conf.Resources == nil {
 		return
 	}

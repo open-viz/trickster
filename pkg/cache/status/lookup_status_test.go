@@ -19,7 +19,6 @@ package status
 import "testing"
 
 func TestLookupStatusString(t *testing.T) {
-
 	t1 := LookupStatusHit
 	t2 := LookupStatusKeyMiss
 

@@ -27,7 +27,6 @@ import (
 )
 
 func TestNew(t *testing.T) {
-
 	pc := New()
 
 	if pc == nil {
@@ -37,11 +36,9 @@ func TestNew(t *testing.T) {
 	if pc.HandlerName != "proxy" {
 		t.Errorf("expected value %s, got %s", "proxy", pc.HandlerName)
 	}
-
 }
 
 func TestPathClone(t *testing.T) {
-
 	pc := New()
 	pc2 := pc.Clone()
 
@@ -52,18 +49,18 @@ func TestPathClone(t *testing.T) {
 	if pc2.HandlerName != "proxy" {
 		t.Errorf("expected value %s, got %s", "proxy", pc2.HandlerName)
 	}
-
 }
 
 func TestPathMerge(t *testing.T) {
-
 	pc := New()
 	pc2 := pc.Clone()
 
-	pc2.Custom = []string{"path", "match_type", "handler", "methods",
+	pc2.Custom = []string{
+		"path", "match_type", "handler", "methods",
 		"cache_key_params", "cache_key_headers", "cache_key_form_fields",
 		"request_headers", "request_params", "response_headers",
-		"response_code", "response_body", "no_metrics", "collapsed_forwarding"}
+		"response_code", "response_body", "no_metrics", "collapsed_forwarding",
+	}
 
 	expectedPath := "testPath"
 	expectedHandlerName := "testHandler"
@@ -142,11 +139,9 @@ func TestPathMerge(t *testing.T) {
 		pc.CollapsedForwardingType != forwarding.CFTypeProgressive {
 		t.Errorf("expected %s got %s", "progressive", pc.CollapsedForwardingName)
 	}
-
 }
 
 func TestMerge(t *testing.T) {
-
 	o := &Options{}
 	o2 := &Options{Custom: []string{"req_rewriter_name"}}
 	o.Merge(o2)
@@ -154,11 +149,9 @@ func TestMerge(t *testing.T) {
 	if len(o.Custom) != 1 {
 		t.Errorf("expected %d got %d", 1, len(o.Custom))
 	}
-
 }
 
 func TestSetDefaults(t *testing.T) {
-
 	err := SetDefaults("default", nil, nil, nil)
 	if err != errInvalidConfigMetadata {
 		t.Error("expected errInvalidConfigMetadata, got", err)

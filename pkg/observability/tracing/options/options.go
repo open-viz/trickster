@@ -25,22 +25,22 @@ import (
 
 // Options is a Tracing Options collection
 type Options struct {
-	Name          string            `yaml:"-"`
-	Provider      string            `yaml:"provider,omitempty"`
-	ServiceName   string            `yaml:"service_name,omitempty"`
-	CollectorURL  string            `yaml:"collector_url,omitempty"`
-	CollectorUser string            `yaml:"collector_user,omitempty"`
-	CollectorPass string            `yaml:"collector_pass,omitempty"`
-	SampleRate    float64           `yaml:"sample_rate,omitempty"`
-	Tags          map[string]string `yaml:"tags,omitempty"`
-	OmitTagsList  []string          `yaml:"omit_tags,omitempty"`
+	Name          string            `json:"-"`
+	Provider      string            `json:"provider,omitempty"`
+	ServiceName   string            `json:"service_name,omitempty"`
+	CollectorURL  string            `json:"collector_url,omitempty"`
+	CollectorUser string            `json:"collector_user,omitempty"`
+	CollectorPass string            `json:"collector_pass,omitempty"`
+	SampleRate    float64           `json:"sample_rate,omitempty"`
+	Tags          map[string]string `json:"tags,omitempty"`
+	OmitTagsList  []string          `json:"omit_tags,omitempty"`
 
-	StdOutOptions *stdoutopts.Options `yaml:"stdout,omitempty"`
-	JaegerOptions *jaegeropts.Options `yaml:"jaeger,omitempty"`
+	StdOutOptions *stdoutopts.Options `json:"stdout,omitempty"`
+	JaegerOptions *jaegeropts.Options `json:"jaeger,omitempty"`
 
-	OmitTags map[string]interface{} `yaml:"-"`
+	OmitTags map[string]interface{} `json:"-"`
 	// for tracers that don't support WithProcess (e.g., Zipkin)
-	attachTagsToSpan bool
+	attachTagsToSpan bool `json:"-"`
 }
 
 // New returns a new *Options with the default values

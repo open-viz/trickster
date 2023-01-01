@@ -38,7 +38,7 @@ import (
 )
 
 type testOptions struct {
-	Backends map[string]*Options `yaml:"backends,omitempty"`
+	Backends map[string]*Options `json:"backends,omitempty"`
 	ncl      negative.Lookups
 }
 

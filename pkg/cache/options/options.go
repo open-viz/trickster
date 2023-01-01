@@ -38,25 +38,25 @@ type Lookup map[string]*Options
 // Options is a collection of defining the Trickster Caching Behavior
 type Options struct {
 	// Name is the Name of the cache, taken from the Key in the Caches map[string]*CacheConfig
-	Name string `yaml:"-"`
+	Name string `json:"-"`
 	// Provider represents the type of cache that we wish to use: "boltdb", "memory", "filesystem", or "redis"
-	Provider string `yaml:"provider,omitempty"`
+	Provider string `json:"provider,omitempty"`
 	// Index provides options for the Cache Index
-	Index *index.Options `yaml:"index,omitempty"`
+	Index *index.Options `json:"index,omitempty"`
 	// Redis provides options for Redis caching
-	Redis *redis.Options `yaml:"redis,omitempty"`
+	Redis *redis.Options `json:"redis,omitempty"`
 	// Filesystem provides options for Filesystem caching
-	Filesystem *filesystem.Options `yaml:"filesystem,omitempty"`
+	Filesystem *filesystem.Options `json:"filesystem,omitempty"`
 	// BBolt provides options for BBolt caching
-	BBolt *bbolt.Options `yaml:"bbolt,omitempty"`
+	BBolt *bbolt.Options `json:"bbolt,omitempty"`
 	// Badger provides options for BadgerDB caching
-	Badger *badger.Options `yaml:"badger,omitempty"`
+	Badger *badger.Options `json:"badger,omitempty"`
 
 	//  Synthetic Values
 
 	// ProviderID represents the internal constant for the provided Provider string
 	// and is automatically populated at startup
-	ProviderID providers.Provider `yaml:"-"`
+	ProviderID providers.Provider `json:"-"`
 }
 
 // New will return a pointer to a CacheOptions with the default configuration settings

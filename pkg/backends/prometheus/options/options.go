@@ -20,8 +20,8 @@ import "github.com/trickstercache/trickster/v2/pkg/util/copiers"
 
 // Options stores information about Prometheus Options
 type Options struct {
-	Labels         map[string]string `yaml:"labels,omitempty"`
-	InstantRoundMS int               `yaml:"instant_round_ms,omitempty"`
+	Labels         map[string]string `json:"labels,omitempty"`
+	InstantRoundMS int               `json:"instant_round_ms,omitempty"`
 }
 
 func (o *Options) Clone() *Options {

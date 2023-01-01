@@ -28,25 +28,25 @@ import (
 // Options defines options for ALBs
 type Options struct {
 	// MechanismName indicates the name of the load balancing mechanism
-	MechanismName string `yaml:"mechanism,omitempty"`
+	MechanismName string `json:"mechanism,omitempty"`
 	// Pool provides the list of backend names to be used by the load balancer
-	Pool []string `yaml:"pool,omitempty"`
+	Pool []string `json:"pool,omitempty"`
 	// HealthyFloor is the minimum health check status value to be considered Available in the pool
 	// -1 : all pool members are Available regardless of health check status
 	//  0 (default) : pool members with status of unknown (0) or healthy (1) are Available
 	//  1 : only pool members with status of healthy (1) are Available
 	// unknown means the first hc hasn't returned yet,
 	// or (more likely) HealthCheck Interval on target backend is not set
-	HealthyFloor int `yaml:"healthy_floor,omitempty"`
+	HealthyFloor int `json:"healthy_floor,omitempty"`
 	// OutputFormat accompanies the tsmerge Mechanism to indicate the provider output format
 	// options include any valid time seres backend like prometheus, influxdb or clickhouse
-	OutputFormat string `yaml:"output_format,omitempty"`
+	OutputFormat string `json:"output_format,omitempty"`
 	// FGRStatusCodes provides an explicit list of status codes considered "good" when using
 	// the First Good Response (fgr) methodology. By default, any code < 400 is good.
-	FGRStatusCodes []int `yaml:"fgr_status_codes"`
+	FGRStatusCodes []int `json:"fgr_status_codes"`
 	//
 	// synthetic values
-	FgrCodesLookup map[int]interface{} `yaml:"-"`
+	FgrCodesLookup map[int]interface{} `json:"-"`
 }
 
 const defaultOutputFormat = "prometheus"

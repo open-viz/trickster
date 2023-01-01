@@ -29,11 +29,11 @@ type testObj struct {
 }
 
 type testOptions1 struct {
-	Backends map[string]*testOptions2 `yaml:"backends,omitempty"`
+	Backends map[string]*testOptions2 `json:"backends,omitempty"`
 }
 
 type testOptions2 struct {
-	Alb *Options `yaml:"alb,omitempty"`
+	Alb *Options `json:"alb,omitempty"`
 }
 
 func fromYAML(conf string) (*Options, yamlx.KeyLookup, error) {

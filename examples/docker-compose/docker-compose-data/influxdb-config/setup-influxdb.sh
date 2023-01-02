@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sleep 10 > /dev/null 2>&1 # allows time for influxdb to be ready
+sleep 10 >/dev/null 2>&1 # allows time for influxdb to be ready
 
 export IFLX_APP=trickster
 export IFLX_ORG=${IFLX_APP}-demo
@@ -12,7 +12,7 @@ export IFLX_RET='30d'
 # this setups influxdb with default users, buckets, orgs, etc.
 
 influx setup -f -r $IFLX_RET -b $IFLX_APP -u $IFLX_APP -p $IFLX_APP \
-  -o $IFLX_ORG -t $IFLX_TOK --host=$IFLX_URL
+    -o $IFLX_ORG -t $IFLX_TOK --host=$IFLX_URL
 
 # expected output:
 
@@ -23,7 +23,7 @@ influx setup -f -r $IFLX_RET -b $IFLX_APP -u $IFLX_APP -p $IFLX_APP \
 # this captures the bucket id for the new bucket, and prints it to the log:
 
 export IFLX_BID=$(influx bucket list -o $IFLX_ORG -t $IFLX_TOK \
-  --host=$IFLX_URL | grep $IFLX_APP  | awk '{print $1}')
+    --host=$IFLX_URL | grep $IFLX_APP | awk '{print $1}')
 # $IFLX_BID should be a 16-char hex, like 60a439a7d894da68, for the bucket id
 
 echo
@@ -37,8 +37,8 @@ echo "BUCKET ID IS [${IFLX_BID}]"
 echo
 
 influx v1 dbrp create --db $IFLX_APP --rp $IFLX_RET --bucket-id $IFLX_BID \
-  --default \
-  -o $IFLX_ORG -t $IFLX_TOK --host=$IFLX_URL
+    --default \
+    -o $IFLX_ORG -t $IFLX_TOK --host=$IFLX_URL
 
 # expected output (your hex values will be different):
 # ID                 Database    Bucket ID          Retention Policy   Default   Organization ID

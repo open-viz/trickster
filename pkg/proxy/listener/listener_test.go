@@ -29,7 +29,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/trickstercache/trickster/v2/cmd/trickster/config"
 	tl "github.com/trickstercache/trickster/v2/pkg/observability/logging"
 	"github.com/trickstercache/trickster/v2/pkg/observability/tracing"
@@ -38,6 +37,8 @@ import (
 	ph "github.com/trickstercache/trickster/v2/pkg/proxy/handlers"
 	testutil "github.com/trickstercache/trickster/v2/pkg/testutil"
 	tlstest "github.com/trickstercache/trickster/v2/pkg/testutil/tls"
+
+	"github.com/gorilla/mux"
 )
 
 func testListener() net.Listener {

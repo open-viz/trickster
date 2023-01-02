@@ -19,10 +19,11 @@ package influxdb
 import (
 	"net/http"
 
-	"github.com/influxdata/influxql"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/headers"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/params"
 	"github.com/trickstercache/trickster/v2/pkg/timeseries"
+
+	"github.com/influxdata/influxql"
 )
 
 // Upstream Endpoints

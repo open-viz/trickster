@@ -22,7 +22,6 @@ import (
 	"strings"
 
 	"github.com/trickstercache/trickster/v2/pkg/encoding/providers"
-
 	strutil "github.com/trickstercache/trickster/v2/pkg/util/strings"
 )
 

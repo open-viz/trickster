@@ -19,9 +19,10 @@ package backends
 import (
 	"testing"
 
-	"github.com/gorilla/mux"
 	ho "github.com/trickstercache/trickster/v2/pkg/backends/healthcheck/options"
 	bo "github.com/trickstercache/trickster/v2/pkg/backends/options"
+
+	"github.com/gorilla/mux"
 )
 
 func TestBackends(t *testing.T) {

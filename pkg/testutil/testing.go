@@ -26,6 +26,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/trickstercache/mockster/pkg/testutil"
 	"github.com/trickstercache/trickster/v2/cmd/trickster/config"
 	bo "github.com/trickstercache/trickster/v2/pkg/backends/options"
 	cr "github.com/trickstercache/trickster/v2/pkg/cache/registration"
@@ -40,8 +41,6 @@ import (
 	"github.com/trickstercache/trickster/v2/pkg/proxy/request/rewriter"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/request/rewriter/options"
 	"github.com/trickstercache/trickster/v2/pkg/runtime"
-
-	"github.com/trickstercache/mockster/pkg/testutil"
 )
 
 // Epoch2020 is the epoch value representing 1 January 2020 00:00:00 UTC

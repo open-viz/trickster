@@ -48,3 +48,6 @@ tags
 
 # any generated test cert/keys that testing did not cleanup due to user abort
 .pem
+
+/.go
+/bin

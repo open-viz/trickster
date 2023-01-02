@@ -1,9 +1,10 @@
-# Copyright 2018 The Trickster Authors
+# Copyright AppsCode Inc. and Contributors.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,209 +12,459 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DEFAULT: build
+SHELL=/bin/bash -o pipefail
 
-PROJECT_DIR    := $(shell pwd)
-GO             ?= go
-GOFMT          ?= $(GO)fmt
-FIRST_GOPATH   := $(firstword $(subst :, ,$(shell $(GO) env GOPATH)))
-TRICKSTER_MAIN := cmd/trickster
-TRICKSTER      := $(FIRST_GOPATH)/bin/trickster
-PROGVER        := $(shell grep 'applicationVersion = ' $(TRICKSTER_MAIN)/main.go | awk '{print $$3}' | sed -e 's/\"//g')
-BUILD_TIME     := $(shell date -u +%FT%T%z)
-GIT_LATEST_COMMIT_ID     := $(shell git rev-parse HEAD)
-IMAGE_TAG      ?= latest
-IMAGE_ARCH     ?= amd64
-GOARCH         ?= amd64
-TAGVER         ?= unspecified
-LDFLAGS         =-ldflags "-extldflags '-static' -w -s -X main.applicationBuildTime=$(BUILD_TIME) -X main.applicationGitCommitID=$(GIT_LATEST_COMMIT_ID)"
-BUILD_SUBDIR   := OPATH
-PACKAGE_DIR    := ./$(BUILD_SUBDIR)/trickster-$(PROGVER)
-BIN_DIR        := $(PACKAGE_DIR)/bin
-CONF_DIR       := $(PACKAGE_DIR)/conf
-CGO_ENABLED    ?= 0
-BUMPER_FILE    := ./testdata/license_header_template.txt
+PRODUCT_OWNER_NAME := appscode
+PRODUCT_NAME       := trickster
+ENFORCE_LICENSE    ?=
 
-.PHONY: validate-app-version
-validate-app-version:
-	@if [ "$(PROGVER)" != $(TAGVER) ]; then\
-		(echo "mismatch between TAGVER '$(TAGVER)' and applicationVersion '$(PROGVER)'"; exit 1);\
+GO_PKG   := github.com/trickstercache
+REPO     := $(notdir $(shell pwd))
+BIN      := trickster
+COMPRESS ?= no
+
+# Where to push the docker image.
+REGISTRY ?= appscode
+SRC_REG  ?=
+
+# This version-strategy uses git tags to set the version string
+git_branch       := $(shell git rev-parse --abbrev-ref HEAD)
+git_tag          := $(shell git describe --exact-match --abbrev=0 2>/dev/null || echo "")
+commit_hash      := $(shell git rev-parse --verify HEAD)
+commit_timestamp := $(shell date --date="@$$(git show -s --format=%ct)" --utc +%FT%T)
+
+VERSION          := $(shell git describe --tags --always --dirty)
+version_strategy := commit_hash
+ifdef git_tag
+	VERSION := $(git_tag)
+	version_strategy := tag
+else
+	ifeq (,$(findstring $(git_branch),master HEAD))
+		ifneq (,$(patsubst release-%,,$(git_branch)))
+			VERSION := $(git_branch)
+			version_strategy := branch
+		endif
+	endif
+endif
+
+###
+### These variables should not need tweaking.
+###
+
+SRC_PKGS := cmd pkg # directories which hold app source excluding tests (not vendored)
+SRC_DIRS := $(SRC_PKGS) # directories which hold app source (not vendored)
+
+DOCKER_PLATFORMS := linux/amd64 linux/arm64
+BIN_PLATFORMS    := $(DOCKER_PLATFORMS)
+
+# Used internally.  Users should pass GOOS and/or GOARCH.
+OS   := $(if $(GOOS),$(GOOS),$(shell go env GOOS))
+ARCH := $(if $(GOARCH),$(GOARCH),$(shell go env GOARCH))
+
+BASEIMAGE_PROD   ?= gcr.io/distroless/static-debian11
+# BASEIMAGE_PROD   ?= alpine
+BASEIMAGE_DBG    ?= debian:bullseye
+
+IMAGE            := $(REGISTRY)/$(BIN)
+VERSION_PROD     := $(VERSION)
+VERSION_DBG      := $(VERSION)-dbg
+TAG              := $(VERSION)_$(OS)_$(ARCH)
+TAG_PROD         := $(TAG)
+TAG_DBG          := $(VERSION)-dbg_$(OS)_$(ARCH)
+
+GO_VERSION       ?= 1.19
+BUILD_IMAGE      ?= appscode/golang-dev:$(GO_VERSION)
+CHART_TEST_IMAGE ?= quay.io/helmpack/chart-testing:v3.5.1
+
+OUTBIN = bin/$(BIN)-$(OS)-$(ARCH)
+ifeq ($(OS),windows)
+  OUTBIN := bin/$(BIN)-$(OS)-$(ARCH).exe
+  BIN := $(BIN).exe
+endif
+
+# Directories that we need created to build/test.
+BUILD_DIRS  := bin/$(OS)_$(ARCH)     \
+               .go/bin/$(OS)_$(ARCH) \
+               .go/cache             \
+               hack/config           \
+               $(HOME)/.credentials  \
+               $(HOME)/.kube         \
+               $(HOME)/.minikube
+
+DOCKERFILE_PROD  = Dockerfile.in
+DOCKERFILE_DBG   = Dockerfile.dbg
+
+DOCKER_REPO_ROOT := /go/src/$(GO_PKG)/$(REPO)
+
+# If you want to build all binaries, see the 'all-build' rule.
+# If you want to build all containers, see the 'all-container' rule.
+# If you want to build AND push all containers, see the 'all-push' rule.
+all: fmt build
+
+# For the following OS/ARCH expansions, we transform OS/ARCH into OS_ARCH
+# because make pattern rules don't match with embedded '/' characters.
+
+build-%:
+	@$(MAKE) build                        \
+	    --no-print-directory              \
+	    GOOS=$(firstword $(subst _, ,$*)) \
+	    GOARCH=$(lastword $(subst _, ,$*))
+
+container-%:
+	@$(MAKE) container                    \
+	    --no-print-directory              \
+	    GOOS=$(firstword $(subst _, ,$*)) \
+	    GOARCH=$(lastword $(subst _, ,$*))
+
+push-%:
+	@$(MAKE) push                         \
+	    --no-print-directory              \
+	    GOOS=$(firstword $(subst _, ,$*)) \
+	    GOARCH=$(lastword $(subst _, ,$*))
+
+all-build: $(addprefix build-, $(subst /,_, $(BIN_PLATFORMS)))
+ifeq ($(COMPRESS),yes)
+	@cd bin; \
+	sha256sum $(patsubst $(BIN)-windows-%.tar.gz,$(BIN)-windows-%.zip, $(addsuffix .tar.gz, $(addprefix $(BIN)-, $(subst /,-, $(BIN_PLATFORMS))))) > $(BIN)-checksums.txt
+endif
+
+all-container: $(addprefix container-, $(subst /,_, $(DOCKER_PLATFORMS)))
+
+all-push: $(addprefix push-, $(subst /,_, $(DOCKER_PLATFORMS)))
+
+version:
+	@echo ::set-output name=version::$(VERSION)
+	@echo ::set-output name=version_strategy::$(version_strategy)
+	@echo ::set-output name=git_tag::$(git_tag)
+	@echo ::set-output name=git_branch::$(git_branch)
+	@echo ::set-output name=commit_hash::$(commit_hash)
+	@echo ::set-output name=commit_timestamp::$(commit_timestamp)
+
+.PHONY: gen
+gen:
+	@true
+
+fmt: $(BUILD_DIRS)
+	@docker run                                                 \
+	    -i                                                      \
+	    --rm                                                    \
+	    -u $$(id -u):$$(id -g)                                  \
+	    -v $$(pwd):/src                                         \
+	    -w /src                                                 \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
+	    -v $$(pwd)/.go/cache:/.cache                            \
+	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
+	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+	    $(BUILD_IMAGE)                                          \
+	    /bin/bash -c "                                          \
+	        REPO_PKG=$(GO_PKG)                                  \
+	        ./hack/fmt.sh $(SRC_DIRS)                           \
+	    "
+
+build: $(OUTBIN)
+
+# The following structure defeats Go's (intentional) behavior to always touch
+# result files, even if they have not changed.  This will still run `go` but
+# will not trigger further work if nothing has actually changed.
+
+$(OUTBIN): .go/$(OUTBIN).stamp
+	@true
+
+# This will build the binary under ./.go and update the real binary iff needed.
+.PHONY: .go/$(OUTBIN).stamp
+.go/$(OUTBIN).stamp: $(BUILD_DIRS)
+	@echo "making $(OUTBIN)"
+	@docker run                                                 \
+	    -i                                                      \
+	    --rm                                                    \
+	    -u $$(id -u):$$(id -g)                                  \
+	    -v $$(pwd):/src                                         \
+	    -w /src                                                 \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
+	    -v $$(pwd)/.go/cache:/.cache                            \
+	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
+	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+	    $(BUILD_IMAGE)                                          \
+	    /bin/bash -c "                                          \
+	        PRODUCT_OWNER_NAME=$(PRODUCT_OWNER_NAME)            \
+	        PRODUCT_NAME=$(PRODUCT_NAME)                        \
+	        ENFORCE_LICENSE=$(ENFORCE_LICENSE)                  \
+	        ARCH=$(ARCH)                                        \
+	        OS=$(OS)                                            \
+	        VERSION=$(VERSION)                                  \
+	        version_strategy=$(version_strategy)                \
+	        git_branch=$(git_branch)                            \
+	        git_tag=$(git_tag)                                  \
+	        commit_hash=$(commit_hash)                          \
+	        commit_timestamp=$(commit_timestamp)                \
+	        ./hack/build.sh                                     \
+	    "
+	@if ! cmp -s .go/bin/$(OS)_$(ARCH)/$(BIN) $(OUTBIN); then   \
+	    mv .go/bin/$(OS)_$(ARCH)/$(BIN) $(OUTBIN);              \
+	    date >$@;                                               \
 	fi
+ifeq ($(COMPRESS),yes)
+ifeq ($(OS),windows)
+	@echo "compressing $(OUTBIN)";                               \
+	cd bin;                                                      \
+	zip -j $(subst .exe,,$(BIN))-$(OS)-$(ARCH).zip $(subst .exe,,$(BIN))-$(OS)-$(ARCH).exe ../LICENSE
+else
+	@echo "compressing $(OUTBIN)";                               \
+	cd bin;                                                      \
+	tar -czvf $(BIN)-$(OS)-$(ARCH).tar.gz $(BIN)-$(OS)-$(ARCH) ../LICENSE
+endif
+endif
+	@echo
 
-.PHONY: go-mod-vendor
-go-mod-vendor:
-	$(GO) mod vendor
+# Used to track state in hidden files.
+DOTFILE_IMAGE    = $(subst /,_,$(IMAGE))-$(TAG)
 
-.PHONY: go-mod-tidy
-go-mod-tidy:
-	$(GO) mod tidy
+container: bin/.container-$(DOTFILE_IMAGE)-PROD bin/.container-$(DOTFILE_IMAGE)-DBG
+ifeq (,$(SRC_REG))
+bin/.container-$(DOTFILE_IMAGE)-%: bin/$(BIN)-$(OS)-$(ARCH) $(DOCKERFILE_%)
+	@echo "container: $(IMAGE):$(TAG_$*)"
+	@sed                                    \
+		-e 's|{ARG_BIN}|$(BIN)|g'           \
+		-e 's|{ARG_ARCH}|$(ARCH)|g'         \
+		-e 's|{ARG_OS}|$(OS)|g'             \
+		-e 's|{ARG_FROM}|$(BASEIMAGE_$*)|g' \
+		$(DOCKERFILE_$*) > bin/.dockerfile-$*-$(OS)_$(ARCH)
+	@docker buildx build --platform $(OS)/$(ARCH) --load --pull -t $(IMAGE):$(TAG_$*) -f bin/.dockerfile-$*-$(OS)_$(ARCH) .
+	@docker images -q $(IMAGE):$(TAG_$*) > $@
+	@echo
+else
+bin/.container-$(DOTFILE_IMAGE)-%:
+	@echo "container: $(IMAGE):$(TAG_$*)"
+	@docker tag $(SRC_REG)/$(BIN):$(TAG_$*) $(IMAGE):$(TAG_$*)
+	@echo
+endif
 
-.PHONY: test-go-mod
-test-go-mod:
-	@git diff --quiet --exit-code go.mod go.sum || echo "There are changes to go.mod and go.sum which needs to be committed"
+push: bin/.push-$(DOTFILE_IMAGE)-PROD bin/.push-$(DOTFILE_IMAGE)-DBG
+bin/.push-$(DOTFILE_IMAGE)-%: bin/.container-$(DOTFILE_IMAGE)-%
+	@docker push $(IMAGE):$(TAG_$*)
+	@echo "pushed: $(IMAGE):$(TAG_$*)"
+	@echo
 
-.PHONY: build
-build: go-mod-tidy go-mod-vendor
-	CGO_ENABLED=$(CGO_ENABLED) $(GO) build $(LDFLAGS) -o ./$(BUILD_SUBDIR)/trickster -a -v $(TRICKSTER_MAIN)/*.go
+.PHONY: docker-manifest
+docker-manifest: docker-manifest-PROD docker-manifest-DBG
+docker-manifest-%:
+	docker manifest create -a $(IMAGE):$(VERSION_$*) $(foreach PLATFORM,$(DOCKER_PLATFORMS),$(IMAGE):$(VERSION_$*)_$(subst /,_,$(PLATFORM)))
+	docker manifest push $(IMAGE):$(VERSION_$*)
 
-rpm: build
-	mkdir -p ./$(BUILD_SUBDIR)/SOURCES
-	cp -p ./$(BUILD_SUBDIR)/trickster ./$(BUILD_SUBDIR)/SOURCES/
-	cp deploy/systemd/trickster.service ./$(BUILD_SUBDIR)/SOURCES/
-	sed -e 's%^# log_file:.*$$%log_file: /var/log/trickster/trickster.log%' \
-		-e 's%prometheus:9090%localhost:9090%' \
-		< examples/conf/example.full.yaml > ./$(BUILD_SUBDIR)/SOURCES/trickster.yaml
-	rpmbuild --define "_topdir $(CURDIR)/$(BUILD_SUBDIR)" \
-		--define "_version $(PROGVER)" \
-		--define "_release 1" \
-		-ba deploy/packaging/trickster.spec
+.PHONY: test
+test: unit-tests e2e-tests
+
+unit-tests: $(BUILD_DIRS)
+	@docker run                                                 \
+	    -i                                                      \
+	    --rm                                                    \
+	    -u $$(id -u):$$(id -g)                                  \
+	    -v $$(pwd):/src                                         \
+	    -w /src                                                 \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
+	    -v $$(pwd)/.go/cache:/.cache                            \
+	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
+	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+	    $(BUILD_IMAGE)                                          \
+	    /bin/bash -c "                                          \
+	        ARCH=$(ARCH)                                        \
+	        OS=$(OS)                                            \
+	        VERSION=$(VERSION)                                  \
+	        ./hack/test.sh $(SRC_PKGS)                          \
+	    "
+
+# - e2e-tests can hold both ginkgo args (as GINKGO_ARGS) and program/test args (as TEST_ARGS).
+#       make e2e-tests TEST_ARGS="--selfhosted-operator=false --storageclass=standard" GINKGO_ARGS="--flakeAttempts=2"
+#
+# - Minimalist:
+#       make e2e-tests
+#
+# NB: -t is used to catch ctrl-c interrupt from keyboard and -t will be problematic for CI.
+
+GINKGO_ARGS ?=
+TEST_ARGS   ?=
+
+.PHONY: e2e-tests
+e2e-tests: $(BUILD_DIRS)
+	@docker run                                                 \
+	    -i                                                      \
+	    --rm                                                    \
+	    -u $$(id -u):$$(id -g)                                  \
+	    -v $$(pwd):/src                                         \
+	    -w /src                                                 \
+	    --net=host                                              \
+	    -v $(HOME)/.kube:/.kube                                 \
+	    -v $(HOME)/.minikube:$(HOME)/.minikube                  \
+	    -v $(HOME)/.credentials:$(HOME)/.credentials            \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
+	    -v $$(pwd)/.go/cache:/.cache                            \
+	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
+	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+	    --env KUBECONFIG=$(KUBECONFIG)                          \
+	    --env-file=$$(pwd)/hack/config/.env                     \
+	    $(BUILD_IMAGE)                                          \
+	    /bin/bash -c "                                          \
+	        ARCH=$(ARCH)                                        \
+	        OS=$(OS)                                            \
+	        VERSION=$(VERSION)                                  \
+	        DOCKER_REGISTRY=$(REGISTRY)                         \
+	        TAG=$(TAG)                                          \
+	        KUBECONFIG=$${KUBECONFIG#$(HOME)}                   \
+	        GINKGO_ARGS='$(GINKGO_ARGS)'                        \
+	        TEST_ARGS='$(TEST_ARGS)'                            \
+	        ./hack/e2e.sh                                       \
+	    "
+
+.PHONY: e2e-parallel
+e2e-parallel:
+	@$(MAKE) e2e-tests GINKGO_ARGS="-p -stream --flakeAttempts=2" --no-print-directory
+
+ADDTL_LINTERS   := goconst,gofmt,goimports,unparam
+
+.PHONY: lint
+lint: $(BUILD_DIRS)
+	@echo "running linter"
+	@docker run                                                 \
+	    -i                                                      \
+	    --rm                                                    \
+	    -u $$(id -u):$$(id -g)                                  \
+	    -v $$(pwd):/src                                         \
+	    -w /src                                                 \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
+	    -v $$(pwd)/.go/cache:/.cache                            \
+	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
+	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+	    --env GOFLAGS="-mod=vendor"                             \
+	    $(BUILD_IMAGE)                                          \
+	    golangci-lint run --enable $(ADDTL_LINTERS) --timeout=10m --skip-files="generated.*\.go$\" --skip-dirs-use-default --skip-dirs=client,vendor
+
+$(BUILD_DIRS):
+	@mkdir -p $@
+
+KUBE_NAMESPACE    ?= kubeops
+REGISTRY_SECRET   ?=
+IMAGE_PULL_POLICY	?= IfNotPresent
+
+ifeq ($(strip $(REGISTRY_SECRET)),)
+	IMAGE_PULL_SECRETS =
+else
+	IMAGE_PULL_SECRETS = --set imagePullSecrets[0].name=$(REGISTRY_SECRET)
+endif
 
 .PHONY: install
 install:
-	$(GO) install -o $(TRICKSTER) $(PROGVER)
+	@cd ../installer; \
+	helm upgrade -i trickster charts/trickster --wait \
+		--namespace=$(KUBE_NAMESPACE) --create-namespace \
+		--set image.registry=$(REGISTRY) \
+		--set image.tag=$(TAG_PROD) \
+		--set imagePullPolicy=$(IMAGE_PULL_POLICY) \
+		$(IMAGE_PULL_SECRETS); \
+
+.PHONY: uninstall
+uninstall:
+	@cd ../installer; \
+	helm uninstall trickster --namespace=$(KUBE_NAMESPACE) || true
+
+.PHONY: purge
+purge: uninstall
+	@true
+
+.PHONY: dev
+dev: gen fmt push
+
+.PHONY: verify
+verify: verify-gen verify-modules
+
+.PHONY: verify-modules
+verify-modules:
+	go mod tidy
+	go mod vendor
+	@if !(git diff --exit-code HEAD); then \
+		echo "go module files are out of date"; exit 1; \
+	fi
+
+.PHONY: verify-gen
+verify-gen: gen fmt
+	@if !(git diff --exit-code HEAD); then \
+		echo "generated files are out of date, run make gen fmt"; exit 1; \
+	fi
+
+.PHONY: add-license
+add-license:
+	@echo "Adding license header"
+	@docker run --rm 	                                 \
+		-u $$(id -u):$$(id -g)                           \
+		-v /tmp:/.cache                                  \
+		-v $$(pwd):$(DOCKER_REPO_ROOT)                   \
+		-w $(DOCKER_REPO_ROOT)                           \
+		--env HTTP_PROXY=$(HTTP_PROXY)                   \
+		--env HTTPS_PROXY=$(HTTPS_PROXY)                 \
+		$(BUILD_IMAGE)                                   \
+		ltag -t "./hack/license" --excludes "vendor contrib bin" -v
+
+.PHONY: check-license
+check-license:
+	@echo "Checking files have proper license header"
+	@docker run --rm 	                                 \
+		-u $$(id -u):$$(id -g)                           \
+		-v /tmp:/.cache                                  \
+		-v $$(pwd):$(DOCKER_REPO_ROOT)                   \
+		-w $(DOCKER_REPO_ROOT)                           \
+		--env HTTP_PROXY=$(HTTP_PROXY)                   \
+		--env HTTPS_PROXY=$(HTTPS_PROXY)                 \
+		$(BUILD_IMAGE)                                   \
+		ltag -t "./hack/license" --excludes "vendor contrib bin" --check -v
+
+.PHONY: ci
+ci: check-license lint build #unit-tests cover verify
+
+.PHONY: qa
+qa:
+	@if [ "$$APPSCODE_ENV" = "prod" ]; then                                              \
+		echo "Nothing to do in prod env. Are you trying to 'release' binaries to prod?"; \
+		exit 1;                                                                          \
+	fi
+	@if [ "$(version_strategy)" = "tag" ]; then               \
+		echo "Are you trying to 'release' binaries to prod?"; \
+		exit 1;                                               \
+	fi
+	@$(MAKE) all-push docker-manifest --no-print-directory
 
 .PHONY: release
-release: validate-app-version clean go-mod-tidy go-mod-vendor release-artifacts
-
-.PHONY: release-artifacts
-release-artifacts: clean
-
-	mkdir -p $(PACKAGE_DIR)
-	mkdir -p $(BIN_DIR)
-	mkdir -p $(CONF_DIR)
-
-	cp -r ./docs $(PACKAGE_DIR)
-	cp -r ./deploy $(PACKAGE_DIR)
-	cp ./README.md $(PACKAGE_DIR)
-	cp ./CONTRIBUTING.md $(PACKAGE_DIR)
-	cp ./LICENSE $(PACKAGE_DIR)
-	cp ./examples/conf/*.yaml $(CONF_DIR)
-
-	GOOS=darwin  GOARCH=amd64 CGO_ENABLED=$(CGO_ENABLED) $(GO) build $(LDFLAGS) -o $(BIN_DIR)/trickster-$(PROGVER).darwin-amd64  -a -v $(TRICKSTER_MAIN)/*.go
-	GOOS=darwin  GOARCH=arm64 CGO_ENABLED=$(CGO_ENABLED) $(GO) build $(LDFLAGS) -o $(BIN_DIR)/trickster-$(PROGVER).darwin-arm64  -a -v $(TRICKSTER_MAIN)/*.go
-	GOOS=linux   GOARCH=amd64 CGO_ENABLED=$(CGO_ENABLED) $(GO) build $(LDFLAGS) -o $(BIN_DIR)/trickster-$(PROGVER).linux-amd64   -a -v $(TRICKSTER_MAIN)/*.go
-	GOOS=linux   GOARCH=arm64 CGO_ENABLED=$(CGO_ENABLED) $(GO) build $(LDFLAGS) -o $(BIN_DIR)/trickster-$(PROGVER).linux-arm64   -a -v $(TRICKSTER_MAIN)/*.go
-	GOOS=windows GOARCH=amd64 CGO_ENABLED=$(CGO_ENABLED) $(GO) build $(LDFLAGS) -o $(BIN_DIR)/trickster-$(PROGVER).windows-amd64 -a -v $(TRICKSTER_MAIN)/*.go
-
-	cd ./$(BUILD_SUBDIR) && tar cvfz ./trickster-$(PROGVER).tar.gz ./trickster-$(PROGVER)/*
-
-# Minikube and helm bootstrapping are done via deploy/helm/Makefile
-.PHONY: helm-local
-helm-local:
-	kubectl config use-context minikube --namespace=trickster
-	kubectl scale --replicas=0 deployment/dev-trickster -n trickster
-	eval $$(minikube docker-env) \
-		&& docker build -f deploy/Dockerfile -t trickster:dev .
-	kubectl set image deployment/dev-trickster trickster=trickster:dev -n trickster
-	kubectl scale --replicas=1 deployment/dev-trickster -n trickster
-
-# Minikube and helm bootstrapping are done via deploy/kube/Makefile
-.PHONY: kube-local
-kube-local:
-	kubectl config use-context minikube
-	kubectl scale --replicas=0 deployment/trickster
-	eval $$(minikube docker-env) \
-		&& docker build -f deploy/Dockerfile -t trickster:dev .
-	kubectl set image deployment/trickster trickster=trickster:dev
-	kubectl scale --replicas=1 deployment/trickster
-
-.PHONY: docker
-docker:
-	docker build --build-arg IMAGE_ARCH=$(IMAGE_ARCH)  --build-arg GOARCH=$(GOARCH) -f ./Dockerfile -t trickster:$(PROGVER) .
-
-.PHONY: docker-release
-docker-release:
-# linux x86 image
-	docker build --build-arg IMAGE_ARCH=amd64 --build-arg GOARCH=amd64 -f ./deploy/Dockerfile -t trickstercache/trickster:$(IMAGE_TAG) .
-# linux arm image
-	docker build --build-arg IMAGE_ARCH=arm64v8 --build-arg GOARCH=arm64 -f ./deploy/Dockerfile -t trickstercache/trickster:arm64v8-$(IMAGE_TAG) .
-
-.PHONY: style
-style:
-	! gofmt -d $$(find . -path ./vendor -prune -o -name '*.go' -print) | grep '^'
-
-.PHONY: test
-test:
-	@go test -v -coverprofile=.coverprofile ./... 
-
-.PHONY: bench
-bench:
-	bash -c "$(GO) test -v -coverprofile=.coverprofile ./... -run=nonthingplease -bench=. | grep -v ' app=trickster '; exit ${PIPESTATUS[0]}"
-
-.PHONY: test-cover
-test-cover: test
-	$(GO) tool cover -html=.coverprofile
+release:
+	@if [ "$$APPSCODE_ENV" != "prod" ]; then      \
+		echo "'release' only works in PROD env."; \
+		exit 1;                                   \
+	fi
+	@if [ "$(version_strategy)" != "tag" ]; then                    \
+		echo "apply tag to release binaries and/or docker images."; \
+		exit 1;                                                     \
+	fi
+	@$(MAKE) all-push docker-manifest --no-print-directory
 
 .PHONY: clean
 clean:
-	rm -rf ./trickster ./$(BUILD_SUBDIR)
+	rm -rf .go bin
 
-.PHONY: generate
-generate: perform-generate insert-license-headers
+.PHONY: run
+run:
+	go run -mod=vendor ./cmd/trickster run \
+		--v=3
 
-.PHONY: perform-generate
-perform-generate:
-	$(GO) generate ./pkg/... ./cmd/...
+.PHONY: push-to-kind
+push-to-kind: container
+	@echo "Loading docker image into kind cluster...."
+	@kind load docker-image $(IMAGE):$(TAG_PROD)
+	@echo "Image has been pushed successfully into kind cluster."
 
-.PHONY: insert-license-headers
-insert-license-headers:
-	@for file in $$(find ./pkg ./cmd -name '*.go') ; \
-	do \
-		output=$$(grep 'Licensed under the Apache License' $$file) ; \
-		if [[ "$$?" != "0" ]]; then \
-			echo "adding License Header Block to $$file" ; \
-			cat $(BUMPER_FILE) > /tmp/trktmp.go ; \
-			cat $$file >> /tmp/trktmp.go ; \
-			mv /tmp/trktmp.go $$file ; \
-		fi ; \
-	done
+.PHONY: deploy-to-kind
+deploy-to-kind: push-to-kind install
 
-.PHONY: spelling
-spelling:
-	@which mdspell ; \
-	if [[ "$$?" != "0" ]]; then \
-		echo "mdspell is not installed" ; \
-	else \
-		mdspell './README.md' './docs/**/*.md' ; \
-	fi
-
-	@which codespell ; \
-	if [[ "$$?" != "0" ]]; then \
-		echo "codespell is not installed" ; \
-	else \
-		codespell --skip='vendor,*.git,*.png,*.pdf,*.tiff,*.plist,*.pem,rangesim*.go,*.gz' --ignore-words='./testdata/ignore_words.txt' ; \
-	fi
-
-.PHONY: serve
-serve:
-	@cd cmd/trickster && go run . -config /etc/trickster/trickster.yaml
-
-.PHONY: serve-debug
-serve-debug:
-	@cd cmd/trickster && go run . -config /etc/trickster/trickster.yaml --log-level debug
-
-.PHONY: serve-info
-serve-info:
-	@cd cmd/trickster && go run . -config /etc/trickster/trickster.yaml --log-level info
-
-## Location to install dependencies to
-# BUILD_SUBDIR ?= $(shell pwd)/bin
-$(BUILD_SUBDIR):
-	mkdir -p $(BUILD_SUBDIR)
-
-## Tool Binaries
-CONTROLLER_GEN ?= $(BUILD_SUBDIR)/controller-gen
-
-## Tool Versions
-CONTROLLER_TOOLS_VERSION ?= v0.10.0
-
-.PHONY: generate2
-generate2: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
-	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./pkg/backends/options/..."
-
-
-.PHONY: controller-gen
-controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary. If wrong version is installed, it will be overwritten.
-$(CONTROLLER_GEN): $(BUILD_SUBDIR)
-	test -s $(BUILD_SUBDIR)/controller-gen && $(BUILD_SUBDIR)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
-	GOBIN=$(shell pwd)/$(BUILD_SUBDIR) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
+.PHONY: deploy
+deploy: uninstall push install

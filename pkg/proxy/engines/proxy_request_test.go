@@ -216,7 +216,6 @@ func TestPrepareResponse(t *testing.T) {
 	pr.prepareResponse()
 
 	// t.Errorf("%s", "foo")
-
 }
 
 func TestPrepareResponsePreconditionFailed(t *testing.T) {

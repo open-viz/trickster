@@ -22,6 +22,8 @@ import (
 	"sync"
 
 	"github.com/trickstercache/trickster/v2/pkg/runtime"
+
+	_ "go.bytebuilders.dev/license-verifier/info"
 )
 
 var (

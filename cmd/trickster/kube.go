@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/trickstercache/trickster/v2/pkg/util/yamlx"
 	"os"
 	goruntime "runtime"
-	"sigs.k8s.io/yaml"
 	"strings"
 	"sync"
 
@@ -14,6 +12,8 @@ import (
 	tl "github.com/trickstercache/trickster/v2/pkg/observability/logging"
 	"github.com/trickstercache/trickster/v2/pkg/observability/metrics"
 	"github.com/trickstercache/trickster/v2/pkg/runtime"
+	"github.com/trickstercache/trickster/v2/pkg/util/yamlx"
+
 	trickstercachev1alpha1 "go.openviz.dev/trickster-config/api/v1alpha1"
 	"go.openviz.dev/trickster-config/controllers"
 	krt "k8s.io/apimachinery/pkg/runtime"
@@ -22,6 +22,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/yaml"
 )
 
 var (

@@ -19,8 +19,9 @@ package backends
 import (
 	"testing"
 
-	"github.com/gorilla/mux"
 	bo "github.com/trickstercache/trickster/v2/pkg/backends/options"
+
+	"github.com/gorilla/mux"
 )
 
 func TestNewTimeseriesBackend(t *testing.T) {

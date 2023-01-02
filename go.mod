@@ -17,6 +17,7 @@ require (
 	github.com/prometheus/client_golang v1.13.0
 	github.com/tinylib/msgp v1.1.6
 	github.com/trickstercache/mockster v1.1.2
+	go.bytebuilders.dev/license-verifier v0.12.1
 	go.etcd.io/bbolt v1.3.6
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.34.0
 	go.opentelemetry.io/otel v1.9.0
@@ -28,7 +29,7 @@ require (
 	go.openviz.dev/trickster-config v0.0.0-20230101204121-7575c6b4b856
 	golang.org/x/net v0.0.0-20220822230855-b0a4917ee28c
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
-	k8s.io/apimachinery v0.25.0
+	k8s.io/apimachinery v0.25.1
 	k8s.io/client-go v0.25.0
 	k8s.io/klog/v2 v2.70.1
 	sigs.k8s.io/controller-runtime v0.13.1

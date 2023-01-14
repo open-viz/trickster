@@ -127,6 +127,9 @@ type Options struct {
 	// Prometheus holds options specific to prometheus backends
 	Prometheus *prop.Options `json:"prometheus,omitempty"`
 
+	// Transport is the transport configuration for the Backend
+	Transport *TransportOptions `json:"transport,omitempty"`
+
 	// TLS is the TLS Configuration for the Frontend and Backend
 	TLS *to.Options `json:"tls,omitempty"`
 
@@ -245,6 +248,7 @@ func New() *Options {
 		MaxShardSize:                 time.Duration(DefaultTimeseriesShardSize) * time.Millisecond,
 		ShardStepMS:                  DefaultTimeseriesShardStep,
 		ShardStep:                    time.Duration(DefaultTimeseriesShardStep) * time.Millisecond,
+		Transport:                    &TransportOptions{},
 		TLS:                          &to.Options{},
 		Timeout:                      time.Millisecond * DefaultBackendTimeoutMS,
 		TimeoutMS:                    DefaultBackendTimeoutMS,
@@ -333,6 +337,10 @@ func (o *Options) Clone() *Options {
 			m[c] = t
 		}
 		no.NegativeCache = m
+	}
+
+	if o.Transport != nil {
+		no.Transport = o.Transport.Clone()
 	}
 
 	if o.TLS != nil {

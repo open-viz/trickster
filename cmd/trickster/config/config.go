@@ -34,6 +34,7 @@ import (
 	lo "github.com/trickstercache/trickster/v2/pkg/observability/logging/options"
 	mo "github.com/trickstercache/trickster/v2/pkg/observability/metrics/options"
 	tracing "github.com/trickstercache/trickster/v2/pkg/observability/tracing/options"
+	no "github.com/trickstercache/trickster/v2/pkg/proxy/nats/options"
 	rewriter "github.com/trickstercache/trickster/v2/pkg/proxy/request/rewriter"
 	rwopts "github.com/trickstercache/trickster/v2/pkg/proxy/request/rewriter/options"
 	"github.com/trickstercache/trickster/v2/pkg/util/yamlx"
@@ -45,6 +46,8 @@ import (
 type Config struct {
 	// Main is the primary MainConfig section
 	Main *MainConfig `json:"main,omitempty"`
+	// Nats is provides for transport via NATS.io
+	Nats *no.Options `json:"nats,omitempty"`
 	// Backends is a map of BackendOptionss
 	Backends map[string]*bo.Options `json:"backends,omitempty"`
 	// Caches is a map of CacheConfigs

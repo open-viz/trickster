@@ -38,6 +38,7 @@ import (
 	"github.com/trickstercache/trickster/v2/pkg/observability/metrics"
 	tr "github.com/trickstercache/trickster/v2/pkg/observability/tracing/registration"
 	"github.com/trickstercache/trickster/v2/pkg/proxy/handlers"
+	"github.com/trickstercache/trickster/v2/pkg/proxy/nats"
 	"github.com/trickstercache/trickster/v2/pkg/routing"
 	"github.com/trickstercache/trickster/v2/pkg/runtime"
 
@@ -117,6 +118,13 @@ func applyConfig(conf, oldConf *config.Config, wg *sync.WaitGroup, logger *tl.Lo
 
 	for _, w := range conf.LoaderWarnings {
 		tl.Warn(logger, w, tl.Pairs{})
+	}
+
+	err := nats.InitNATS(conf.Nats)
+	if err != nil {
+		handleStartupIssue("nats initialization failed", tl.Pairs{"detail": err.Error()},
+			logger, errorFunc)
+		return err
 	}
 
 	// Register Tracing Configurations

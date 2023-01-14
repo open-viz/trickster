@@ -562,6 +562,15 @@ func (in *TricksterSpec) DeepCopyInto(out *TricksterSpec) {
 		in, out := &in.Main, &out.Main
 		*out = (*in).DeepCopy()
 	}
+	if in.Nats != nil {
+		in, out := &in.Nats, &out.Nats
+		*out = (*in).DeepCopy()
+	}
+	if in.Secret != nil {
+		in, out := &in.Secret, &out.Secret
+		*out = new(v1.SecretProjection)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.BackendSelector != nil {
 		in, out := &in.BackendSelector, &out.BackendSelector
 		*out = new(metav1.LabelSelector)

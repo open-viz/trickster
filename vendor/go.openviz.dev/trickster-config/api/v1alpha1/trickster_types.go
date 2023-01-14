@@ -23,6 +23,8 @@ import (
 	fropt "github.com/trickstercache/trickster/v2/pkg/frontend/options"
 	lo "github.com/trickstercache/trickster/v2/pkg/observability/logging/options"
 	mo "github.com/trickstercache/trickster/v2/pkg/observability/metrics/options"
+	no "github.com/trickstercache/trickster/v2/pkg/proxy/nats/options"
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -30,6 +32,11 @@ import (
 type TricksterSpec struct {
 	// Main is the primary MainConfig section
 	Main *config.MainConfig `json:"main,omitempty"`
+	// Nats is provides for transport via NATS.io
+	Nats *no.Options `json:"nats,omitempty"`
+	// secret information about the secret data to project
+	// +optional
+	Secret *core.SecretProjection `json:"secret,omitempty"`
 	// Backends is a map of BackendOptionss
 	// Backends map[string]*bo.Options `json:"backends,omitempty"`
 	BackendSelector *metav1.LabelSelector `json:"backend_selector,omitempty"`

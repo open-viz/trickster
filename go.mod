@@ -27,7 +27,7 @@ require (
 	go.opentelemetry.io/otel/exporters/zipkin v1.9.0
 	go.opentelemetry.io/otel/sdk v1.9.0
 	go.opentelemetry.io/otel/trace v1.9.0
-	go.openviz.dev/trickster-config v0.0.0-20230101204121-7575c6b4b856
+	go.openviz.dev/trickster-config v0.0.0-20230114122538-5000a86378ff
 	golang.org/x/net v0.5.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	k8s.io/apimachinery v0.25.3

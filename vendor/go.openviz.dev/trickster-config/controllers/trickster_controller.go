@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"os"
 	"path/filepath"
 
@@ -84,6 +85,15 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	//delete(cfg.TracingConfigs, "default")
 	if trickster.Spec.Main != nil {
 		cfg.Main = trickster.Spec.Main
+	}
+	if trickster.Spec.Nats != nil {
+		cfg.Nats = trickster.Spec.Nats
+	}
+	if trickster.Spec.Secret != nil {
+		err := r.writeConfig(ctx, req.Name, trickster.Spec.Secret)
+		if err != nil {
+			return ctrl.Result{}, client.IgnoreNotFound(err)
+		}
 	}
 	if trickster.Spec.Frontend != nil {
 		cfg.Frontend = trickster.Spec.Frontend
@@ -252,8 +262,94 @@ func (r *TricksterReconciler) writeConfig(ctx context.Context, ns string, sp *co
 	return nil
 }
 
+var (
+	tricksterSecretKey = ".trickster.secret"
+)
+
 // SetupWithManager sets up the controller with the Manager.
 func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	// https://book.kubebuilder.io/cronjob-tutorial/controller-implementation.html#setup
+	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &trickstercachev1alpha1.Trickster{}, tricksterSecretKey, func(rawObj client.Object) []string {
+		trickster := rawObj.(*trickstercachev1alpha1.Trickster)
+		secretNames := sets.NewString()
+
+		if trickster.Spec.Secret != nil {
+			secretNames.Insert(trickster.Spec.Secret.Name)
+		}
+		{
+			var list trickstercachev1alpha1.BackendList
+			sel := labels.Everything()
+			if trickster.Spec.BackendSelector != nil {
+				var err error
+				sel, err = metav1.LabelSelectorAsSelector(trickster.Spec.BackendSelector)
+				if err != nil {
+					return secretNames.UnsortedList()
+				}
+			}
+			if err := r.List(context.Background(), &list, client.InNamespace(trickster.Namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
+				return secretNames.UnsortedList()
+			}
+			for _, item := range list.Items {
+				if item.Spec.Secret != nil {
+					secretNames.Insert(item.Spec.Secret.Name)
+				}
+			}
+		}
+		{
+			var list trickstercachev1alpha1.CacheList
+			sel := labels.Everything()
+			if trickster.Spec.CacheSelector != nil {
+				var err error
+				sel, err = metav1.LabelSelectorAsSelector(trickster.Spec.CacheSelector)
+				if err != nil {
+					return secretNames.UnsortedList()
+				}
+			}
+			if err := r.List(context.Background(), &list, client.InNamespace(trickster.Namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
+				return secretNames.UnsortedList()
+			}
+			for _, item := range list.Items {
+				if item.Spec.Secret != nil {
+					secretNames.Insert(item.Spec.Secret.Name)
+				}
+			}
+		}
+		{
+			var list trickstercachev1alpha1.TracingConfigList
+			sel := labels.Everything()
+			if trickster.Spec.TracingConfigSelector != nil {
+				var err error
+				sel, err = metav1.LabelSelectorAsSelector(trickster.Spec.TracingConfigSelector)
+				if err != nil {
+					return secretNames.UnsortedList()
+				}
+			}
+			if err := r.List(context.Background(), &list, client.InNamespace(trickster.Namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
+				return secretNames.UnsortedList()
+			}
+			for _, item := range list.Items {
+				if item.Spec.Secret != nil {
+					secretNames.Insert(item.Spec.Secret.Name)
+				}
+			}
+		}
+
+		return secretNames.UnsortedList()
+	}); err != nil {
+		return err
+	}
+	secretHandler := func(a client.Object) []reconcile.Request {
+		var tricksters trickstercachev1alpha1.TricksterList
+		if err := r.List(context.Background(), &tricksters, client.InNamespace(a.GetNamespace()), client.MatchingFields{tricksterSecretKey: a.GetName()}); err != nil {
+			return nil
+		}
+		var req []reconcile.Request
+		for _, o := range tricksters.Items {
+			req = append(req, reconcile.Request{NamespacedName: client.ObjectKeyFromObject(&o)})
+		}
+		return req
+	}
+
 	handlerGenerator := func(selectorGetter func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector) handler.EventHandler {
 		return handler.EnqueueRequestsFromMapFunc(func(a client.Object) []reconcile.Request {
 			var tricksters trickstercachev1alpha1.TricksterList
@@ -290,5 +386,6 @@ func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(&source.Kind{Type: &trickstercachev1alpha1.TracingConfig{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
 			return c.Spec.TracingConfigSelector
 		})).
+		Watches(&source.Kind{Type: &core.Secret{}}, handler.EnqueueRequestsFromMapFunc(secretHandler)).
 		Complete(r)
 }

@@ -17,21 +17,21 @@ limitations under the License.
 package v1alpha1
 
 import (
-	bo "github.com/trickstercache/trickster/v2/pkg/backends/options"
+	tracing "github.com/trickstercache/trickster/v2/pkg/observability/tracing/options"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// BackendSpec defines the desired state of Backend
-type BackendSpec struct {
-	bo.Options `json:",inline"`
+// TricksterTracingConfigSpec defines the desired state of TricksterTracingConfig
+type TricksterTracingConfigSpec struct {
+	tracing.Options `json:",inline"`
 	// secret information about the secret data to project
 	// +optional
 	Secret *core.SecretProjection `json:"secret,omitempty"`
 }
 
-// BackendStatus defines the observed state of Backend
-type BackendStatus struct {
+// TricksterTracingConfigStatus defines the observed state of TricksterTracingConfig
+type TricksterTracingConfigStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
@@ -39,24 +39,24 @@ type BackendStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// Backend is the Schema for the backends API
-type Backend struct {
+// TricksterTracingConfig is the Schema for the trickstertracingconfigs API
+type TricksterTracingConfig struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   BackendSpec   `json:"spec,omitempty"`
-	Status BackendStatus `json:"status,omitempty"`
+	Spec   TricksterTracingConfigSpec   `json:"spec,omitempty"`
+	Status TricksterTracingConfigStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// BackendList contains a list of Backend
-type BackendList struct {
+// TricksterTracingConfigList contains a list of TricksterTracingConfig
+type TricksterTracingConfigList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Backend `json:"items"`
+	Items           []TricksterTracingConfig `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Backend{}, &BackendList{})
+	SchemeBuilder.Register(&TricksterTracingConfig{}, &TricksterTracingConfigList{})
 }

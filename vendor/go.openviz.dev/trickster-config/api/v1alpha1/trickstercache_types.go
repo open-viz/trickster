@@ -17,21 +17,21 @@ limitations under the License.
 package v1alpha1
 
 import (
-	tracing "github.com/trickstercache/trickster/v2/pkg/observability/tracing/options"
+	cache "github.com/trickstercache/trickster/v2/pkg/cache/options"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// TracingConfigSpec defines the desired state of TracingConfig
-type TracingConfigSpec struct {
-	tracing.Options `json:",inline"`
+// TricksterCacheSpec defines the desired state of TricksterCache
+type TricksterCacheSpec struct {
+	cache.Options `json:",inline"`
 	// secret information about the secret data to project
 	// +optional
 	Secret *core.SecretProjection `json:"secret,omitempty"`
 }
 
-// TracingConfigStatus defines the observed state of TracingConfig
-type TracingConfigStatus struct {
+// TricksterCacheStatus defines the observed state of TricksterCache
+type TricksterCacheStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
@@ -39,24 +39,24 @@ type TracingConfigStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// TracingConfig is the Schema for the tracingconfigs API
-type TracingConfig struct {
+// TricksterCache is the Schema for the trickstercaches API
+type TricksterCache struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   TracingConfigSpec   `json:"spec,omitempty"`
-	Status TracingConfigStatus `json:"status,omitempty"`
+	Spec   TricksterCacheSpec   `json:"spec,omitempty"`
+	Status TricksterCacheStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// TracingConfigList contains a list of TracingConfig
-type TracingConfigList struct {
+// TricksterCacheList contains a list of TricksterCache
+type TricksterCacheList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []TracingConfig `json:"items"`
+	Items           []TricksterCache `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&TracingConfig{}, &TracingConfigList{})
+	SchemeBuilder.Register(&TricksterCache{}, &TricksterCacheList{})
 }

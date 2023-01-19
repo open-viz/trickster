@@ -21,13 +21,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// RequestRewriterSpec defines the desired state of RequestRewriter
-type RequestRewriterSpec struct {
+// TricksterRequestRewriterSpec defines the desired state of TricksterRequestRewriter
+type TricksterRequestRewriterSpec struct {
 	rwopts.Options `json:",inline"`
 }
 
-// RequestRewriterStatus defines the observed state of RequestRewriter
-type RequestRewriterStatus struct {
+// TricksterRequestRewriterStatus defines the observed state of TricksterRequestRewriter
+type TricksterRequestRewriterStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
@@ -35,24 +35,24 @@ type RequestRewriterStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// RequestRewriter is the Schema for the requestrewriters API
-type RequestRewriter struct {
+// TricksterRequestRewriter is the Schema for the tricksterrequestrewriters API
+type TricksterRequestRewriter struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   RequestRewriterSpec   `json:"spec,omitempty"`
-	Status RequestRewriterStatus `json:"status,omitempty"`
+	Spec   TricksterRequestRewriterSpec   `json:"spec,omitempty"`
+	Status TricksterRequestRewriterStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// RequestRewriterList contains a list of RequestRewriter
-type RequestRewriterList struct {
+// TricksterRequestRewriterList contains a list of TricksterRequestRewriter
+type TricksterRequestRewriterList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []RequestRewriter `json:"items"`
+	Items           []TricksterRequestRewriter `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&RequestRewriter{}, &RequestRewriterList{})
+	SchemeBuilder.Register(&TricksterRequestRewriter{}, &TricksterRequestRewriterList{})
 }

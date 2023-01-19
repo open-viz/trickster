@@ -44,7 +44,7 @@ import (
 )
 
 // TODO(tamal): Must be configurable
-const configDir = "/tmp/trickster"
+const configDir = "/etc/trickster/conf.d"
 
 // TricksterReconciler reconciles a Trickster object
 type TricksterReconciler struct {
@@ -111,7 +111,7 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		cfg.ReloadConfig = trickster.Spec.ReloadConfig
 	}
 	{
-		var list trickstercachev1alpha1.BackendList
+		var list trickstercachev1alpha1.TricksterBackendList
 		sel := labels.Everything()
 		if trickster.Spec.BackendSelector != nil {
 			var err error
@@ -137,7 +137,7 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 	}
 	{
-		var list trickstercachev1alpha1.CacheList
+		var list trickstercachev1alpha1.TricksterCacheList
 		sel := labels.Everything()
 		if trickster.Spec.CacheSelector != nil {
 			var err error
@@ -163,7 +163,7 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 	}
 	{
-		var list trickstercachev1alpha1.RequestRewriterList
+		var list trickstercachev1alpha1.TricksterRequestRewriterList
 		sel := labels.Everything()
 		if trickster.Spec.RequestRewriterSelector != nil {
 			var err error
@@ -183,7 +183,7 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 	}
 	{
-		var list trickstercachev1alpha1.RuleList
+		var list trickstercachev1alpha1.TricksterRuleList
 		sel := labels.Everything()
 		if trickster.Spec.RuleSelector != nil {
 			var err error
@@ -203,7 +203,7 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 	}
 	{
-		var list trickstercachev1alpha1.TracingConfigList
+		var list trickstercachev1alpha1.TricksterTracingConfigList
 		sel := labels.Everything()
 		if trickster.Spec.TracingConfigSelector != nil {
 			var err error
@@ -249,12 +249,15 @@ func (r *TricksterReconciler) writeConfig(ctx context.Context, ns string, sp *co
 		return err
 	}
 	for _, item := range sp.Items {
-		path := filepath.Join(configDir, item.Path)
+		path := item.Path
+		if !filepath.IsAbs(path) {
+			path = filepath.Join(configDir, path)
+		}
 		err = os.MkdirAll(filepath.Dir(path), 0755)
 		if err != nil {
 			return err
 		}
-		err = os.WriteFile(filepath.Join(configDir, item.Path), secret.Data[item.Key], 0444)
+		err = os.WriteFile(path, secret.Data[item.Key], 0444)
 		if err != nil {
 			return err
 		}
@@ -277,7 +280,7 @@ func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			secretNames.Insert(trickster.Spec.Secret.Name)
 		}
 		{
-			var list trickstercachev1alpha1.BackendList
+			var list trickstercachev1alpha1.TricksterBackendList
 			sel := labels.Everything()
 			if trickster.Spec.BackendSelector != nil {
 				var err error
@@ -296,7 +299,7 @@ func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			}
 		}
 		{
-			var list trickstercachev1alpha1.CacheList
+			var list trickstercachev1alpha1.TricksterCacheList
 			sel := labels.Everything()
 			if trickster.Spec.CacheSelector != nil {
 				var err error
@@ -315,7 +318,7 @@ func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			}
 		}
 		{
-			var list trickstercachev1alpha1.TracingConfigList
+			var list trickstercachev1alpha1.TricksterTracingConfigList
 			sel := labels.Everything()
 			if trickster.Spec.TracingConfigSelector != nil {
 				var err error
@@ -371,19 +374,19 @@ func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	}
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&trickstercachev1alpha1.Trickster{}).
-		Watches(&source.Kind{Type: &trickstercachev1alpha1.Backend{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
+		Watches(&source.Kind{Type: &trickstercachev1alpha1.TricksterBackend{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
 			return c.Spec.BackendSelector
 		})).
-		Watches(&source.Kind{Type: &trickstercachev1alpha1.Cache{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
+		Watches(&source.Kind{Type: &trickstercachev1alpha1.TricksterCache{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
 			return c.Spec.CacheSelector
 		})).
-		Watches(&source.Kind{Type: &trickstercachev1alpha1.RequestRewriter{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
+		Watches(&source.Kind{Type: &trickstercachev1alpha1.TricksterRequestRewriter{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
 			return c.Spec.RequestRewriterSelector
 		})).
-		Watches(&source.Kind{Type: &trickstercachev1alpha1.Rule{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
+		Watches(&source.Kind{Type: &trickstercachev1alpha1.TricksterRule{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
 			return c.Spec.RuleSelector
 		})).
-		Watches(&source.Kind{Type: &trickstercachev1alpha1.TracingConfig{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
+		Watches(&source.Kind{Type: &trickstercachev1alpha1.TricksterTracingConfig{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
 			return c.Spec.TracingConfigSelector
 		})).
 		Watches(&source.Kind{Type: &core.Secret{}}, handler.EnqueueRequestsFromMapFunc(secretHandler)).

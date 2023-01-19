@@ -21,13 +21,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// RuleSpec defines the desired state of Rule
-type RuleSpec struct {
+// TricksterRuleSpec defines the desired state of TricksterRule
+type TricksterRuleSpec struct {
 	rule.Options `json:",inline"`
 }
 
-// RuleStatus defines the observed state of Rule
-type RuleStatus struct {
+// TricksterRuleStatus defines the observed state of TricksterRule
+type TricksterRuleStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
@@ -35,24 +35,24 @@ type RuleStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// Rule is the Schema for the rules API
-type Rule struct {
+// TricksterRule is the Schema for the tricksterrules API
+type TricksterRule struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   RuleSpec   `json:"spec,omitempty"`
-	Status RuleStatus `json:"status,omitempty"`
+	Spec   TricksterRuleSpec   `json:"spec,omitempty"`
+	Status TricksterRuleStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// RuleList contains a list of Rule
-type RuleList struct {
+// TricksterRuleList contains a list of TricksterRule
+type TricksterRuleList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Rule `json:"items"`
+	Items           []TricksterRule `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Rule{}, &RuleList{})
+	SchemeBuilder.Register(&TricksterRule{}, &TricksterRuleList{})
 }

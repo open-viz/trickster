@@ -17,21 +17,21 @@ limitations under the License.
 package v1alpha1
 
 import (
-	cache "github.com/trickstercache/trickster/v2/pkg/cache/options"
+	bo "github.com/trickstercache/trickster/v2/pkg/backends/options"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// CacheSpec defines the desired state of Cache
-type CacheSpec struct {
-	cache.Options `json:",inline"`
+// TricksterBackendSpec defines the desired state of TricksterBackend
+type TricksterBackendSpec struct {
+	bo.Options `json:",inline"`
 	// secret information about the secret data to project
 	// +optional
 	Secret *core.SecretProjection `json:"secret,omitempty"`
 }
 
-// CacheStatus defines the observed state of Cache
-type CacheStatus struct {
+// TricksterBackendStatus defines the observed state of TricksterBackend
+type TricksterBackendStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
@@ -39,24 +39,24 @@ type CacheStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// Cache is the Schema for the caches API
-type Cache struct {
+// TricksterBackend is the Schema for the tricksterbackends API
+type TricksterBackend struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   CacheSpec   `json:"spec,omitempty"`
-	Status CacheStatus `json:"status,omitempty"`
+	Spec   TricksterBackendSpec   `json:"spec,omitempty"`
+	Status TricksterBackendStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// CacheList contains a list of Cache
-type CacheList struct {
+// TricksterBackendList contains a list of TricksterBackend
+type TricksterBackendList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Cache `json:"items"`
+	Items           []TricksterBackend `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Cache{}, &CacheList{})
+	SchemeBuilder.Register(&TricksterBackend{}, &TricksterBackendList{})
 }

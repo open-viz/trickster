@@ -308,7 +308,7 @@ go.opentelemetry.io/otel/sdk/trace/tracetest
 # go.opentelemetry.io/otel/trace v1.9.0
 ## explicit; go 1.17
 go.opentelemetry.io/otel/trace
-# go.openviz.dev/trickster-config v0.0.0-20230114122538-5000a86378ff
+# go.openviz.dev/trickster-config v0.0.0-20230119195325-b2bc47c6d5b3
 ## explicit; go 1.19
 go.openviz.dev/trickster-config/api/v1alpha1
 go.openviz.dev/trickster-config/controllers

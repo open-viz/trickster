@@ -202,8 +202,8 @@ github.com/modern-go/reflect2
 github.com/munnerz/goautoneg
 # github.com/nats-io/nats-server/v2 v2.9.11
 ## explicit; go 1.19
-# github.com/nats-io/nats.go v1.22.1
-## explicit; go 1.16
+# github.com/nats-io/nats.go v1.23.0
+## explicit; go 1.18
 github.com/nats-io/nats.go
 github.com/nats-io/nats.go/encoders/builtin
 github.com/nats-io/nats.go/util
@@ -308,7 +308,7 @@ go.opentelemetry.io/otel/sdk/trace/tracetest
 # go.opentelemetry.io/otel/trace v1.9.0
 ## explicit; go 1.17
 go.opentelemetry.io/otel/trace
-# go.openviz.dev/trickster-config v0.0.0-20230119195325-b2bc47c6d5b3
+# go.openviz.dev/trickster-config v0.0.0-20230120185601-dbae497db688
 ## explicit; go 1.19
 go.openviz.dev/trickster-config/api/v1alpha1
 go.openviz.dev/trickster-config/controllers

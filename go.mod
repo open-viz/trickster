@@ -14,7 +14,7 @@ require (
 	github.com/influxdata/influxdb v1.10.0
 	github.com/influxdata/influxql v1.1.1-0.20211004132434-7e7d61973256
 	github.com/klauspost/compress v1.15.14
-	github.com/nats-io/nats.go v1.22.1
+	github.com/nats-io/nats.go v1.23.0
 	github.com/prometheus/client_golang v1.13.0
 	github.com/tinylib/msgp v1.1.6
 	github.com/trickstercache/mockster v1.1.2
@@ -27,7 +27,7 @@ require (
 	go.opentelemetry.io/otel/exporters/zipkin v1.9.0
 	go.opentelemetry.io/otel/sdk v1.9.0
 	go.opentelemetry.io/otel/trace v1.9.0
-	go.openviz.dev/trickster-config v0.0.0-20230119195325-b2bc47c6d5b3
+	go.openviz.dev/trickster-config v0.0.0-20230120185601-dbae497db688
 	golang.org/x/net v0.5.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	k8s.io/apimachinery v0.25.3

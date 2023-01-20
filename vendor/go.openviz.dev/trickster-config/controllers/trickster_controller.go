@@ -44,7 +44,7 @@ import (
 )
 
 // TODO(tamal): Must be configurable
-const configDir = "/etc/trickster/conf.d"
+const configDir = "/etc/trickster"
 
 // TricksterReconciler reconciles a Trickster object
 type TricksterReconciler struct {
@@ -90,7 +90,7 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		cfg.Nats = trickster.Spec.Nats
 	}
 	if trickster.Spec.Secret != nil {
-		err := r.writeConfig(ctx, req.Name, trickster.Spec.Secret)
+		err := r.writeConfig(ctx, req.Namespace, trickster.Spec.Secret)
 		if err != nil {
 			return ctrl.Result{}, client.IgnoreNotFound(err)
 		}
@@ -128,7 +128,7 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 		for _, item := range list.Items {
 			if item.Spec.Secret != nil {
-				err := r.writeConfig(ctx, req.Name, item.Spec.Secret)
+				err := r.writeConfig(ctx, req.Namespace, item.Spec.Secret)
 				if err != nil {
 					return ctrl.Result{}, client.IgnoreNotFound(err)
 				}
@@ -154,7 +154,7 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 		for _, item := range list.Items {
 			if item.Spec.Secret != nil {
-				err := r.writeConfig(ctx, req.Name, item.Spec.Secret)
+				err := r.writeConfig(ctx, req.Namespace, item.Spec.Secret)
 				if err != nil {
 					return ctrl.Result{}, client.IgnoreNotFound(err)
 				}
@@ -220,7 +220,7 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 		for _, item := range list.Items {
 			if item.Spec.Secret != nil {
-				err := r.writeConfig(ctx, req.Name, item.Spec.Secret)
+				err := r.writeConfig(ctx, req.Namespace, item.Spec.Secret)
 				if err != nil {
 					return ctrl.Result{}, client.IgnoreNotFound(err)
 				}

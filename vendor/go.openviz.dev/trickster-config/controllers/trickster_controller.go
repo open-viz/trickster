@@ -123,9 +123,7 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		if err := r.List(context.Background(), &list, client.InNamespace(req.Namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
 			return ctrl.Result{}, client.IgnoreNotFound(err)
 		}
-		if cfg.Backends == nil {
-			cfg.Backends = make(map[string]*bo.Options, len(list.Items))
-		}
+		cfg.Backends = make(map[string]*bo.Options, len(list.Items))
 		for _, item := range list.Items {
 			if item.Spec.Secret != nil {
 				err := r.writeConfig(ctx, req.Namespace, item.Spec.Secret)

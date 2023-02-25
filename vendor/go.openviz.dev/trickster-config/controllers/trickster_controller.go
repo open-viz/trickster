@@ -20,7 +20,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"os"
 	"path/filepath"
 
@@ -35,6 +34,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -79,10 +79,10 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 
 	cfg := config.NewConfig()
-	//delete(cfg.Caches, "default")
-	//delete(cfg.Backends, "default")
-	//delete(cfg.NegativeCacheConfigs, "default")
-	//delete(cfg.TracingConfigs, "default")
+	// delete(cfg.Caches, "default")
+	// delete(cfg.Backends, "default")
+	// delete(cfg.NegativeCacheConfigs, "default")
+	// delete(cfg.TracingConfigs, "default")
 	if trickster.Spec.Main != nil {
 		cfg.Main = trickster.Spec.Main
 	}
@@ -251,11 +251,11 @@ func (r *TricksterReconciler) writeConfig(ctx context.Context, ns string, sp *co
 		if !filepath.IsAbs(path) {
 			path = filepath.Join(configDir, path)
 		}
-		err = os.MkdirAll(filepath.Dir(path), 0755)
+		err = os.MkdirAll(filepath.Dir(path), 0o755)
 		if err != nil {
 			return err
 		}
-		err = os.WriteFile(path, secret.Data[item.Key], 0444)
+		err = os.WriteFile(path, secret.Data[item.Key], 0o444)
 		if err != nil {
 			return err
 		}
@@ -263,9 +263,7 @@ func (r *TricksterReconciler) writeConfig(ctx context.Context, ns string, sp *co
 	return nil
 }
 
-var (
-	tricksterSecretKey = ".trickster.secret"
-)
+var tricksterSecretKey = ".trickster.secret"
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {

@@ -17,7 +17,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -28,6 +27,7 @@ import (
 
 	"github.com/trickstercache/trickster/v2/cmd/trickster/config"
 	ro "github.com/trickstercache/trickster/v2/cmd/trickster/config/reload/options"
+	"github.com/trickstercache/trickster/v2/cmd/trickster/config/validate"
 	"github.com/trickstercache/trickster/v2/pkg/backends/alb"
 	"github.com/trickstercache/trickster/v2/pkg/backends/healthcheck"
 	"github.com/trickstercache/trickster/v2/pkg/cache"
@@ -85,7 +85,7 @@ func runConfig(oldConf *config.Config, wg *sync.WaitGroup, logger *tl.Logger,
 		return nil
 	}
 
-	err = validateConfig(conf)
+	err = validate.ValidateConfig(conf)
 	if err != nil {
 		handleStartupIssue("ERROR: Could not load configuration: "+err.Error(),
 			nil, nil, errorFunc)
@@ -312,42 +312,4 @@ func handleStartupIssue(event string, detail tl.Pairs, logger *tl.Logger, errorF
 	if errorFunc != nil {
 		errorFunc()
 	}
-}
-
-func validateConfig(conf *config.Config) error {
-	for _, w := range conf.LoaderWarnings {
-		fmt.Println(w)
-	}
-
-	caches := make(map[string]cache.Cache)
-	for k := range conf.Caches {
-		caches[k] = nil
-	}
-
-	router := mux.NewRouter()
-	mr := http.NewServeMux()
-	logger := tl.ConsoleLogger(conf.Logging.LogLevel)
-
-	tracers, err := tr.RegisterAll(conf, logger, true)
-	if err != nil {
-		return err
-	}
-
-	_, err = routing.RegisterProxyRoutes(conf, router, mr, caches, tracers, logger, true)
-	if err != nil {
-		return err
-	}
-
-	if conf.Frontend.TLSListenPort < 1 && conf.Frontend.ListenPort < 1 {
-		return errors.New("no http or https listeners configured")
-	}
-
-	if conf.Frontend.ServeTLS && conf.Frontend.TLSListenPort > 0 {
-		_, err = conf.TLSCertConfig()
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

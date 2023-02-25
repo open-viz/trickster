@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/trickstercache/trickster/v2/cmd/trickster/config"
+	"github.com/trickstercache/trickster/v2/cmd/trickster/config/validate"
 	"github.com/trickstercache/trickster/v2/pkg/cache"
 	tl "github.com/trickstercache/trickster/v2/pkg/observability/logging"
 	"github.com/trickstercache/trickster/v2/pkg/observability/metrics"
@@ -176,7 +177,7 @@ func runConfig2(oldConf *config.Config, wg *sync.WaitGroup, logger *tl.Logger,
 		return nil
 	}
 
-	err = validateConfig(conf)
+	err = validate.ValidateConfig(conf)
 	if err != nil {
 		handleStartupIssue("ERROR: Could not load configuration: "+err.Error(),
 			nil, nil, errorFunc)

@@ -13,7 +13,6 @@ import (
 	tl "github.com/trickstercache/trickster/v2/pkg/observability/logging"
 	"github.com/trickstercache/trickster/v2/pkg/observability/metrics"
 	"github.com/trickstercache/trickster/v2/pkg/runtime"
-	"github.com/trickstercache/trickster/v2/pkg/util/yamlx"
 
 	trickstercachev1alpha1 "go.openviz.dev/trickster-config/api/v1alpha1"
 	"go.openviz.dev/trickster-config/controllers"
@@ -23,7 +22,6 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/yaml"
 )
 
 var (
@@ -91,21 +89,21 @@ func startKubeController(conf *config.Config, wg *sync.WaitGroup, log *tl.Logger
 				Client: mgr.GetClient(),
 				Scheme: mgr.GetScheme(),
 				Fn: func(nc *config.Config) error {
-					yml, err := yaml.Marshal(nc)
-					if err != nil {
-						return err
-					}
-					md, err := yamlx.GetKeyList(string(yml))
-					if err != nil {
-						nc.SetDefaults(yamlx.KeyLookup{})
-						return err
-					}
-					err = nc.SetDefaults(md)
-					if err != nil {
-						return err
-						// nc.Main.configFilePath = flags.ConfigPath
-						// c.Main.configLastModified = c.CheckFileLastModified()
-					}
+					//yml, err := yaml.Marshal(nc)
+					//if err != nil {
+					//	return err
+					//}
+					//md, err := yamlx.GetKeyList(string(yml))
+					//if err != nil {
+					//	nc.SetDefaults(yamlx.KeyLookup{})
+					//	return err
+					//}
+					//err = nc.SetDefaults(md)
+					//if err != nil {
+					//	return err
+					//	// nc.Main.configFilePath = flags.ConfigPath
+					//	// c.Main.configLastModified = c.CheckFileLastModified()
+					//}
 					reloadFF(nc, conf, log, wg, caches, args)
 					return nil
 				},

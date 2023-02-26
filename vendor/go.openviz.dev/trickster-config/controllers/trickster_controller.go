@@ -18,17 +18,21 @@ package controllers
 
 import (
 	"context"
-	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/trickstercache/trickster/v2/cmd/trickster/config"
+	"github.com/trickstercache/trickster/v2/cmd/trickster/config/validate"
 	bo "github.com/trickstercache/trickster/v2/pkg/backends/options"
 	rule "github.com/trickstercache/trickster/v2/pkg/backends/rule/options"
+	"github.com/trickstercache/trickster/v2/pkg/cache/negative"
 	cache "github.com/trickstercache/trickster/v2/pkg/cache/options"
 	tracing "github.com/trickstercache/trickster/v2/pkg/observability/tracing/options"
 	rwopts "github.com/trickstercache/trickster/v2/pkg/proxy/request/rewriter/options"
+	"github.com/trickstercache/trickster/v2/pkg/util/yamlx"
 	trickstercachev1alpha1 "go.openviz.dev/trickster-config/api/v1alpha1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,6 +45,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+	"sigs.k8s.io/yaml"
 )
 
 // TODO(tamal): Must be configurable
@@ -78,11 +83,7 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	cfg := config.NewConfig()
-	// delete(cfg.Caches, "default")
-	// delete(cfg.Backends, "default")
-	// delete(cfg.NegativeCacheConfigs, "default")
-	// delete(cfg.TracingConfigs, "default")
+	var cfg config.Config
 	if trickster.Spec.Main != nil {
 		cfg.Main = trickster.Spec.Main
 	}
@@ -226,18 +227,84 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 			cfg.TracingConfigs[item.Name] = &item.Spec.Options
 		}
 	}
-
-	data, err := json.MarshalIndent(cfg, "", "  ")
+	data, err := yaml.Marshal(cfg)
 	if err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
+	fmt.Println("-------------------------")
 	fmt.Println(string(data))
+	fmt.Println("-------------------------")
+	yml := string(data)
 
-	if err := r.Fn(cfg); err != nil {
+	c, err := LoadConfig(yml)
+	if err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+	data2, err := yaml.Marshal(c)
+	if err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+	fmt.Println("-------------------------")
+	fmt.Println(string(data2))
+	fmt.Println("-------------------------")
+
+	if err := r.Fn(c); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
 	return ctrl.Result{}, nil
+}
+
+func LoadConfig(yml string) (*config.Config, error) {
+	c := config.NewConfig()
+	err := yaml.Unmarshal([]byte(yml), &c)
+	if err != nil {
+		return nil, err
+	}
+	md, err := yamlx.GetKeyList(yml)
+	if err != nil {
+		c.SetDefaults(yamlx.KeyLookup{})
+		return nil, err
+	}
+	err = c.SetDefaults(md)
+	//if err == nil {
+	//	c.Main.configFilePath = flags.ConfigPath
+	//	c.Main.configLastModified = c.CheckFileLastModified()
+	//}
+
+	// set the default origin url from the flags
+	if d, ok := c.Backends["default"]; ok {
+		// If the user has configured their own backends, and one of them is not "default"
+		// then Trickster will not use the auto-created default backend
+		if d.OriginURL == "" {
+			delete(c.Backends, "default")
+		}
+	}
+
+	if len(c.Backends) == 0 {
+		return nil, errors.New("no valid backends configured")
+	}
+
+	ncl, err := negative.ConfigLookup(c.NegativeCacheConfigs).Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	err = bo.Lookup(c.Backends).Validate(ncl)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, c := range c.Caches {
+		c.Index.FlushInterval = time.Duration(c.Index.FlushIntervalMS) * time.Millisecond
+		c.Index.ReapInterval = time.Duration(c.Index.ReapIntervalMS) * time.Millisecond
+	}
+
+	err = validate.ValidateConfig(c)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 func (r *TricksterReconciler) writeConfig(ctx context.Context, ns string, sp *core.SecretProjection) error {
@@ -255,7 +322,7 @@ func (r *TricksterReconciler) writeConfig(ctx context.Context, ns string, sp *co
 		if err != nil {
 			return err
 		}
-		err = os.WriteFile(path, secret.Data[item.Key], 0o444)
+		err = os.WriteFile(path, secret.Data[item.Key], 0o644)
 		if err != nil {
 			return err
 		}

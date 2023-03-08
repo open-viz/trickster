@@ -113,19 +113,16 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 	{
 		var list trickstercachev1alpha1.TricksterBackendList
-		sel := labels.Everything()
-		if trickster.Spec.BackendSelector != nil {
-			var err error
-			sel, err = metav1.LabelSelectorAsSelector(trickster.Spec.BackendSelector)
-			if err != nil {
-				return ctrl.Result{}, client.IgnoreNotFound(err)
-			}
+		sel, err := metav1.LabelSelectorAsSelector(trickster.Spec.BackendSelector)
+		if err != nil {
+			return ctrl.Result{}, client.IgnoreNotFound(err)
 		}
 		if err := r.List(context.Background(), &list, client.InNamespace(req.Namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
 			return ctrl.Result{}, client.IgnoreNotFound(err)
 		}
 		cfg.Backends = make(map[string]*bo.Options, len(list.Items))
-		for _, item := range list.Items {
+		for i := range list.Items {
+			item := list.Items[i]
 			if item.Spec.Secret != nil {
 				err := r.writeConfig(ctx, req.Namespace, item.Spec.Secret)
 				if err != nil {
@@ -137,13 +134,9 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 	{
 		var list trickstercachev1alpha1.TricksterCacheList
-		sel := labels.Everything()
-		if trickster.Spec.CacheSelector != nil {
-			var err error
-			sel, err = metav1.LabelSelectorAsSelector(trickster.Spec.CacheSelector)
-			if err != nil {
-				return ctrl.Result{}, client.IgnoreNotFound(err)
-			}
+		sel, err := metav1.LabelSelectorAsSelector(trickster.Spec.CacheSelector)
+		if err != nil {
+			return ctrl.Result{}, client.IgnoreNotFound(err)
 		}
 		if err := r.List(context.Background(), &list, client.InNamespace(req.Namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
 			return ctrl.Result{}, client.IgnoreNotFound(err)
@@ -151,7 +144,8 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		if cfg.Caches == nil {
 			cfg.Caches = make(map[string]*cache.Options, len(list.Items))
 		}
-		for _, item := range list.Items {
+		for i := range list.Items {
+			item := list.Items[i]
 			if item.Spec.Secret != nil {
 				err := r.writeConfig(ctx, req.Namespace, item.Spec.Secret)
 				if err != nil {
@@ -163,13 +157,9 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 	{
 		var list trickstercachev1alpha1.TricksterRequestRewriterList
-		sel := labels.Everything()
-		if trickster.Spec.RequestRewriterSelector != nil {
-			var err error
-			sel, err = metav1.LabelSelectorAsSelector(trickster.Spec.RequestRewriterSelector)
-			if err != nil {
-				return ctrl.Result{}, client.IgnoreNotFound(err)
-			}
+		sel, err := metav1.LabelSelectorAsSelector(trickster.Spec.RequestRewriterSelector)
+		if err != nil {
+			return ctrl.Result{}, client.IgnoreNotFound(err)
 		}
 		if err := r.List(context.Background(), &list, client.InNamespace(req.Namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
 			return ctrl.Result{}, client.IgnoreNotFound(err)
@@ -177,19 +167,16 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		if cfg.RequestRewriters == nil {
 			cfg.RequestRewriters = make(map[string]*rwopts.Options, len(list.Items))
 		}
-		for _, item := range list.Items {
+		for i := range list.Items {
+			item := list.Items[i]
 			cfg.RequestRewriters[item.Name] = &item.Spec.Options
 		}
 	}
 	{
 		var list trickstercachev1alpha1.TricksterRuleList
-		sel := labels.Everything()
-		if trickster.Spec.RuleSelector != nil {
-			var err error
-			sel, err = metav1.LabelSelectorAsSelector(trickster.Spec.RuleSelector)
-			if err != nil {
-				return ctrl.Result{}, client.IgnoreNotFound(err)
-			}
+		sel, err := metav1.LabelSelectorAsSelector(trickster.Spec.RuleSelector)
+		if err != nil {
+			return ctrl.Result{}, client.IgnoreNotFound(err)
 		}
 		if err := r.List(context.Background(), &list, client.InNamespace(req.Namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
 			return ctrl.Result{}, client.IgnoreNotFound(err)
@@ -197,19 +184,16 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		if cfg.Rules == nil {
 			cfg.Rules = make(map[string]*rule.Options, len(list.Items))
 		}
-		for _, item := range list.Items {
+		for i := range list.Items {
+			item := list.Items[i]
 			cfg.Rules[item.Name] = &item.Spec.Options
 		}
 	}
 	{
 		var list trickstercachev1alpha1.TricksterTracingConfigList
-		sel := labels.Everything()
-		if trickster.Spec.TracingConfigSelector != nil {
-			var err error
-			sel, err = metav1.LabelSelectorAsSelector(trickster.Spec.TracingConfigSelector)
-			if err != nil {
-				return ctrl.Result{}, client.IgnoreNotFound(err)
-			}
+		sel, err := metav1.LabelSelectorAsSelector(trickster.Spec.TracingConfigSelector)
+		if err != nil {
+			return ctrl.Result{}, client.IgnoreNotFound(err)
 		}
 		if err := r.List(context.Background(), &list, client.InNamespace(req.Namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
 			return ctrl.Result{}, client.IgnoreNotFound(err)
@@ -217,7 +201,8 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		if cfg.TracingConfigs == nil {
 			cfg.TracingConfigs = make(map[string]*tracing.Options, len(list.Items))
 		}
-		for _, item := range list.Items {
+		for i := range list.Items {
+			item := list.Items[i]
 			if item.Spec.Secret != nil {
 				err := r.writeConfig(ctx, req.Namespace, item.Spec.Secret)
 				if err != nil {
@@ -231,9 +216,7 @@ func (r *TricksterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	if err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
-	fmt.Println("-------------------------")
-	fmt.Println(string(data))
-	fmt.Println("-------------------------")
+	fmt.Println(trickster.GetResourceVersion(), "================================")
 	yml := string(data)
 
 	c, err := LoadConfig(yml)
@@ -344,13 +327,9 @@ func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		}
 		{
 			var list trickstercachev1alpha1.TricksterBackendList
-			sel := labels.Everything()
-			if trickster.Spec.BackendSelector != nil {
-				var err error
-				sel, err = metav1.LabelSelectorAsSelector(trickster.Spec.BackendSelector)
-				if err != nil {
-					return secretNames.UnsortedList()
-				}
+			sel, err := metav1.LabelSelectorAsSelector(trickster.Spec.BackendSelector)
+			if err != nil {
+				return secretNames.UnsortedList()
 			}
 			if err := r.List(context.Background(), &list, client.InNamespace(trickster.Namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
 				return secretNames.UnsortedList()
@@ -363,13 +342,9 @@ func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		}
 		{
 			var list trickstercachev1alpha1.TricksterCacheList
-			sel := labels.Everything()
-			if trickster.Spec.CacheSelector != nil {
-				var err error
-				sel, err = metav1.LabelSelectorAsSelector(trickster.Spec.CacheSelector)
-				if err != nil {
-					return secretNames.UnsortedList()
-				}
+			sel, err := metav1.LabelSelectorAsSelector(trickster.Spec.CacheSelector)
+			if err != nil {
+				return secretNames.UnsortedList()
 			}
 			if err := r.List(context.Background(), &list, client.InNamespace(trickster.Namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
 				return secretNames.UnsortedList()
@@ -382,13 +357,9 @@ func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		}
 		{
 			var list trickstercachev1alpha1.TricksterTracingConfigList
-			sel := labels.Everything()
-			if trickster.Spec.TracingConfigSelector != nil {
-				var err error
-				sel, err = metav1.LabelSelectorAsSelector(trickster.Spec.TracingConfigSelector)
-				if err != nil {
-					return secretNames.UnsortedList()
-				}
+			sel, err := metav1.LabelSelectorAsSelector(trickster.Spec.TracingConfigSelector)
+			if err != nil {
+				return secretNames.UnsortedList()
 			}
 			if err := r.List(context.Background(), &list, client.InNamespace(trickster.Namespace), client.MatchingLabelsSelector{Selector: sel}); err != nil {
 				return secretNames.UnsortedList()
@@ -410,26 +381,26 @@ func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			return nil
 		}
 		var req []reconcile.Request
-		for _, o := range tricksters.Items {
-			req = append(req, reconcile.Request{NamespacedName: client.ObjectKeyFromObject(&o)})
+		for _, item := range tricksters.Items {
+			req = append(req, reconcile.Request{NamespacedName: client.ObjectKeyFromObject(&item)})
 		}
 		return req
 	}
 
-	handlerGenerator := func(selectorGetter func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector) handler.EventHandler {
+	handlerGenerator := func(getSelector func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector) handler.EventHandler {
 		return handler.EnqueueRequestsFromMapFunc(func(a client.Object) []reconcile.Request {
 			var tricksters trickstercachev1alpha1.TricksterList
 			if err := r.List(context.Background(), &tricksters, client.InNamespace(a.GetNamespace())); err != nil {
 				return nil
 			}
 			var req []reconcile.Request
-			for _, c := range tricksters.Items {
-				sel, err := metav1.LabelSelectorAsSelector(selectorGetter(&c))
+			for _, item := range tricksters.Items {
+				sel, err := metav1.LabelSelectorAsSelector(getSelector(&item))
 				if err != nil {
 					return nil
 				}
 				if sel.Matches(labels.Set(a.GetLabels())) {
-					req = append(req, reconcile.Request{NamespacedName: client.ObjectKeyFromObject(&c)})
+					req = append(req, reconcile.Request{NamespacedName: client.ObjectKeyFromObject(&item)})
 				}
 			}
 			return req

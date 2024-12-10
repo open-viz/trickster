@@ -61,14 +61,6 @@ func NewHTTPClient(o *bo.Options) (*http.Client, error) {
 			tlsConfig.KeyData = keyPEMBlock
 		}
 		if o.TLS.CertificateAuthorityPaths != nil && len(o.TLS.CertificateAuthorityPaths) > 0 {
-
-			// credit snippet to https://forfuncsake.github.io/post/2017/08/trust-extra-ca-cert-in-go-app/
-			// Get the SystemCertPool, continue with an empty pool on error
-			rootCAs, _ := x509.SystemCertPool()
-			if rootCAs == nil {
-				rootCAs = x509.NewCertPool()
-			}
-
 			var buf bytes.Buffer
 			for _, path := range o.TLS.CertificateAuthorityPaths {
 				// Read in the cert file
@@ -158,7 +150,7 @@ func NewHTTPClient(o *bo.Options) (*http.Client, error) {
 			return http.ErrUseLastResponse
 		},
 		Transport: &http.Transport{
-			Dial:                (&net.Dialer{KeepAlive: time.Duration(o.KeepAliveTimeoutMS) * time.Millisecond}).Dial,
+			DialContext:         (&net.Dialer{KeepAlive: time.Duration(o.KeepAliveTimeoutMS) * time.Millisecond}).DialContext,
 			MaxIdleConns:        o.MaxIdleConns,
 			MaxIdleConnsPerHost: o.MaxIdleConns,
 			TLSClientConfig:     TLSConfig,

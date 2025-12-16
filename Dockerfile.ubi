@@ -12,23 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM ghcr.io/appscode/dlv:1.24
-
 FROM {ARG_FROM}
 
-LABEL org.opencontainers.image.source https://ghcr.io/open-viz/trickster
+LABEL org.opencontainers.image.source="https://ghcr.io/open-viz/trickster" \
+    name="Trickster" \
+    maintainer=AppsCode \
+    vendor=AppsCode \
+    version={ARG_TAG} \
+    release={ARG_TAG} \
+    summary="Trickster is an HTTP reverse proxy/cache for http applications and a dashboard query accelerator for time series databases" \
+    description="Trickster is an HTTP reverse proxy/cache for http applications and a dashboard query accelerator for time series databases"
 
-RUN set -x \
-  && apt-get update \
-  && apt-get upgrade -y \
-  && apt-get install -y --no-install-recommends ca-certificates \
-  && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man /tmp/* \
-  && echo 'Etc/UTC' > /etc/timezone
+RUN mkdir -p /licenses
+COPY LICENSE /licenses/
 
 ADD bin/{ARG_BIN}-{ARG_OS}-{ARG_ARCH} /{ARG_BIN}
 COPY examples/conf/example.full.yaml /etc/trickster/trickster.yaml
-COPY --from=0 /usr/local/bin/dlv /bin/dlv
 
-EXPOSE 40000
+# USER nobody
 
-ENTRYPOINT ["/bin/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "exec", "/{ARG_BIN}", "--"]
+ENTRYPOINT ["/{ARG_BIN}"]

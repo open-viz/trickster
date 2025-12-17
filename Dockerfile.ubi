@@ -29,6 +29,6 @@ COPY LICENSE /licenses/
 ADD bin/{ARG_BIN}-{ARG_OS}-{ARG_ARCH} /{ARG_BIN}
 COPY examples/conf/example.full.yaml /etc/trickster/trickster.yaml
 
-# USER nobody
+USER 65534
 
 ENTRYPOINT ["/{ARG_BIN}"]

@@ -257,6 +257,12 @@ docker-manifest-%:
 	@docker manifest create -a $(IMAGE):$(VERSION_$*) $(foreach PLATFORM,$(DOCKER_PLATFORMS),$(IMAGE):$(VERSION_$*)_$(subst /,_,$(PLATFORM)))
 	@docker manifest push $(IMAGE):$(VERSION_$*)
 
+.PHONY: docker-certify-redhat
+docker-certify-redhat:
+  @preflight check container $(IMAGE):$(VERSION_UBI) \
+    --submit \
+    --certification-component-id=69423549c3532f69bf47190d
+
 .PHONY: test
 test: unit-tests e2e-tests
 

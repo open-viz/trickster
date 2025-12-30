@@ -52,6 +52,7 @@ BUILD_FLAGS ?= -a -v
 build: go-mod-tidy go-mod-vendor
 	CGO_ENABLED=$(CGO_ENABLED) $(GO) build $(LDFLAGS) $(BUILD_FLAGS) -o ./$(BUILD_SUBDIR)/trickster  $(TRICKSTER_MAIN)/*.go
 
+<<<<<<< HEAD
 rpm: build
 	mkdir -p ./$(BUILD_SUBDIR)/SOURCES
 	cp -p ./$(BUILD_SUBDIR)/trickster ./$(BUILD_SUBDIR)/SOURCES/
@@ -63,6 +64,322 @@ rpm: build
 		--define "_version $(TAGVER)" \
 		--define "_release 1" \
 		-ba deploy/packaging/trickster.spec
+=======
+SRC_PKGS := cmd pkg # directories which hold app source excluding tests (not vendored)
+SRC_DIRS := $(SRC_PKGS) # directories which hold app source (not vendored)
+
+DOCKER_PLATFORMS := linux/amd64 linux/arm64
+BIN_PLATFORMS    := $(DOCKER_PLATFORMS)
+
+# Used internally.  Users should pass GOOS and/or GOARCH.
+OS   := $(if $(GOOS),$(GOOS),$(shell go env GOOS))
+ARCH := $(if $(GOARCH),$(GOARCH),$(shell go env GOARCH))
+
+BASEIMAGE_PROD   ?= alpine
+BASEIMAGE_DBG    ?= debian:12
+BASEIMAGE_UBI    ?= registry.access.redhat.com/ubi10/ubi-minimal
+
+IMAGE            := $(REGISTRY)/$(BIN)
+VERSION_PROD     := $(VERSION)
+VERSION_DBG      := $(VERSION)-dbg
+VERSION_UBI      := $(VERSION)-ubi
+TAG              := $(VERSION)_$(OS)_$(ARCH)
+TAG_PROD         := $(TAG)
+TAG_DBG          := $(VERSION)-dbg_$(OS)_$(ARCH)
+TAG_UBI          := $(VERSION)-ubi_$(OS)_$(ARCH)
+
+GO_VERSION       ?= 1.24
+BUILD_IMAGE      ?= ghcr.io/appscode/golang-dev:$(GO_VERSION)
+CHART_TEST_IMAGE ?= quay.io/helmpack/chart-testing:v3.13.0
+
+OUTBIN = bin/$(BIN)-$(OS)-$(ARCH)
+ifeq ($(OS),windows)
+  OUTBIN := bin/$(BIN)-$(OS)-$(ARCH).exe
+  BIN := $(BIN).exe
+endif
+
+# Directories that we need created to build/test.
+BUILD_DIRS  := bin/$(OS)_$(ARCH)     \
+               .go/bin/$(OS)_$(ARCH) \
+               .go/cache             \
+               hack/config           \
+               $(HOME)/.credentials  \
+               $(HOME)/.kube         \
+               $(HOME)/.minikube
+
+DOCKERFILE_PROD  = Dockerfile.in
+DOCKERFILE_DBG   = Dockerfile.dbg
+DOCKERFILE_UBI   = Dockerfile.ubi
+
+DOCKER_REPO_ROOT := /go/src/$(GO_PKG)/$(REPO)
+
+# If you want to build all binaries, see the 'all-build' rule.
+# If you want to build all containers, see the 'all-container' rule.
+# If you want to build AND push all containers, see the 'all-push' rule.
+all: fmt build
+
+# For the following OS/ARCH expansions, we transform OS/ARCH into OS_ARCH
+# because make pattern rules don't match with embedded '/' characters.
+
+build-%:
+	@$(MAKE) build                        \
+	    --no-print-directory              \
+	    GOOS=$(firstword $(subst _, ,$*)) \
+	    GOARCH=$(lastword $(subst _, ,$*))
+
+container-%:
+	@$(MAKE) container                    \
+	    --no-print-directory              \
+	    GOOS=$(firstword $(subst _, ,$*)) \
+	    GOARCH=$(lastword $(subst _, ,$*))
+
+push-%:
+	@$(MAKE) push                         \
+	    --no-print-directory              \
+	    GOOS=$(firstword $(subst _, ,$*)) \
+	    GOARCH=$(lastword $(subst _, ,$*))
+
+all-build: $(addprefix build-, $(subst /,_, $(BIN_PLATFORMS)))
+ifeq ($(COMPRESS),yes)
+	@cd bin; \
+	sha256sum $(patsubst $(BIN)-windows-%.tar.gz,$(BIN)-windows-%.zip, $(addsuffix .tar.gz, $(addprefix $(BIN)-, $(subst /,-, $(BIN_PLATFORMS))))) > $(BIN)-checksums.txt
+endif
+
+all-container: $(addprefix container-, $(subst /,_, $(DOCKER_PLATFORMS)))
+
+all-push: $(addprefix push-, $(subst /,_, $(DOCKER_PLATFORMS)))
+
+version:
+	@echo ::set-output name=version::$(VERSION)
+	@echo ::set-output name=version_strategy::$(version_strategy)
+	@echo ::set-output name=git_tag::$(git_tag)
+	@echo ::set-output name=git_branch::$(git_branch)
+	@echo ::set-output name=commit_hash::$(commit_hash)
+	@echo ::set-output name=commit_timestamp::$(commit_timestamp)
+
+.PHONY: gen
+gen:
+	@true
+
+fmt: $(BUILD_DIRS)
+	@docker run                                                 \
+	    -i                                                      \
+	    --rm                                                    \
+	    -u $$(id -u):$$(id -g)                                  \
+	    -v $$(pwd):/src                                         \
+	    -w /src                                                 \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
+	    -v $$(pwd)/.go/cache:/.cache                            \
+	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
+	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+	    $(BUILD_IMAGE)                                          \
+	    /bin/bash -c "                                          \
+	        REPO_PKG=$(GO_PKG)                                  \
+	        ./hack/fmt.sh $(SRC_DIRS)                           \
+	    "
+
+build: $(OUTBIN)
+
+# The following structure defeats Go's (intentional) behavior to always touch
+# result files, even if they have not changed.  This will still run `go` but
+# will not trigger further work if nothing has actually changed.
+
+$(OUTBIN): .go/$(OUTBIN).stamp
+	@true
+
+# This will build the binary under ./.go and update the real binary iff needed.
+.PHONY: .go/$(OUTBIN).stamp
+.go/$(OUTBIN).stamp: $(BUILD_DIRS)
+	@echo "making $(OUTBIN)"
+	@docker run                                                 \
+	    -i                                                      \
+	    --rm                                                    \
+	    -u $$(id -u):$$(id -g)                                  \
+	    -v $$(pwd):/src                                         \
+	    -w /src                                                 \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
+	    -v $$(pwd)/.go/cache:/.cache                            \
+	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
+	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+	    $(BUILD_IMAGE)                                          \
+	    /bin/bash -c "                                          \
+	        PRODUCT_OWNER_NAME=$(PRODUCT_OWNER_NAME)            \
+	        PRODUCT_NAME=$(PRODUCT_NAME)                        \
+	        ENFORCE_LICENSE=$(ENFORCE_LICENSE)                  \
+	        ARCH=$(ARCH)                                        \
+	        OS=$(OS)                                            \
+	        VERSION=$(VERSION)                                  \
+	        version_strategy=$(version_strategy)                \
+	        git_branch=$(git_branch)                            \
+	        git_tag=$(git_tag)                                  \
+	        commit_hash=$(commit_hash)                          \
+	        commit_timestamp=$(commit_timestamp)                \
+	        ./hack/build.sh                                     \
+	    "
+	@if ! cmp -s .go/bin/$(OS)_$(ARCH)/$(BIN) $(OUTBIN); then   \
+	    mv .go/bin/$(OS)_$(ARCH)/$(BIN) $(OUTBIN);              \
+	    date >$@;                                               \
+	fi
+ifeq ($(COMPRESS),yes)
+ifeq ($(OS),windows)
+	@echo "compressing $(OUTBIN)";                               \
+	cd bin;                                                      \
+	zip -j $(subst .exe,,$(BIN))-$(OS)-$(ARCH).zip $(subst .exe,,$(BIN))-$(OS)-$(ARCH).exe ../LICENSE
+else
+	@echo "compressing $(OUTBIN)";                               \
+	cd bin;                                                      \
+	tar -czvf $(BIN)-$(OS)-$(ARCH).tar.gz $(BIN)-$(OS)-$(ARCH) ../LICENSE
+endif
+endif
+	@echo
+
+# Used to track state in hidden files.
+DOTFILE_IMAGE    = $(subst /,_,$(IMAGE))-$(TAG)
+
+container: bin/.container-$(DOTFILE_IMAGE)-PROD bin/.container-$(DOTFILE_IMAGE)-DBG bin/.container-$(DOTFILE_IMAGE)-UBI
+ifeq (,$(SRC_REG))
+bin/.container-$(DOTFILE_IMAGE)-%: bin/$(BIN)-$(OS)-$(ARCH) $(DOCKERFILE_%)
+	@echo "container: $(IMAGE):$(TAG_$*)"
+	@sed                                  \
+		-e 's|{ARG_BIN}|$(BIN)|g'           \
+		-e 's|{ARG_ARCH}|$(ARCH)|g'         \
+		-e 's|{ARG_OS}|$(OS)|g'             \
+		-e 's|{ARG_FROM}|$(BASEIMAGE_$*)|g' \
+		-e 's|{ARG_TAG}|$(TAG)|g'           \
+		$(DOCKERFILE_$*) > bin/.dockerfile-$*-$(OS)_$(ARCH)
+	@docker buildx build --platform $(OS)/$(ARCH) --load --pull -t $(IMAGE):$(TAG_$*) -f bin/.dockerfile-$*-$(OS)_$(ARCH) .
+	@docker images -q $(IMAGE):$(TAG_$*) > $@
+	@echo
+else
+bin/.container-$(DOTFILE_IMAGE)-%:
+	@echo "container: $(IMAGE):$(TAG_$*)"
+	@docker tag $(SRC_REG)/$(BIN):$(TAG_$*) $(IMAGE):$(TAG_$*)
+	@echo
+endif
+
+push: bin/.push-$(DOTFILE_IMAGE)-PROD bin/.push-$(DOTFILE_IMAGE)-DBG bin/.push-$(DOTFILE_IMAGE)-UBI
+bin/.push-$(DOTFILE_IMAGE)-%: bin/.container-$(DOTFILE_IMAGE)-%
+	@docker push $(IMAGE):$(TAG_$*)
+	@echo "pushed: $(IMAGE):$(TAG_$*)"
+	@echo
+
+.PHONY: docker-manifest
+docker-manifest: docker-manifest-PROD docker-manifest-DBG docker-manifest-UBI
+docker-manifest-%:
+	@docker manifest create -a $(IMAGE):$(VERSION_$*) $(foreach PLATFORM,$(DOCKER_PLATFORMS),$(IMAGE):$(VERSION_$*)_$(subst /,_,$(PLATFORM)))
+	@docker manifest push $(IMAGE):$(VERSION_$*)
+
+.PHONY: docker-certify-redhat
+docker-certify-redhat:
+	@preflight check container $(IMAGE):$(VERSION_UBI) \
+		--submit \
+		--certification-component-id=69423549c3532f69bf47190d
+
+.PHONY: test
+test: unit-tests e2e-tests
+
+unit-tests: $(BUILD_DIRS)
+	@docker run                                                 \
+	    -i                                                      \
+	    --rm                                                    \
+	    -u $$(id -u):$$(id -g)                                  \
+	    -v $$(pwd):/src                                         \
+	    -w /src                                                 \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
+	    -v $$(pwd)/.go/cache:/.cache                            \
+	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
+	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+	    $(BUILD_IMAGE)                                          \
+	    /bin/bash -c "                                          \
+	        ARCH=$(ARCH)                                        \
+	        OS=$(OS)                                            \
+	        VERSION=$(VERSION)                                  \
+	        ./hack/test.sh $(SRC_PKGS)                          \
+	    "
+
+# - e2e-tests can hold both ginkgo args (as GINKGO_ARGS) and program/test args (as TEST_ARGS).
+#       make e2e-tests TEST_ARGS="--selfhosted-operator=false --storageclass=standard" GINKGO_ARGS="--flakeAttempts=2"
+#
+# - Minimalist:
+#       make e2e-tests
+#
+# NB: -t is used to catch ctrl-c interrupt from keyboard and -t will be problematic for CI.
+
+GINKGO_ARGS ?=
+TEST_ARGS   ?=
+
+.PHONY: e2e-tests
+e2e-tests: $(BUILD_DIRS)
+	@docker run                                                 \
+	    -i                                                      \
+	    --rm                                                    \
+	    -u $$(id -u):$$(id -g)                                  \
+	    -v $$(pwd):/src                                         \
+	    -w /src                                                 \
+	    --net=host                                              \
+	    -v $(HOME)/.kube:/.kube                                 \
+	    -v $(HOME)/.minikube:$(HOME)/.minikube                  \
+	    -v $(HOME)/.credentials:$(HOME)/.credentials            \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
+	    -v $$(pwd)/.go/cache:/.cache                            \
+	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
+	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+	    --env KUBECONFIG=$(KUBECONFIG)                          \
+	    --env-file=$$(pwd)/hack/config/.env                     \
+	    $(BUILD_IMAGE)                                          \
+	    /bin/bash -c "                                          \
+	        ARCH=$(ARCH)                                        \
+	        OS=$(OS)                                            \
+	        VERSION=$(VERSION)                                  \
+	        DOCKER_REGISTRY=$(REGISTRY)                         \
+	        TAG=$(TAG)                                          \
+	        KUBECONFIG=$${KUBECONFIG#$(HOME)}                   \
+	        GINKGO_ARGS='$(GINKGO_ARGS)'                        \
+	        TEST_ARGS='$(TEST_ARGS)'                            \
+	        ./hack/e2e.sh                                       \
+	    "
+
+.PHONY: e2e-parallel
+e2e-parallel:
+	@$(MAKE) e2e-tests GINKGO_ARGS="-p -stream --flakeAttempts=2" --no-print-directory
+
+ADDTL_LINTERS   := goconst,gofmt,goimports,unparam
+
+.PHONY: lint
+lint: $(BUILD_DIRS)
+	@echo "running linter"
+	@docker run                                                 \
+	    -i                                                      \
+	    --rm                                                    \
+	    -u $$(id -u):$$(id -g)                                  \
+	    -v $$(pwd):/src                                         \
+	    -w /src                                                 \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
+	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
+	    -v $$(pwd)/.go/cache:/.cache                            \
+	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
+	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+	    --env GOFLAGS="-mod=vendor"                             \
+	    $(BUILD_IMAGE)                                          \
+	    golangci-lint run --enable $(ADDTL_LINTERS) --timeout=10m --skip-files="generated.*\.go$\" --skip-dirs-use-default --skip-dirs=client,vendor
+
+$(BUILD_DIRS):
+	@mkdir -p $@
+
+KUBE_NAMESPACE    ?= kubeops
+REGISTRY_SECRET   ?=
+IMAGE_PULL_POLICY	?= IfNotPresent
+
+ifeq ($(strip $(REGISTRY_SECRET)),)
+	IMAGE_PULL_SECRETS =
+else
+	IMAGE_PULL_SECRETS = --set imagePullSecrets[0].name=$(REGISTRY_SECRET)
+endif
+>>>>>>> ced7bd5c (Fix certify make target)
 
 .PHONY: install
 install:

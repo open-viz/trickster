@@ -44,7 +44,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 	"sigs.k8s.io/yaml"
 )
 
@@ -246,10 +245,12 @@ func LoadConfig(yml string) (*config.Config, error) {
 	}
 	md, err := yamlx.GetKeyList(yml)
 	if err != nil {
-		c.SetDefaults(yamlx.KeyLookup{})
 		return nil, err
 	}
 	err = c.SetDefaults(md)
+	if err != nil {
+		return nil, err
+	}
 	//if err == nil {
 	//	c.Main.configFilePath = flags.ConfigPath
 	//	c.Main.configLastModified = c.CheckFileLastModified()
@@ -375,7 +376,7 @@ func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	}); err != nil {
 		return err
 	}
-	secretHandler := func(a client.Object) []reconcile.Request {
+	secretHandler := func(_ context.Context, a client.Object) []reconcile.Request {
 		var tricksters trickstercachev1alpha1.TricksterList
 		if err := r.List(context.Background(), &tricksters, client.InNamespace(a.GetNamespace()), client.MatchingFields{tricksterSecretKey: a.GetName()}); err != nil {
 			return nil
@@ -388,7 +389,7 @@ func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	}
 
 	handlerGenerator := func(getSelector func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector) handler.EventHandler {
-		return handler.EnqueueRequestsFromMapFunc(func(a client.Object) []reconcile.Request {
+		return handler.EnqueueRequestsFromMapFunc(func(_ context.Context, a client.Object) []reconcile.Request {
 			var tricksters trickstercachev1alpha1.TricksterList
 			if err := r.List(context.Background(), &tricksters, client.InNamespace(a.GetNamespace())); err != nil {
 				return nil
@@ -408,21 +409,21 @@ func (r *TricksterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	}
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&trickstercachev1alpha1.Trickster{}).
-		Watches(&source.Kind{Type: &trickstercachev1alpha1.TricksterBackend{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
+		Watches(&trickstercachev1alpha1.TricksterBackend{}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
 			return c.Spec.BackendSelector
 		})).
-		Watches(&source.Kind{Type: &trickstercachev1alpha1.TricksterCache{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
+		Watches(&trickstercachev1alpha1.TricksterCache{}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
 			return c.Spec.CacheSelector
 		})).
-		Watches(&source.Kind{Type: &trickstercachev1alpha1.TricksterRequestRewriter{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
+		Watches(&trickstercachev1alpha1.TricksterRequestRewriter{}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
 			return c.Spec.RequestRewriterSelector
 		})).
-		Watches(&source.Kind{Type: &trickstercachev1alpha1.TricksterRule{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
+		Watches(&trickstercachev1alpha1.TricksterRule{}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
 			return c.Spec.RuleSelector
 		})).
-		Watches(&source.Kind{Type: &trickstercachev1alpha1.TricksterTracingConfig{}}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
+		Watches(&trickstercachev1alpha1.TricksterTracingConfig{}, handlerGenerator(func(c *trickstercachev1alpha1.Trickster) *metav1.LabelSelector {
 			return c.Spec.TracingConfigSelector
 		})).
-		Watches(&source.Kind{Type: &core.Secret{}}, handler.EnqueueRequestsFromMapFunc(secretHandler)).
+		Watches(&core.Secret{}, handler.EnqueueRequestsFromMapFunc(secretHandler)).
 		Complete(r)
 }

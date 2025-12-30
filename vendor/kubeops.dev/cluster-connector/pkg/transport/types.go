@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"time"
 
-	"gomodules.xyz/cert"
 	"k8s.io/client-go/transport"
 )
 
@@ -53,7 +52,7 @@ type PersistableTLSConfig struct {
 // TLSConfigFor returns a tls.Config that will provide the transport level security defined
 // by the provided Config. Will return nil if no transport level security is requested.
 func PersistableTLSConfigFor(c *transport.Config) (*PersistableTLSConfig, error) {
-	if !(c.HasCA() || c.HasCertAuth() || c.HasCertCallback() || c.TLS.Insecure || len(c.TLS.ServerName) > 0 || len(c.TLS.NextProtos) > 0) {
+	if !c.HasCA() && !c.HasCertAuth() && !c.HasCertCallback() && !c.TLS.Insecure && len(c.TLS.ServerName) <= 0 && len(c.TLS.NextProtos) <= 0 {
 		return nil, nil
 	}
 	if c.HasCA() && c.TLS.Insecure {
@@ -87,18 +86,18 @@ func PersistableTLSConfigFor(c *transport.Config) (*PersistableTLSConfig, error)
 
 		tlsConfig.CertData = c.TLS.CertData
 		tlsConfig.KeyData = c.TLS.KeyData
-	} else if c.HasCertCallback() {
-		crt, err := c.TLS.GetCert()
-		if err != nil {
-			return nil, err
-		}
-		// GetCert may return empty value, meaning no cert.
-		if crt != nil {
-			tlsConfig.CertData, tlsConfig.KeyData, err = cert.ToX509KeyPair(crt)
-			if err != nil {
-				return nil, err
-			}
-		}
+		//} else if c.HasCertCallback() {
+		//	crt, err := c.TLS.GetCert()
+		//	if err != nil {
+		//		return nil, err
+		//	}
+		//	// GetCert may return empty value, meaning no cert.
+		//	if crt != nil {
+		//		tlsConfig.CertData, tlsConfig.KeyData, err = cert.ToX509KeyPair(crt)
+		//		if err != nil {
+		//			return nil, err
+		//		}
+		//	}
 	}
 
 	return tlsConfig, nil
@@ -117,7 +116,7 @@ func (c *PersistableTLSConfig) HasCertAuth() bool {
 // TLSConfigFor returns a tls.Config that will provide the transport level security defined
 // by the provided Config. Will return nil if no transport level security is requested.
 func (c *PersistableTLSConfig) TLSConfigFor() (*tls.Config, error) {
-	if !(c.HasCA() || c.HasCertAuth() || c.Insecure || len(c.ServerName) > 0 || len(c.NextProtos) > 0) {
+	if !c.HasCA() && !c.HasCertAuth() && !c.Insecure && len(c.ServerName) <= 0 && len(c.NextProtos) <= 0 {
 		return nil, nil
 	}
 	if c.HasCA() && c.Insecure {

@@ -22,6 +22,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
 var (
@@ -62,9 +63,10 @@ func startKubeController(conf *config.Config, wg *sync.WaitGroup, log *tl.Logger
 			ctrl.SetLogger(klog.NewKlogr())
 
 			mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-				Scheme:                 scheme,
-				MetricsBindAddress:     metricsAddr,
-				Port:                   9443,
+				Scheme: scheme,
+				Metrics: metricsserver.Options{
+					BindAddress: metricsAddr,
+				},
 				HealthProbeBindAddress: probeAddr,
 				LeaderElection:         enableLeaderElection,
 				LeaderElectionID:       "95c6021a.org",

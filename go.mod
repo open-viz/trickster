@@ -1,24 +1,24 @@
 module github.com/trickstercache/trickster/v2
 
-go 1.24.0
+go 1.25
 
 require (
 	github.com/alicebob/miniredis v2.5.0+incompatible
 	github.com/andybalholm/brotli v1.0.4
 	github.com/dgraph-io/badger v1.6.2
 	github.com/go-kit/log v0.2.1
-	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-stack/stack v1.8.1
 	github.com/golang/snappy v0.0.4
 	github.com/gorilla/mux v1.8.0
 	github.com/influxdata/influxdb v1.10.0
 	github.com/influxdata/influxql v1.1.1-0.20211004132434-7e7d61973256
 	github.com/klauspost/compress v1.18.1
-	github.com/nats-io/nats.go v1.47.0
+	github.com/nats-io/nats.go v1.48.0
 	github.com/prometheus/client_golang v1.22.0
+	github.com/redis/go-redis/v9 v9.17.2
 	github.com/tinylib/msgp v1.1.6
 	github.com/trickstercache/mockster v1.1.2
-	go.bytebuilders.dev/license-verifier v0.14.10
+	go.bytebuilders.dev/license-verifier v0.15.0
 	go.etcd.io/bbolt v1.4.2
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.44.0
 	go.opentelemetry.io/otel v1.36.0
@@ -46,6 +46,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.12.2 // indirect
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect

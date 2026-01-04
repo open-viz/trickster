@@ -19,6 +19,7 @@
 package redis
 
 import (
+	"context"
 	"time"
 
 	"github.com/trickstercache/trickster/v2/pkg/cache"
@@ -28,7 +29,7 @@ import (
 	"github.com/trickstercache/trickster/v2/pkg/locks"
 	tl "github.com/trickstercache/trickster/v2/pkg/observability/logging"
 
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 // Redis is the string "redis"
@@ -91,20 +92,20 @@ func (c *Cache) Connect() error {
 		c.closer = client.Close
 		c.client = client
 	}
-	return c.client.Ping().Err()
+	return c.client.Ping(context.Background()).Err()
 }
 
 // Store places the the data into the Redis Cache using the provided Key and TTL
 func (c *Cache) Store(cacheKey string, data []byte, ttl time.Duration) error {
 	metrics.ObserveCacheOperation(c.Name, c.Config.Provider, "set", "none", float64(len(data)))
 	tl.Debug(c.Logger, "redis cache store", tl.Pairs{"key": cacheKey})
-	return c.client.Set(cacheKey, data, ttl).Err()
+	return c.client.Set(context.Background(), cacheKey, data, ttl).Err()
 }
 
 // Retrieve gets data from the Redis Cache using the provided Key
 // because Redis manages Object Expiration internally, allowExpired is not used.
 func (c *Cache) Retrieve(cacheKey string, allowExpired bool) ([]byte, status.LookupStatus, error) {
-	res, err := c.client.Get(cacheKey).Result()
+	res, err := c.client.Get(context.Background(), cacheKey).Result()
 
 	if err == nil {
 		data := []byte(res)
@@ -127,19 +128,19 @@ func (c *Cache) Retrieve(cacheKey string, allowExpired bool) ([]byte, status.Loo
 // Remove removes an object in cache, if present
 func (c *Cache) Remove(cacheKey string) {
 	tl.Debug(c.Logger, "redis cache remove", tl.Pairs{"key": cacheKey})
-	c.client.Del(cacheKey)
+	c.client.Del(context.Background(), cacheKey)
 	metrics.ObserveCacheDel(c.Name, c.Config.Provider, 0)
 }
 
 // SetTTL updates the TTL for the provided cache object
 func (c *Cache) SetTTL(cacheKey string, ttl time.Duration) {
-	c.client.Expire(cacheKey, ttl)
+	c.client.Expire(context.Background(), cacheKey, ttl)
 }
 
 // BulkRemove removes a list of objects from the cache. noLock is not used for Redis
 func (c *Cache) BulkRemove(cacheKeys []string) {
 	tl.Debug(c.Logger, "redis cache bulk remove", tl.Pairs{})
-	c.client.Del(cacheKeys...)
+	c.client.Del(context.Background(), cacheKeys...)
 	metrics.ObserveCacheDel(c.Name, c.Config.Provider, float64(len(cacheKeys)))
 }
 

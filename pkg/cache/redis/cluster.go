@@ -17,7 +17,7 @@
 package redis
 
 import (
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 func (c *Cache) clusterOpts() (*redis.ClusterOptions, error) {
@@ -66,7 +66,7 @@ func (c *Cache) clusterOpts() (*redis.ClusterOptions, error) {
 	}
 
 	if c.Config.Redis.MaxConnAgeMS != 0 {
-		o.MaxConnAge = durationFromMS(c.Config.Redis.MaxConnAgeMS)
+		o.ConnMaxLifetime = durationFromMS(c.Config.Redis.MaxConnAgeMS)
 	}
 
 	if c.Config.Redis.PoolTimeoutMS != 0 {
@@ -74,12 +74,10 @@ func (c *Cache) clusterOpts() (*redis.ClusterOptions, error) {
 	}
 
 	if c.Config.Redis.IdleTimeoutMS != 0 {
-		o.IdleTimeout = durationFromMS(c.Config.Redis.IdleTimeoutMS)
+		o.ConnMaxIdleTime = durationFromMS(c.Config.Redis.IdleTimeoutMS)
 	}
 
-	if c.Config.Redis.IdleCheckFrequencyMS != 0 {
-		o.IdleCheckFrequency = durationFromMS(c.Config.Redis.IdleCheckFrequencyMS)
-	}
+	// Note: IdleCheckFrequency was removed in go-redis/v9
 
 	return o, nil
 }

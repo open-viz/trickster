@@ -25,8 +25,7 @@ jobs:
 
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 1
-          fetch-tags: true
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@e9aba2c848f5ebd159c070c61ea2c4e2b122355e # v2.3.4
         with:
@@ -43,8 +42,7 @@ jobs:
           go-version: ${{ matrix.go }}
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 1
-          fetch-tags: true
+          fetch-depth: 0
 
       - name: Get dependencies
         run: |

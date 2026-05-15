@@ -24,8 +24,10 @@ jobs:
     steps:
 
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@e9aba2c848f5ebd159c070c61ea2c4e2b122355e # v2.3.4
         with:
           python-version: '3.x'
       - name: Install python dependencies
@@ -39,6 +41,8 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Get dependencies
         run: |
